@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const {goals} = require\\('./data/site.ts'\\); console.log\\('ok'\\)\")",
+      "Bash(mkdir -p preview)",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=500&q=60\" -o preview/1.jpg)",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=500&q=60\" -o preview/2.jpg)",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=500&q=60\" -o preview/3.jpg)",
+      "Bash(curl -s -A \"Mozilla/5.0\" \"https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=500&q=60\" -o preview/4.jpg)",
+      "Bash(curl -sf http://localhost:3000)",
+      "Bash(break)",
+      "Read(//private/tmp/**)",
+      "Bash(npx --yes playwright --version)",
+      "Read(//Users/marcussilva/Library/Caches/**)"
+    ]
+  }
+}
