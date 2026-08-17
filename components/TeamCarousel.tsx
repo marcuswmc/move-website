@@ -41,6 +41,13 @@ export function TeamCarousel({ members, eyebrow, title, body }: TeamCarouselProp
   const trackRef = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState(true);
   const [atEnd, setAtEnd] = useState(true);
+  /**
+   * Card com o resumo aberto. No mouse quem abre é o hover, mas no toque não existe
+   * hover — antes o resumo ficava permanentemente aberto no celular, tapando a foto e
+   * enchendo o card. O toque agora é o gesto que abre e fecha, e um card por vez fica
+   * aberto para a lista não virar um paredão de texto.
+   */
+  const [openCard, setOpenCard] = useState<string | null>(null);
 
   const syncEdges = useCallback(() => {
     const track = trackRef.current;
@@ -111,52 +118,84 @@ export function TeamCarousel({ members, eyebrow, title, body }: TeamCarouselProp
 
 
       {/* O trilho termina na borda do .editorial-container: o último card fica cortado
-          ali, sinalizando que a lista continua, sem desalinhar da grade da página. */}
-      <div>
+          ali, sinalizando que a lista continua, sem desalinhar da grade da página.
+
+          `min-w-0` é o que faz o carrossel existir no mobile. Item de grid nasce com
+          `min-width: auto`, então esta coluna esticava até a largura somada dos cards
+          (1148px numa tela de 393px): `scrollWidth` ficava igual a `clientWidth` e não
+          havia excedente para rolar nem arrastar. O `minmax(0,…)` do `md:` já resolvia
+          isso a partir de tablet — faltava a coluna única do mobile. */}
+      <div className="min-w-0">
         <ul
           ref={trackRef}
           tabIndex={0}
           aria-label={`Equipe da Move — ${members.length} pessoas`}
           className="hide-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-2"
         >
-          {members.map((member) => (
-            <li key={member.name} className="w-[min(74vw,17rem)] shrink-0 snap-start">
-              <article className="group relative aspect-[3/4] overflow-hidden rounded-[1.25rem] bg-move-purple/10">
-                <Image
-                  src={member.image}
-                  alt={member.imageAlt}
-                  fill
-                  sizes="(min-width: 768px) 272px, 74vw"
-                  className="object-cover grayscale transition duration-700 group-hover:scale-[1.04] group-hover:grayscale-0 group-focus-within:grayscale-0"
-                />
-                {/* Dois scrims em cruzamento de opacidade: gradiente não interpola em
-                    CSS, então o hover não poderia "escurecer" um único gradiente. */}
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-gradient-to-t from-move-purple from-0% via-move-purple/35 via-30% to-transparent to-60%"
-                />
-                <div
-                  aria-hidden
-                  className="absolute inset-0 bg-gradient-to-t from-move-purple via-move-purple/85 to-move-purple/25 opacity-0 transition-opacity duration-500 group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100"
-                />
+          {members.map((member) => {
+            /* Estado aberto e estado "abre no hover/foco" são exclusivos, escolhidos com
+               ternário em vez de empilhar `grid-rows-[0fr]` e `grid-rows-[1fr]` na mesma
+               lista de classes: entre duas utilitárias de igual especificidade quem vence
+               é a ordem no CSS gerado, não a ordem no atributo — daria sorte. */
+            const isOpen = openCard === member.name;
 
-                <div className="absolute inset-x-0 bottom-0 p-5">
-                  {/* 0fr → 1fr abre a altura real do resumo sem precisar medir nada. Em
-                      telas sem hover (touch) ele já entra aberto — não há gesto para
-                      revelar. */}
-                  {member.bio && (
-                    <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-out group-hover:grid-rows-[1fr] group-focus-within:grid-rows-[1fr] [@media(hover:none)]:grid-rows-[1fr]">
-                      <p className="overflow-hidden text-[0.8125rem] leading-relaxed text-white/85">
-                        <span className="block pb-4">{member.bio}</span>
-                      </p>
-                    </div>
-                  )}
-                  <p className="text-eyebrow font-bold uppercase text-move-yellow">{member.specialty}</p>
-                  <p className="mt-2 text-xl font-bold leading-tight text-white">{member.name}</p>
-                </div>
-              </article>
-            </li>
-          ))}
+            return (
+              <li key={member.name} className="w-[min(74vw,17rem)] shrink-0 snap-start">
+                {/* Botão, e não article: no toque o card precisa de um gesto para abrir
+                    o resumo, e virar controle real dá de brinde foco por teclado e o
+                    `aria-expanded` que anuncia o estado. */}
+                <button
+                  type="button"
+                  onClick={() => setOpenCard(isOpen ? null : member.name)}
+                  aria-expanded={member.bio ? isOpen : undefined}
+                  className="group relative block aspect-[3/4] w-full overflow-hidden rounded-[1.25rem] bg-move-purple/10 text-left"
+                >
+                  <Image
+                    src={member.image}
+                    alt={member.imageAlt}
+                    fill
+                    sizes="(min-width: 768px) 272px, 74vw"
+                    className={`object-cover transition duration-700 group-hover:scale-[1.04] group-hover:grayscale-0 group-focus-visible:grayscale-0 ${
+                      isOpen ? "grayscale-0" : "grayscale"
+                    }`}
+                  />
+                  {/* Dois scrims em cruzamento de opacidade: gradiente não interpola em
+                      CSS, então o hover não poderia "escurecer" um único gradiente. */}
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 bg-gradient-to-t from-move-purple from-0% via-move-purple/35 via-30% to-transparent to-60%"
+                  />
+                  <div
+                    aria-hidden
+                    className={`absolute inset-0 bg-gradient-to-t from-move-purple via-move-purple/85 to-move-purple/25 transition-opacity duration-500 ${
+                      isOpen
+                        ? "opacity-100"
+                        : "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
+                    }`}
+                  />
+
+                  <div className="absolute inset-x-0 bottom-0 p-5">
+                    {/* 0fr → 1fr abre a altura real do resumo sem precisar medir nada. */}
+                    {member.bio && (
+                      <div
+                        className={`grid transition-[grid-template-rows] duration-500 ease-out ${
+                          isOpen
+                            ? "grid-rows-[1fr]"
+                            : "grid-rows-[0fr] group-hover:grid-rows-[1fr] group-focus-visible:grid-rows-[1fr]"
+                        }`}
+                      >
+                        <p className="overflow-hidden text-[0.8125rem] leading-relaxed text-white/85">
+                          <span className="block pb-4">{member.bio}</span>
+                        </p>
+                      </div>
+                    )}
+                    <p className="text-eyebrow font-bold uppercase text-move-yellow">{member.specialty}</p>
+                    <p className="mt-2 text-xl font-bold leading-tight text-white">{member.name}</p>
+                  </div>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
