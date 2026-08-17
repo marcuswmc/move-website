@@ -4,6 +4,7 @@ out
 dist
 .env
 .env.local
+.env.example
 
 # Uploads da collection Media do Payload (arquivos ficam fora do git)
 /media

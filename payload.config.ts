@@ -2,6 +2,7 @@ import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import type { GenerateDescription, GenerateTitle } from "@payloadcms/plugin-seo/types";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { pt } from "@payloadcms/translations/languages/pt";
 import path from "path";
 import { buildConfig } from "payload";
@@ -93,6 +94,17 @@ export default buildConfig({
       // Move só escreve algo próprio onde o texto automático não serve.
       generateTitle,
       generateDescription,
+    }),
+    // O filesystem das functions da Vercel é efêmero e somente-leitura, então o
+    // staticDir local da Media só funciona em dev: em produção o arquivo não existe
+    // e /api/media/file/* responde 500. Os uploads vão para o Vercel Blob.
+    //
+    // Sem token o plugin se desativa **em silêncio** e volta a gravar em disco. Como
+    // dev e produção compartilham o mesmo banco, isso recria exatamente o bug: o
+    // registro existe, o arquivo não. Mantenha BLOB_READ_WRITE_TOKEN nos dois lados.
+    vercelBlobStorage({
+      collections: { media: true },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
     }),
   ],
 });

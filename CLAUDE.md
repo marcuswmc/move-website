@@ -43,7 +43,11 @@ Publications come in three types (`article`, `download`, `external`), and the ty
 
 Tones and brand icons are closed `select` fields (`fields/toneField.ts`, `fields/iconField.ts`), never free text: each value maps to classes already written in a component, so an unlisted value would render an unstyled card.
 
-`next.config.ts` allows remote images from `images.unsplash.com` and local paths (Payload serves uploads from `/api/media/file/**`). Uploaded files land in `/media`, which is gitignored.
+`next.config.ts` allows remote images from `images.unsplash.com` and local paths (Payload serves uploads from `/api/media/file/**`).
+
+Uploads go to a **public Vercel Blob store**, via `vercelBlobStorage` in `payload.config.ts`. Vercel's filesystem is ephemeral and read-only, so the local `staticDir: "media"` only ever worked in dev — in production the record existed in Mongo while the file didn't, and `/api/media/file/*` answered 500. The URLs are unchanged: the adapter keeps serving through `/api/media/file/**` and streams from the store, so nothing in the components or in the stored documents needs to know. `/media` is still gitignored and now holds only leftovers from the original seed.
+
+**`BLOB_READ_WRITE_TOKEN` is required in every environment, dev included.** Without it the plugin disables itself *silently* and falls back to writing to local disk — and since dev and production share one Atlas database, that recreates the exact bug above. The token must be the `vercel_blob_rw_<store>_<hash>` form (the adapter parses the store id out of it); the OIDC variables Vercel now injects by default, `BLOB_STORE_ID` and `VERCEL_OIDC_TOKEN`, are not enough. `pnpm migrate:media` pushes whatever is in `./media` to the store, skipping names that already exist.
 
 ### Animation stack: GSAP+Lenis for scroll choreography, Framer Motion for simple reveals
 
