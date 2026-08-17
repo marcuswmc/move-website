@@ -1,8 +1,10 @@
+// Contato fica sempre por último: o Header o separa da lista para virar o CTA da direita.
 export const navItems = [
   { label: "Início", href: "/#hero" },
-  { label: "Teoria da Mudança", href: "/#narrativa" },
+  { label: "Teoria da Mudança", href: "/teoria-da-mudanca" },
+  { label: "Publicações", href: "/publicacoes" },
   { label: "Serviços", href: "/#entregamos" },
-  { label: "Projetos", href: "/portfolio" },
+  { label: "Portfólio", href: "/portfolio" },
   { label: "Contato", href: "/contato" }
 ];
 
@@ -228,42 +230,50 @@ export const deliverables = [
   {
     number: "01",
     title: "Planejamento estratégico",
-    body: "Processos colaborativos que transformam leituras do presente em planos realistas, capazes de responder aos diferentes contextos de cada organização."
+    body: "Processos colaborativos que transformam leituras do presente em planos realistas, capazes de responder aos diferentes contextos de cada organização.",
+    icon: "/brand/icons/Group 13.svg"
   },
   {
     number: "02",
     title: "Teoria de mudança",
-    body: "Teorias sensíveis e adaptativas para reconhecer sistemas complexos, dar clareza às escolhas e orientar os impactos que se quer alcançar."
+    body: "Teorias sensíveis e adaptativas para reconhecer sistemas complexos, dar clareza às escolhas e orientar os impactos que se quer alcançar.",
+    icon: "/brand/icons/Group 12.svg"
   },
   {
     number: "03",
     title: "Avaliações",
-    body: "Abordagens de métodos mistos para compreender resultados e impactos, com rigor analítico e atenção às perguntas que importam em cada contexto."
+    body: "Abordagens de métodos mistos para compreender resultados e impactos, com rigor analítico e atenção às perguntas que importam em cada contexto.",
+    icon: "/brand/icons/Group 11.svg"
   },
   {
     number: "04",
     title: "Estudos, sistematizações e diagnósticos",
-    body: "Investigação e narrativa para organizar experiências, ampliar o debate e gerar conhecimento que apoia decisões mais consistentes."
+    body: "Investigação e narrativa para organizar experiências, ampliar o debate e gerar conhecimento que apoia decisões mais consistentes.",
+    icon: "/brand/icons/Group 4.svg"
   },
   {
     number: "05",
     title: "Facilitações",
-    body: "Espaços de diálogo franco, aprendizagem e adaptação, criados para que pessoas e organizações possam alcançar seu potencial."
+    body: "Espaços de diálogo franco, aprendizagem e adaptação, criados para que pessoas e organizações possam alcançar seu potencial.",
+    icon: "/brand/icons/Group 3.svg"
   },
   {
     number: "06",
     title: "Formações",
-    body: "Saberes do campo traduzidos em processos de aprendizagem que unem tendências, repertório prático e as questões vivas de cada equipe."
+    body: "Saberes do campo traduzidos em processos de aprendizagem que unem tendências, repertório prático e as questões vivas de cada equipe.",
+    icon: "/brand/icons/Group 2.svg"
   },
   {
     number: "07",
     title: "Publicações",
-    body: "Conteúdos que sistematizam aprendizados, ampliam o diálogo público e compartilham experiências relevantes para o campo socioambiental."
+    body: "Conteúdos que sistematizam aprendizados, ampliam o diálogo público e compartilham experiências relevantes para o campo socioambiental.",
+    icon: "/brand/icons/Group 10.svg"
   },
   {
     number: "08",
     title: "Painéis de visualização de dados",
-    body: "Painéis construídos a partir de escuta ativa e metodologias sólidas para gerar insights e apoiar decisões alinhadas a propósitos transformadores."
+    body: "Painéis construídos a partir de escuta ativa e metodologias sólidas para gerar insights e apoiar decisões alinhadas a propósitos transformadores.",
+    icon: "/brand/icons/Group 16.svg"
   }
 ];
 
@@ -302,101 +312,80 @@ export const principles = [
   }
 ];
 
-export const metrics = [
-  { value: "15", label: "anos dentro do campo" },
-  { value: "200+", label: "organizações apoiadas" },
-  { value: "23", label: "estados alcançados" },
-  { value: "6", label: "países" }
+export const hero = {
+  eyebrow: "Gestão de impacto socioambiental",
+  title: "Ampliar e qualificar o impacto socioambiental positivo.",
+  body: "Há 15 anos apoiando organizações de diferentes setores, tamanhos e temáticas a tomarem decisões com base em evidências, a planejarem e articularem-se para a solução de problemas complexos."
+};
+
+export const metrics = [{ value: "450", label: "iniciativas apoiadas" }];
+
+// Placeholder labels — swap in the official seal/logo assets when the client sends them,
+// per data/images.ts convention for provisional visuals.
+export const affiliations = [
+  { label: "Empresa B" },
+  { label: "Rede Brasileira de Monitoramento e Avaliação" },
+  { label: "Latimpacto" }
 ];
 
-export const testimonials = [
+// Os resumos vêm da seção "Quem move a Move" do site atual (move.social), que é a
+// única fonte com a trajetória de cada pessoa.
+//
+// DIVISÃO PROVISÓRIA — o site atual não separa conselho de equipe. Estes três foram
+// postos no conselho por terem o perfil mais estratégico; a Move confirma a composição
+// real e o ajuste é feito no admin (campo Grupo), sem precisar de deploy.
+export const boardMembers = [
   {
-    quote:
-      "A Move atua de forma muito colaborativa e customizada às necessidades da organização, com sensibilidade às dores e desafios de cada momento.",
-    name: "Juliana Vilhena",
-    role: "Líder de Gestão de Impacto e Inovação Socioambiental",
-    organization: "Fundo Vale",
-    initials: "JV"
+    name: "Antonio Ribeiro",
+    specialty: "Planejamento, teoria de mudança e avaliação",
+    bio: "Consultor especializado em planejamento estratégico, teoria de mudança, desenvolvimento organizacional e avaliação de iniciativas. Possui expertise em elaboração de planos estratégicos, facilitação de grupos, pesquisa e gestão de projetos. Graduado em Psicologia, Mestre em Psicologia Social e Doutorando em Estudos Culturais.",
+    image: "/team/antonio-ribeiro.webp",
+    imageAlt: "Retrato de Antonio Ribeiro"
   },
   {
-    quote: "Cada interação foi uma oportunidade de se desafiar e aprender.",
-    name: "Andreas Ufer",
-    role: "Sócio-fundador",
-    organization: "Sense-Lab",
-    initials: "AU"
+    name: "Elis Alquezar",
+    specialty: "Avaliação, saúde e garantia de direitos",
+    bio: "Consultora especializada em avaliação de projetos em saúde, assistência social e garantia de direitos. Possui ampla experiência como pesquisadora em órgãos públicos nacionais e municipais, atuando em diversas iniciativas. Graduada em Psicologia e especialista em avaliação de políticas públicas e serviços de saúde.",
+    image: "/team/elis-alquezar.webp",
+    imageAlt: "Retrato de Elis Alquezar"
   },
   {
-    quote: "O encontro com a Move trouxe escuta sensível, visão sistêmica e repertório metodológico para nos guiar nesse processo.",
-    name: "Talita Novacoski",
-    role: "Diretora de Inteligência e Tecnologia",
-    organization: "NOSSAS",
-    initials: "TN"
-  },
-  {
-    quote: "A atenção à diversidade e inclusão de vozes diferentes também enriquece o processo de avaliação.",
-    name: "Mariana Xavier",
-    role: "Gerente Sênior de Avaliação",
-    organization: "Laudes Foundation",
-    initials: "MX"
-  },
-  {
-    quote: "A Move combina alta técnica e conhecimento com uma profunda capacidade de escuta e sensibilidade.",
-    name: "Maria Helena Faller",
-    role: "Head",
-    organization: "Agente Muda e Din4mo",
-    initials: "MF"
-  },
-  {
-    quote: "A excelência técnica associada à sensibilidade se traduz em resultados fundamentais para o fortalecimento da nossa missão.",
-    name: "Natacha Costa",
-    role: "Diretora Executiva",
-    organization: "Associação Cidade Escola Aprendiz",
-    initials: "NC"
+    name: "Gabriela Brettas",
+    specialty: "Desenvolvimento organizacional e avaliação",
+    bio: "Consultora especializada em planejamento estratégico, desenvolvimento organizacional e avaliação de projetos nas áreas de assistência social e garantia de direitos. Possui experiência em facilitação de processos de desenvolvimento institucional e pesquisa em organizações sociais. Graduada em Ciências Sociais e Mestre em Gestão de Políticas Públicas.",
+    image: "/team/gabriela-brettas.webp",
+    imageAlt: "Retrato de Gabriela Brettas"
   }
 ];
 
 export const teamMembers = [
   {
-    name: "Elis Alquezar",
-    specialty: "Avaliação, saúde e garantia de direitos",
-    image: "/team/elis-alquezar.webp",
-    imageAlt: "Retrato de Elis Alquezar"
-  },
-  {
     name: "Arthur da Hora",
     specialty: "Planejamento, avaliação e inteligência de dados",
+    bio: "Consultor especializado em planejamento, avaliação e monitoramento de resultados e impactos, com ênfase em inteligência de dados. Possui experiência em consultoria, pesquisa, estratégia e gestão de pessoas em organizações civis e privadas. Bacharel em Administração e pós-graduado em Gestão de Inovação Social.",
     image: "/team/arthur-da-hora.webp",
     imageAlt: "Retrato de Arthur da Hora"
   },
   {
-    name: "Gabriela Brettas",
-    specialty: "Desenvolvimento organizacional e avaliação",
-    image: "/team/gabriela-brettas.webp",
-    imageAlt: "Retrato de Gabriela Brettas"
-  },
-  {
-    name: "Rodrigo Petrucelli",
-    specialty: "Administrativo e financeiro",
-    image: "/team/rodrigo-petrucelli.webp",
-    imageAlt: "Retrato de Rodrigo Petrucelli"
-  },
-  {
     name: "Juliana Moraes",
     specialty: "Desenvolvimento organizacional e avaliação",
+    bio: "Consultora especializada em desenvolvimento organizacional e avaliação de projetos, com ênfase nas áreas de educação e garantia de direitos. Possui experiência em processos avaliativos e planejamento em diferentes contextos. Graduada em Ciências Sociais e Mestre em Antropologia Social e Cultural.",
     image: "/team/juliana-moraes.webp",
     imageAlt: "Retrato de Juliana Moraes"
   },
   {
     name: "Igor Braz",
     specialty: "Vendas, representação e comunicação",
+    bio: "Responsável pela área de vendas, representação institucional e comunicação. Atua como mentor de profissionais em início de carreira e possui amplo conhecimento em impacto socioambiental. Bacharel em Gestão Ambiental, realizou iniciação científica com foco na formação de empreendedores sociais.",
     image: "/team/igor-braz.webp",
     imageAlt: "Retrato de Igor Braz"
   },
   {
-    name: "Antonio Ribeiro",
-    specialty: "Planejamento, teoria de mudança e avaliação",
-    image: "/team/antonio-ribeiro.webp",
-    imageAlt: "Retrato de Antonio Ribeiro"
+    name: "Rodrigo Petrucelli",
+    specialty: "Administrativo e financeiro",
+    bio: "Responsável pelo setor administrativo e financeiro. Possui experiência em gestão administrativa, contábil e financeira em empresas de diversos segmentos. Bacharel em Administração de Empresas, especialista em Gestão de Projetos no Terceiro Setor e Bacharel em Filosofia.",
+    image: "/team/rodrigo-petrucelli.webp",
+    imageAlt: "Retrato de Rodrigo Petrucelli"
   }
 ];
 
@@ -410,7 +399,7 @@ export const portfolioProjects = [
       "Uma parceria orientada pela escuta, pela articulação de atores e pela construção de estratégias que respondem à complexidade do campo.",
     image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=85",
     imageAlt: "Vista por dentro de uma floresta verde e densa",
-    tone: "green"
+    tone: "purple"
   },
   {
     number: "02",
@@ -421,7 +410,7 @@ export const portfolioProjects = [
       "Investigamos resultados, aprendizados e oportunidades para que iniciativas educacionais possam decidir com mais clareza e intenção.",
     image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=85",
     imageAlt: "Pessoa escrevendo em um quadro branco durante uma aula",
-    tone: "periwinkle"
+    tone: "light"
   },
   {
     number: "03",
@@ -432,7 +421,7 @@ export const portfolioProjects = [
       "Processos participativos que aproximam dados, territórios e pessoas para ampliar a proteção integral de crianças e adolescentes.",
     image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=85",
     imageAlt: "Retrato de uma jovem mulher negra, olhando para a câmera",
-    tone: "purple"
+    tone: "yellow"
   },
   {
     number: "04",
@@ -443,7 +432,7 @@ export const portfolioProjects = [
       "Apoiamos a leitura de mudanças socioambientais para conectar conservação, comunidades e decisões de longo prazo.",
     image: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&q=85",
     imageAlt: "Folhagens verdes iluminadas pelo sol",
-    tone: "yellow"
+    tone: "light"
   }
 ];
 
@@ -469,6 +458,29 @@ export const contactSteps = [
     number: "03",
     title: "Desenhamos o caminho juntos",
     body: "Se fizer sentido para os dois lados, propomos um formato de trabalho sob medida."
+  }
+];
+
+// PLACEHOLDER — a Move ainda vai enviar a lista real de publicações (título, capa, sinopse).
+// Substitua estas 3 entradas pelos dados reais assim que chegarem; não usar como conteúdo final.
+export const publications = [
+  {
+    id: "publicacao-01",
+    title: "Título da publicação",
+    synopsis: "Resumo de uma a duas linhas sobre o que esta publicação aborda e para quem ela é relevante.",
+    cover: { src: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&q=80", alt: "Capa provisória — substituir pela capa real da publicação" }
+  },
+  {
+    id: "publicacao-02",
+    title: "Título da publicação",
+    synopsis: "Resumo de uma a duas linhas sobre o que esta publicação aborda e para quem ela é relevante.",
+    cover: { src: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80", alt: "Capa provisória — substituir pela capa real da publicação" }
+  },
+  {
+    id: "publicacao-03",
+    title: "Título da publicação",
+    synopsis: "Resumo de uma a duas linhas sobre o que esta publicação aborda e para quem ela é relevante.",
+    cover: { src: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80", alt: "Capa provisória — substituir pela capa real da publicação" }
   }
 ];
 

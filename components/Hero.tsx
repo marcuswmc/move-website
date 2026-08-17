@@ -1,122 +1,87 @@
-import Image from "next/image";
 import Link from "next/link";
-import { images } from "@/data/images";
-import { metrics } from "@/data/site";
+import { MoveSymbol } from "@/components/MoveSymbol";
 import { Reveal } from "@/components/Reveal";
 
 type HeroProps = {
-  /** Optional real footage — plays inside the left frame when provided, falling back to the still. */
-  videoSrc?: string;
+  hero: { eyebrow: string; title: string; body: string };
+  metrics: { value: string; label: string }[];
+  affiliations: { label: string }[];
 };
 
-export function Hero({ videoSrc }: HeroProps) {
+export function Hero({ hero, metrics, affiliations }: HeroProps) {
   return (
     <section
       id="hero"
-      className="grain-overlay relative isolate flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-move-purple px-5 pb-16 pt-36 md:px-14 md:pb-20 md:pt-40"
+      className="grain-overlay relative isolate flex h-[100dvh] flex-col justify-center overflow-hidden bg-move-purple px-5 pb-8 pt-28 md:px-14 md:pb-10 md:pt-32"
     >
-      {/* Brand symbol echo — the ring + dot from the "O" mark, standing in for a background photo */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -right-32 -top-40 h-[30rem] w-[30rem] rounded-full border-[4rem] border-move-periwinkle/[0.14] md:-right-24 md:-top-48 md:h-[38rem] md:w-[38rem] md:border-[5.5rem]" />
-        <div
-          className="float-slow absolute -bottom-6 left-[10%] h-14 w-14 rounded-full bg-move-mint/25 md:h-20 md:w-20"
-          style={{ animationDelay: "-3s" }}
-        />
+      {/* Move symbol — bled 50% off the right edge, lg+ only so it never competes with the copy on small screens */}
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 -z-0 hidden items-center lg:flex">
+        <MoveSymbol className="h-[87vh] max-h-[42rem] w-auto translate-x-1/2 text-move-yellow opacity-95 xl:h-[95vh] xl:max-h-[50rem]" />
       </div>
 
-      {/* Lateral photo frames — desktop only, flank the headline like tilted Polaroids */}
-      <div className="absolute left-[3%] top-[16%] hidden w-40 -rotate-6 xl:block xl:w-48" aria-hidden>
-        <Reveal delay={0.32}>
-          <div className="float-slow" style={{ animationDelay: "-1.5s" }}>
-            <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] shadow-[0_20px_45px_rgba(0,0,0,0.35)] ring-1 ring-white/10">
-              {videoSrc ? (
-                <video
-                  className="h-full w-full object-cover"
-                  src={videoSrc}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                />
-              ) : (
-                <Image
-                  src={images.hero.src}
-                  alt={images.hero.alt}
-                  fill
-                  priority
-                  sizes="192px"
-                  className="object-cover"
-                />
-              )}
-            </div>
+      <div className="editorial-container relative z-10">
+        <div className="max-w-xl lg:max-w-3xl">
+          <Reveal>
+            <p className="mb-4 text-eyebrow font-bold uppercase text-move-yellow">{hero.eyebrow}</p>
+          </Reveal>
+
+          <Reveal delay={0.08}>
+            {/* Sem line-clamp: o título é conteúdo de CMS e cortar com reticências
+                esconderia texto que a Move escreveu. A escala abaixo foi reduzida até
+                a chamada atual caber em duas linhas; se uma futura ficar mais longa,
+                ela quebra para uma terceira linha em vez de sumir. */}
+            <h1 className="text-balance font-sans text-[clamp(2rem,1.2rem+2.3vw,3.25rem)] font-bold leading-[1.05] text-white">
+              {hero.title}
+            </h1>
+          </Reveal>
+
+          <Reveal delay={0.16}>
+            <p className="mt-5 max-w-lg text-pretty text-body-lg leading-relaxed text-white/75">{hero.body}</p>
+          </Reveal>
+
+          <Reveal delay={0.24} className="mt-7 flex flex-wrap items-center gap-5">
+            <Link
+              href="#entregamos"
+              className="rounded-full bg-move-yellow px-7 py-3.5 text-sm font-bold text-move-purple transition hover:bg-white active:scale-[0.96]"
+            >
+              Conhecer nossos serviços
+            </Link>
+            <Link
+              href="/teoria-da-mudanca"
+              className="text-sm font-bold text-white underline decoration-move-yellow decoration-2 underline-offset-4 transition-colors hover:text-move-yellow hover:decoration-white"
+            >
+              Ver teoria de mudança
+            </Link>
+          </Reveal>
+        </div>
+
+        <Reveal
+          delay={0.32}
+          className="mt-8 flex w-full max-w-3xl flex-col gap-5 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:gap-8"
+        >
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            {metrics.map((metric) => (
+              <div key={metric.label} className="flex items-baseline gap-3">
+                <span className="font-sans text-4xl font-bold tabular-nums text-white md:text-5xl">{metric.value}</span>
+                <span className="text-sm font-medium text-white/70">{metric.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div aria-hidden="true" className="hidden h-8 w-px shrink-0 bg-white/15 sm:block" />
+
+          <div className="flex flex-wrap items-center gap-3">
+            {affiliations.map((item) => (
+              <span
+                key={item.label}
+                className="rounded-soft border border-white/20 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.06em] text-white/70"
+              >
+                {item.label}
+              </span>
+            ))}
           </div>
         </Reveal>
       </div>
-
-      <div className="absolute right-[3%] top-[36%] hidden w-36 rotate-[8deg] xl:block xl:w-44" aria-hidden>
-        <Reveal delay={0.4}>
-          <div className="float-slow" style={{ animationDelay: "-6s" }}>
-            <div className="relative aspect-square w-full overflow-hidden rounded-[2rem] shadow-[0_20px_45px_rgba(0,0,0,0.35)] ring-1 ring-white/10">
-              <Image
-                src={images.heroPortrait.src}
-                alt={images.heroPortrait.alt}
-                fill
-                sizes="176px"
-                className="object-cover grayscale"
-              />
-              <div className="absolute inset-0 bg-move-periwinkle mix-blend-multiply" />
-            </div>
-          </div>
-        </Reveal>
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-4xl text-center">
-        <Reveal>
-          <p className="mb-6 text-eyebrow font-bold uppercase text-move-mint">
-            Gestão de impacto socioambiental · 15 anos de campo
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.08}>
-          <h1 className="font-serif text-display-1 font-medium text-white text-balance">
-            Ampliar o que o <em className="text-move-mint">impacto</em> pode ser.
-          </h1>
-        </Reveal>
-
-        <Reveal delay={0.16}>
-          <p className="mx-auto mt-7 max-w-xl text-pretty text-body-lg leading-relaxed text-white/75">
-            Fazemos parte do campo socioambiental. Há 15 anos ajudamos organizações a transformar
-            intenção em impacto, com rigor analítico, escuta qualificada e presença.
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.24} className="mt-9 flex flex-wrap items-center justify-center gap-5">
-          <Link
-            href="#queremos"
-            className="rounded-full bg-move-yellow px-7 py-3.5 text-sm font-bold text-move-purple transition hover:bg-white active:scale-[0.96]"
-          >
-            Conheça nossa forma de trabalhar
-          </Link>
-          <Link
-            href="/teoria-da-mudanca"
-            className="text-sm font-bold text-white underline decoration-move-yellow decoration-2 underline-offset-4 transition-colors hover:text-move-mint hover:decoration-move-mint"
-          >
-            Ver teoria de mudança
-          </Link>
-        </Reveal>
-      </div>
-
-      <Reveal
-        delay={0.32}
-        className="relative z-10 mt-16 grid w-full max-w-3xl grid-cols-2 gap-x-6 gap-y-8 border-t border-white/15 pt-8 sm:grid-cols-4"
-      >
-        {metrics.map((metric) => (
-          <div key={metric.label} className="text-center">
-            <div className="font-serif text-3xl font-medium tabular-nums text-white md:text-4xl">{metric.value}</div>
-            <p className="mt-1 text-sm font-medium text-white/70">{metric.label}</p>
-          </div>
-        ))}
-      </Reveal>
     </section>
   );
 }

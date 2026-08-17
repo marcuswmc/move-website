@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { navItems } from "@/data/site";
 import { handleHashLinkClick } from "@/components/HashScrollSync";
 
-export function Header() {
+export type NavItem = { label: string; href: string };
+
+export function Header({ navItems }: { navItems: NavItem[] }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -28,10 +29,13 @@ export function Header() {
 
   const dark = scrolled || mobileOpen || pathname === "/portfolio";
 
+  // Contato tem lugar próprio como CTA à direita, então sai da lista de links.
+  const primaryNav = navItems.filter((item) => item.href !== "/contato");
+
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        dark ? "bg-move-offwhite/85 shadow-[0_1px_0_rgba(35,3,67,0.08)] backdrop-blur-md" : "bg-transparent"
+        dark ? "bg-move-offwhite/85 shadow-[0_1px_0_rgba(84,53,93,0.08)] backdrop-blur-md" : "bg-transparent"
       }`}
     >
       {!dark && (
@@ -49,8 +53,8 @@ export function Header() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-9 md:flex">
-          {navItems.slice(0, 4).map((item) => (
+        <nav className="hidden items-center gap-7 lg:flex xl:gap-9">
+          {primaryNav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -79,7 +83,7 @@ export function Header() {
           aria-expanded={mobileOpen}
           aria-controls="mobile-nav-panel"
           aria-label={mobileOpen ? "Fechar menu" : "Abrir menu"}
-          className="relative z-10 flex h-9 w-9 items-center justify-center md:hidden"
+          className="relative z-10 flex h-9 w-9 items-center justify-center lg:hidden"
         >
           <span className="relative block h-3.5 w-5">
             <span
@@ -104,7 +108,7 @@ export function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-t border-move-purple/10 bg-move-offwhite md:hidden"
+            className="overflow-hidden border-t border-move-purple/10 bg-move-offwhite lg:hidden"
           >
             <div className="editorial-container flex flex-col gap-1 py-6">
               {navItems.map((item) => (

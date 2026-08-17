@@ -4,6 +4,9 @@ out
 dist
 .env
 .env.local
+
+# Uploads da collection Media do Payload (arquivos ficam fora do git)
+/media
 .DS_Store
 npm-debug.log*
 pnpm-debug.log*

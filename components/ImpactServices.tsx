@@ -1,59 +1,44 @@
-"use client";
-
-import { useState } from "react";
-import { deliverables } from "@/data/site";
+import Image from "next/image";
+import { Grafismo } from "@/components/Grafismo";
+import { Reveal } from "@/components/Reveal";
 import { SectionLabel } from "@/components/SectionLabel";
 
-export function ImpactServices() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const activeService = deliverables[activeIndex];
+export type ServiceCard = { number: string; title: string; body: string; icon: string };
 
+export function ImpactServices({ services }: { services: ServiceCard[] }) {
   return (
-    <section id="entregamos" className="bg-white px-5 py-24 md:px-14 md:py-32">
-      <div className="editorial-container">
-        <SectionLabel dot="yellow">O que entregamos</SectionLabel>
-        <div className="grid gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
-          <div className="lg:sticky lg:top-32 lg:self-start">
-            <p className="text-eyebrow font-bold uppercase text-move-green">Do planejamento à avaliação</p>
-            <h2 className="mt-5 max-w-xl font-sans text-display-2 font-bold leading-[0.98] tracking-[-0.035em] text-move-purple text-balance">
-              Todo o ciclo de impacto, por inteiro.
-            </h2>
-            <p className="mt-7 max-w-md text-body-lg leading-relaxed text-move-black/65">
-              Partimos do que já está em jogo para construir caminhos com intenção, rigor analítico e escuta qualificada.
-            </p>
+    <section id="entregamos" className="relative overflow-hidden bg-white px-5 py-24 md:px-14 md:py-32">
+      <Grafismo
+        src="/brand/icons/Group 13.svg"
+        animate="float"
+        className="pointer-events-none absolute -right-16 -top-16 w-48 opacity-[0.06] md:w-64"
+      />
+      <div className="editorial-container relative">
+        <Reveal>
+          <SectionLabel dot="yellow">O que entregamos</SectionLabel>
+          <h2 className="max-w-2xl font-sans text-display-3 font-bold leading-[0.98] tracking-[-0.035em] text-move-purple text-balance">
+            Do planejamento à avaliação, gestão de impacto de ponta a ponta.
+          </h2>
+          <p className="mt-6 max-w-xl text-body-lg leading-relaxed text-move-black/65">
+            Partimos do que já está em jogo para construir caminhos com intenção, rigor analítico e escuta qualificada.
+          </p>
+        </Reveal>
 
-            <div className="mt-10 hidden border-l-2 border-move-yellow pl-6 lg:block" aria-live="polite">
-              <p className="text-eyebrow font-bold uppercase text-move-green">{activeService.number} · Em foco</p>
-              <h3 className="mt-3 text-2xl font-bold leading-tight text-move-purple">{activeService.title}</h3>
-              <p className="mt-4 max-w-sm leading-relaxed text-move-black/65">{activeService.body}</p>
-            </div>
-          </div>
-
-          <ol className="border-t border-move-purple/15">
-            {deliverables.map((service, index) => {
-              const isActive = index === activeIndex;
-              return (
-                <li key={service.number} className="border-b border-move-purple/15">
-                  <button
-                    type="button"
-                    onClick={() => setActiveIndex(index)}
-                    onFocus={() => setActiveIndex(index)}
-                    aria-pressed={isActive}
-                    className={`group grid w-full grid-cols-[3rem_1fr_auto] items-center gap-3 py-5 text-left transition-[color,background-color] duration-200 sm:grid-cols-[4.5rem_1fr_auto] sm:gap-5 sm:py-6 ${
-                      isActive ? "bg-move-purple px-4 text-white sm:px-6" : "text-move-purple hover:bg-move-offwhite"
-                    }`}
-                  >
-                    <span className={`text-eyebrow font-bold ${isActive ? "text-move-yellow" : "text-move-green"}`}>{service.number}</span>
-                    <span className="text-xl font-bold leading-tight sm:text-2xl">{service.title}</span>
-                    <span className={`text-xl transition-transform duration-200 group-hover:translate-x-1 ${isActive ? "text-move-yellow" : "text-move-periwinkle"}`} aria-hidden="true">
-                      {isActive ? "−" : "↗"}
-                    </span>
-                  </button>
-                  {isActive && <p className="bg-move-purple px-4 pb-6 text-base leading-relaxed text-white/75 sm:px-6 lg:hidden">{service.body}</p>}
-                </li>
-              );
-            })}
-          </ol>
+        <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {services.map((service, index) => (
+            <Reveal key={service.number} delay={(index % 4) * 0.06}>
+              <article className="group flex h-full flex-col rounded-[1.5rem] border border-move-purple/10 bg-move-offwhite p-7 transition-[transform,box-shadow,background-color] duration-300 hover:-translate-y-1 hover:bg-white hover:shadow-editorial">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white p-2.5 shadow-[0_6px_16px_rgba(84,53,93,0.1)]">
+                    <Image src={service.icon} alt="" width={28} height={28} className="h-7 w-7" />
+                  </span>
+                  <span className="text-eyebrow font-bold text-move-purple/40">{service.number}</span>
+                </div>
+                <h3 className="mt-6 text-lg font-bold leading-tight text-move-purple">{service.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-move-black/65">{service.body}</p>
+              </article>
+            </Reveal>
+          ))}
         </div>
       </div>
     </section>

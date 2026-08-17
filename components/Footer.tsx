@@ -3,15 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { contact, navItems } from "@/data/site";
 import { FlowerGraphic } from "@/components/FlowerGraphic";
 import { handleHashLinkClick } from "@/components/HashScrollSync";
+import type { NavItem } from "@/components/Header";
 
-export function Footer() {
+type FooterProps = {
+  navItems: NavItem[];
+  contact: { email: string; phone: string; address: string };
+};
+
+export function Footer({ navItems, contact }: FooterProps) {
   const pathname = usePathname();
 
   return (
-    <footer className="relative overflow-hidden bg-move-black px-5 py-14 text-white md:px-14">
+    <footer className="relative overflow-hidden bg-move-purple px-5 py-14 text-white md:px-14">
       <FlowerGraphic className="pointer-events-none absolute -bottom-16 -right-16 w-64 opacity-[0.06] md:w-80" />
 
       <div className="relative mx-auto grid max-w-[1340px] gap-10 border-t border-white/15 pt-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
@@ -26,7 +31,7 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="mb-5 text-eyebrow font-bold uppercase text-move-mint">Navegação</p>
+          <p className="mb-5 text-eyebrow font-bold uppercase text-move-yellow">Navegação</p>
           <div className="flex flex-col gap-3 text-white/65">
             {navItems.map((item) => (
               <Link
@@ -43,7 +48,7 @@ export function Footer() {
         </div>
 
         <div>
-          <p className="mb-5 text-eyebrow font-bold uppercase text-move-mint">Contato</p>
+          <p className="mb-5 text-eyebrow font-bold uppercase text-move-yellow">Contato</p>
           <div className="flex flex-col gap-3 text-white/65">
             <a href={`mailto:${contact.email}`} className="w-fit transition hover:text-white">
               {contact.email}

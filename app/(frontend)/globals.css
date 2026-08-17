@@ -1,0 +1,292 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f2f2f2;
+  --foreground: #000000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto;
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-raleway), Raleway, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #faca77;
+  color: #54355d;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid #faca77;
+  outline-offset: 3px;
+}
+
+.editorial-container {
+  width: min(100% - 40px, 1340px);
+  margin-inline: auto;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Carrosséis horizontais que já têm setas próprias (components/TeamCarousel.tsx): a
+   barra nativa duplicaria o controle e cortaria a base dos cards. O trilho continua
+   navegável por arrasto, roda e teclado. */
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Corpo de texto longo vindo do editor do Payload (components/RichText.tsx).
+   Os elementos chegam sem classe — o editor entrega HTML semântico puro —, então a
+   tipografia é aplicada por seletor de descendente. A medida de ~68ch mantém a linha
+   num comprimento confortável de leitura, independente da largura do contêiner. */
+.editorial-prose {
+  max-width: 68ch;
+  color: rgba(0, 0, 0, 0.78);
+  font-size: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem);
+  line-height: 1.7;
+}
+
+.editorial-prose > * + * {
+  margin-top: 1.35em;
+}
+
+.editorial-prose h2,
+.editorial-prose h3,
+.editorial-prose h4 {
+  color: #54355d;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.editorial-prose h2 {
+  margin-top: 2.2em;
+  font-size: 1.6em;
+}
+
+.editorial-prose h3 {
+  margin-top: 1.9em;
+  font-size: 1.28em;
+}
+
+.editorial-prose h4 {
+  margin-top: 1.7em;
+  font-size: 1.1em;
+}
+
+.editorial-prose strong {
+  color: #000;
+  font-weight: 700;
+}
+
+.editorial-prose a {
+  color: #54355d;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #faca77;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.editorial-prose a:hover {
+  text-decoration-color: #54355d;
+}
+
+.editorial-prose ul,
+.editorial-prose ol {
+  padding-left: 1.3em;
+}
+
+.editorial-prose ul {
+  list-style: disc;
+}
+
+.editorial-prose ol {
+  list-style: decimal;
+}
+
+.editorial-prose li + li {
+  margin-top: 0.5em;
+}
+
+.editorial-prose li::marker {
+  color: rgba(84, 53, 93, 0.55);
+}
+
+.editorial-prose blockquote {
+  border-left: 3px solid #faca77;
+  padding-left: 1.15em;
+  color: #54355d;
+  font-size: 1.1em;
+  line-height: 1.55;
+}
+
+.editorial-prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.editorial-prose hr {
+  border: 0;
+  border-top: 1px solid rgba(84, 53, 93, 0.15);
+  margin-block: 2.4em;
+}
+
+.flower-spin {
+  animation: flowerSpin 32s linear infinite;
+}
+
+.float-slow {
+  animation: floatSlow 9s ease-in-out infinite;
+}
+
+.mask-line {
+  display: block;
+  overflow: hidden;
+}
+
+.grid-paper {
+  background-image:
+    linear-gradient(rgba(84, 53, 93, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(84, 53, 93, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.portfolio-stack {
+  padding-bottom: 4rem;
+}
+
+.portfolio-stack-card {
+  box-shadow: 0 -1px 0 rgba(84, 53, 93, 0.12), 0 14px 30px rgba(84, 53, 93, 0.12);
+}
+
+.portfolio-stack-card + .portfolio-stack-card {
+  margin-top: 8rem;
+}
+
+.logo-loop {
+  mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+}
+
+.logo-loop-track {
+  animation: logoLoop 36s linear infinite;
+}
+
+.logo-loop:hover .logo-loop-track {
+  animation-play-state: paused;
+}
+
+@keyframes logoLoop {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 767px) {
+  .portfolio-stack {
+    padding-bottom: 2.5rem;
+  }
+
+  .portfolio-stack-card {
+    position: relative;
+    top: auto !important;
+  }
+
+  .portfolio-stack-card + .portfolio-stack-card {
+    margin-top: 1.25rem;
+  }
+
+  .logo-loop {
+    mask-image: none;
+  }
+}
+
+/* Subtle grain overlay — breaks up flat dark surfaces without a bitmap asset */
+.grain-overlay {
+  position: relative;
+  isolation: isolate;
+}
+
+.grain-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Ken Burns — slow ambient zoom for background photography */
+.ken-burns {
+  animation: kenBurns 18s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes flowerSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}

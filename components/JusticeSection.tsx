@@ -47,16 +47,16 @@ export function JusticeSection() {
     <section
       ref={sectionRef}
       id="queremos"
-      className="overflow-hidden bg-move-green px-5 py-24 text-white md:px-14 md:py-32"
+      className="overflow-hidden bg-move-purple px-5 py-24 text-white md:px-14 md:py-32"
     >
       <div className="editorial-container grid gap-14 md:grid-cols-[1.05fr_0.95fr] md:items-center">
         <div>
           <Reveal>
-            <SectionLabel dot="mint" light>
+            <SectionLabel dot="yellow" light>
               O que queremos
             </SectionLabel>
           </Reveal>
-          <h2 ref={headingRef} className="font-serif text-display-2 font-medium leading-[1.05]">
+          <h2 ref={headingRef} className="font-sans text-display-2 font-medium leading-[1.05]">
             Justiça social <br />e climática.
           </h2>
           <Reveal delay={0.15}>

@@ -9,7 +9,7 @@ export function FlowerGraphic({ className = "" }: FlowerGraphicProps) {
     <svg className={className} viewBox="0 0 220 220" aria-hidden="true">
       <g className="flower-spin" style={{ transformOrigin: "110px 110px" }}>
         {petals.map((_, index) => {
-          const color = index % 3 === 0 ? "#004A3D" : index % 3 === 1 ? "#A2DAA8" : "#6268D9";
+          const color = index % 2 === 0 ? "#54355D" : "#FACA77";
           return (
             <ellipse
               key={index}
@@ -24,7 +24,7 @@ export function FlowerGraphic({ className = "" }: FlowerGraphicProps) {
           );
         })}
       </g>
-      <circle cx="110" cy="110" r="34" fill="#F8E44B" />
+      <circle cx="110" cy="110" r="34" fill="#FACA77" />
     </svg>
   );
 }

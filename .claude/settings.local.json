@@ -12,7 +12,9 @@
       "Bash(break)",
       "Read(//private/tmp/**)",
       "Bash(npx --yes playwright --version)",
-      "Read(//Users/marcussilva/Library/Caches/**)"
+      "Read(//Users/marcussilva/Library/Caches/**)",
+      "Bash(claude mcp *)",
+      "WebFetch(domain:payloadcms.com)"
     ]
   }
 }
