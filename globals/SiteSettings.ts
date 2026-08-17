@@ -45,6 +45,24 @@ export const SiteSettings: GlobalConfig = {
       ],
     },
     {
+      name: "social",
+      type: "group",
+      label: "Redes sociais",
+      admin: {
+        description:
+          "Aparecem como ícones no header. Um campo vazio simplesmente não renderiza o ícone — nunca vira link quebrado.",
+      },
+      fields: [
+        {
+          type: "row",
+          fields: [
+            { name: "instagram", type: "text", label: "Instagram (URL)" },
+            { name: "linkedin", type: "text", label: "LinkedIn (URL)" },
+          ],
+        },
+      ],
+    },
+    {
       name: "metrics",
       type: "array",
       label: "Números",

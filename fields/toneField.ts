@@ -32,14 +32,3 @@ export const showcaseToneField = (): SelectField =>
       { label: "Ipê (amarelo, texto roxo)", value: "yellow" },
     ],
   });
-
-/** Tons suportados pelos cards de camada da Teoria da Mudança. */
-export const goalToneField = (): SelectField =>
-  toneField({
-    defaultValue: "light",
-    options: [
-      { label: "Açaí (roxo, texto claro)", value: "purple" },
-      { label: "Preto (texto claro)", value: "black" },
-      { label: "Off White (texto roxo)", value: "light" },
-    ],
-  });

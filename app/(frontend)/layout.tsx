@@ -34,14 +34,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { navItems, contact } = await getSiteSettings();
+  const { navItems, contact, social } = await getSiteSettings();
 
   return (
     <html lang="pt-BR">
       <body className={`${raleway.variable} ${fraunces.variable} antialiased`} suppressHydrationWarning>
         <SmoothScroll />
         <HashScrollSync />
-        <Header navItems={navItems} />
+        <Header navItems={navItems} social={social} />
         {children}
         <Footer navItems={navItems} contact={contact} />
       </body>

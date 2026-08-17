@@ -161,6 +161,21 @@ a {
   margin-block: 2.4em;
 }
 
+/* Pontos da lista de entregas (components/TheoryDeliverables.tsx). A classe é alternada
+   por ScrollTrigger, que só sabe ligar/desligar um nome de classe — daí o estado morar
+   aqui em vez de numa classe utilitária do Tailwind. */
+.theory-dot {
+  background-color: rgba(84, 53, 93, 0.22);
+  transition:
+    background-color 0.4s ease,
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theory-dot.is-on {
+  background-color: #54355d;
+  transform: scale(1.55);
+}
+
 .flower-spin {
   animation: flowerSpin 32s linear infinite;
 }

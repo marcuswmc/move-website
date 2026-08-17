@@ -5,10 +5,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { handleHashLinkClick } from "@/components/HashScrollSync";
+import { InstagramIcon, LinkedInIcon } from "@/components/SocialIcons";
 
 export type NavItem = { label: string; href: string };
+export type SocialLink = { name: "Instagram" | "LinkedIn"; href: string };
 
-export function Header({ navItems }: { navItems: NavItem[] }) {
+/** O conjunto fechado espelha o de `SocialLink` — uma rede nova entra nos dois lugares. */
+const SOCIAL_ICONS = {
+  Instagram: InstagramIcon,
+  LinkedIn: LinkedInIcon,
+} as const;
+
+export function Header({ navItems, social = [] }: { navItems: NavItem[]; social?: SocialLink[] }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -67,6 +75,39 @@ export function Header({ navItems }: { navItems: NavItem[] }) {
               {item.label}
             </Link>
           ))}
+          {social.length > 0 && (
+            <>
+              {/* Filete separando navegação de redes: sem ele os ícones leem como mais
+                  um item do menu, e não como um bloco à parte. Irmão direto do nav, e
+                  não interno ao grupo, para receber o mesmo respiro dos dois lados. */}
+              <span
+                aria-hidden="true"
+                className={`h-4 w-px ${dark ? "bg-move-purple/20" : "bg-white/25"}`}
+              />
+              <div className="-mx-2 flex items-center gap-1">
+                {social.map((item) => {
+                  const Icon = SOCIAL_ICONS[item.name];
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Move Social no ${item.name}`}
+                      className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+                        dark
+                          ? "text-move-black/70 hover:bg-move-purple/[0.07] hover:text-move-purple"
+                          : "text-white/85 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <Icon size={18} />
+                    </a>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
           <Link
             href="/contato"
             className={`rounded-full px-5 py-2.5 text-sm font-bold transition-colors ${
@@ -125,6 +166,26 @@ export function Header({ navItems }: { navItems: NavItem[] }) {
                   {item.label}
                 </Link>
               ))}
+
+              {social.length > 0 && (
+                <div className="mt-4 flex items-center gap-2 border-t border-move-purple/10 pt-5">
+                  {social.map((item) => {
+                    const Icon = SOCIAL_ICONS[item.name];
+                    return (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Move Social no ${item.name}`}
+                        className="flex h-11 w-11 items-center justify-center rounded-full border border-move-purple/15 text-move-purple transition-colors hover:bg-move-purple hover:text-white"
+                      >
+                        <Icon size={19} />
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </motion.nav>
         )}

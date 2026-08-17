@@ -43,6 +43,15 @@ export const getSiteSettings = cache(async () => {
   return {
     navItems: (settings.nav ?? []).map((item) => ({ label: item.label, href: item.href })),
     contact: settings.contact,
+    /**
+     * Só as redes de fato preenchidas. Montar a lista aqui — em vez de mandar o grupo
+     * cru para o header — deixa o componente apenas iterar: sem link cadastrado, não
+     * existe item, então nunca há ícone apontando para lugar nenhum.
+     */
+    social: [
+      { name: "Instagram" as const, href: settings.social?.instagram },
+      { name: "LinkedIn" as const, href: settings.social?.linkedin },
+    ].filter((item): item is { name: "Instagram" | "LinkedIn"; href: string } => Boolean(item.href?.trim())),
     metrics: (settings.metrics ?? []).map((metric) => ({ value: metric.value, label: metric.label })),
   };
 });
@@ -473,18 +482,36 @@ export const getTheoryOfChange = cache(async () => {
 
   return {
     meta: theory.meta,
-    goals: (theory.goals ?? []).map((goal, index) => {
-      const image = resolveImage(goal.image) ?? IMAGE_FALLBACK;
-      return {
-        number: displayNumber(index),
-        eyebrow: goal.eyebrow,
-        title: goal.title,
-        body: goal.body,
-        image: image.src,
-        imageAlt: image.alt,
-        tone: goal.tone,
-      };
-    }),
+    hero: theory.hero,
+    frontsIntro: theory.frontsIntro,
+    fronts: (theory.fronts ?? []).map((front, index) => ({
+      number: displayNumber(index),
+      label: front.label,
+      description: front.description,
+    })),
+    activitiesIntro: theory.activitiesIntro,
+    audiencesIntro: theory.audiencesIntro,
+    /**
+     * Guardadas do centro para fora, como no diagrama oficial. O componente dos anéis
+     * é quem inverte para desenhar — o anel externo precisa ser pintado primeiro.
+     */
+    audiences: (theory.audiences ?? []).map((audience, index) => ({
+      number: displayNumber(index),
+      label: audience.label,
+      summary: audience.summary,
+      description: audience.description,
+    })),
+    deliverablesIntro: theory.deliverablesIntro,
+    deliverables: (theory.deliverables ?? []).map((item, index) => ({
+      number: displayNumber(index),
+      label: item.label,
+    })),
+    outcomesIntro: theory.outcomesIntro,
+    outcomes: (theory.outcomes ?? []).map((item, index) => ({
+      number: displayNumber(index),
+      label: item.label,
+    })),
+    impact: theory.impact,
     pdf: {
       label: theory.pdf?.label ?? "",
       // O upload vence o caminho manual, mesma regra do resolveImage.

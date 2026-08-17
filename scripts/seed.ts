@@ -27,7 +27,6 @@ import {
   contactSteps,
   contracted,
   deliverables,
-  goals,
   hero,
   metrics,
   navItems,
@@ -36,7 +35,9 @@ import {
   principles,
   publications,
   received,
+  social,
   teamMembers,
+  theoryOfChange,
   theoryPdf,
 } from "../data/site";
 import { images } from "../data/images";
@@ -89,20 +90,6 @@ const partners = [
   { name: "Instituto Alana", file: "instituto-alana.webp", caseId: "instituto-alana" },
   { name: "Escolas Criativas", file: "escolas-criativas.webp", caseId: "escolas-criativas" },
 ];
-
-/**
- * A paleta foi reduzida às cores base + principais (docs/brand-guide-cores.md), e
- * `move-green`/`move-periwinkle` deixaram de existir no tailwind.config.ts. A página
- * da Teoria da Mudança já renderiza esses dois tons como card claro — o mapa abaixo
- * só torna isso explícito no CMS, sem mudar nada visualmente.
- */
-const GOAL_TONE_MAP: Record<string, "purple" | "black" | "light"> = {
-  purple: "purple",
-  black: "black",
-  light: "light",
-  green: "light",
-  periwinkle: "light",
-};
 
 const payload = await getPayload({ config });
 
@@ -345,6 +332,10 @@ await withRetry("global site-settings", () =>
         phone: contact.phone,
         address: contact.address,
       },
+      social: {
+        instagram: social.instagram,
+        linkedin: social.linkedin,
+      },
       metrics: metrics.map((metric) => ({ value: metric.value, label: metric.label })),
     },
   }),
@@ -402,13 +393,17 @@ await withRetry("global theory-of-change", () =>
   payload.updateGlobal({
     slug: "theory-of-change",
     data: {
-      goals: goals.map((goal) => ({
-        eyebrow: goal.eyebrow,
-        title: goal.title,
-        body: goal.body,
-        image: externalImage(goal.image, goal.imageAlt),
-        tone: GOAL_TONE_MAP[goal.tone] ?? "light",
-      })),
+      hero: theoryOfChange.hero,
+      frontsIntro: theoryOfChange.fronts.intro,
+      fronts: theoryOfChange.fronts.items,
+      activitiesIntro: theoryOfChange.activitiesIntro,
+      audiencesIntro: theoryOfChange.audiences.intro,
+      audiences: theoryOfChange.audiences.items,
+      deliverablesIntro: theoryOfChange.deliverables.intro,
+      deliverables: theoryOfChange.deliverables.items.map((label) => ({ label })),
+      outcomesIntro: theoryOfChange.outcomes.intro,
+      outcomes: theoryOfChange.outcomes.items.map((label) => ({ label })),
+      impact: theoryOfChange.impact,
       pdf: {
         label: theoryPdf.label,
         href: theoryPdf.href,

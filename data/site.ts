@@ -172,59 +172,134 @@ export const portfolioCases: PortfolioCase[] = [
   }
 ];
 
-export const goals = [
-  {
-    number: "01",
-    kind: "intro",
-    eyebrow: "Teoria da mudança",
-    title: "A mudança acontece em camadas.",
-    body: "Da pessoa ao campo socioambiental, cada camada sustenta a próxima — é assim que a Move enxerga impacto de verdade.",
-    tone: "purple",
-    image: "https://images.unsplash.com/photo-1560439514-4e9645039924?auto=format&fit=crop&q=80",
-    imageAlt: "Grande público reunido em um evento, vista de cima",
+/**
+ * Teoria de Mudança oficial da Move, transcrita do documento TdM_MoveSocial_2025.pdf.
+ *
+ * Os itens de `deliverables`, `outcomes` e `impact` são o texto literal do documento —
+ * não reescreva sem conferir o PDF. As aberturas de seção (`intro`) e as descrições das
+ * frentes e dos públicos foram redigidas para a web: o documento só nomeia essas partes,
+ * sem texto corrido. Tudo isso é editável em /admin › Páginas › Teoria da Mudança.
+ */
+export const theoryOfChange = {
+  hero: {
+    eyebrow: "Nossa Teoria de Mudança",
+    title: "O porquê e o como do nosso trabalho.",
+    description:
+      "A nossa Teoria de Mudança descreve o porquê e como trabalhamos para realizar nossa missão: uma cadeia de seis elos, das frentes que nos sustentam até a justiça social e climática que queremos ver.",
   },
-  {
-    number: "02",
-    kind: "objective",
-    eyebrow: "Camada 01/03 · Campo",
-    title: "Um campo mais articulado e mais justo.",
-    body: "Conhecimento situado para responder a problemas complexos, com gênero e relações étnico-raciais como lente de decisão — não como camada posterior.",
-    tone: "green",
-    image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80",
-    imageAlt: "Retrato de uma jovem mulher negra, olhando para a câmera",
+
+  fronts: {
+    intro: {
+      eyebrow: "Como atuamos",
+      title: "Quatro frentes que se cruzam em cada projeto.",
+      description:
+        "Consultoria, formação, articulação e produção de conhecimento não são serviços separados: são modos de atuação que se sobrepõem. É no encontro entre eles que o trabalho acontece.",
+    },
+    items: [
+      {
+        label: "Consultoria",
+        description:
+          "Acompanhamos organizações no desenho e na revisão das suas estratégias, com processos colaborativos que respeitam o contexto e o momento de cada uma.",
+      },
+      {
+        label: "Formação",
+        description:
+          "Traduzimos o que aprendemos em campo em oficinas, formações e mentorias que ampliam o repertório de quem conduz as iniciativas.",
+      },
+      {
+        label: "Articulação",
+        description:
+          "Aproximamos organizações, iniciativas e pessoas do campo socioambiental, porque problemas complexos não se resolvem isoladamente.",
+      },
+      {
+        label: "Produção de conhecimento",
+        description:
+          "Sistematizamos experiências e produzimos evidências que ficam disponíveis para o campo inteiro, não apenas para quem nos contrata.",
+      },
+    ],
   },
-  {
-    number: "03",
-    kind: "objective",
-    eyebrow: "Camada 02/03 · Organizações",
-    title: "Organizações mais intencionais e eficazes.",
-    body: "Iniciativas que se reconhecem no que fazem, medem o que importa e ganham clareza sobre por que cada escolha conta no ciclo de impacto.",
-    tone: "periwinkle",
-    image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80",
-    imageAlt: "Equipe analisando dados em um notebook em um escritório",
+
+  activitiesIntro: {
+    eyebrow: "O que fazemos",
+    title: "Oito formas de colocar essas frentes em prática.",
+    description:
+      "Cada projeto combina algumas delas. Desenhar a combinação já é parte do trabalho — ela muda conforme a pergunta que a organização precisa responder.",
   },
-  {
-    number: "04",
-    kind: "objective",
-    eyebrow: "Camada 03/03 · Pessoas",
-    title: "Pessoas com mais voz e mais confiança.",
-    body: "Referenciais diferentes mudam a qualidade da leitura. Times do campo ganham um olhar mais estratégico, integrativo e confiante.",
-    tone: "light",
-    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80",
-    imageAlt: "Três mulheres conversando e sorrindo em uma mesa de trabalho",
+
+  audiences: {
+    intro: {
+      eyebrow: "Para quem fazemos",
+      title: "Três camadas que se contêm.",
+      description:
+        "Pessoas no centro, organizações em volta, campo abraçando tudo. Cada camada contém a anterior — é por isso que fortalecer uma alcança as de fora.",
+    },
+    // Do centro para fora, como no diagrama oficial.
+    items: [
+      {
+        label: "Pessoas",
+        summary: "Interessadas e/ou relacionadas ao campo de impacto",
+        description:
+          "Quem conduz as iniciativas no dia a dia — equipes, lideranças, conselhos — e as pessoas atendidas por elas. É onde a mudança começa a ser sentida.",
+      },
+      {
+        label: "Organizações de impacto",
+        summary: "Iniciativas socioambientais de todos os portes",
+        description:
+          "Fundações, institutos, organizações da sociedade civil, negócios de impacto e governos que precisam de clareza sobre o que fazem e sobre o que muda a partir disso.",
+      },
+      {
+        label: "Campo de impacto socioambiental positivo",
+        summary: "O ecossistema em que essas organizações atuam",
+        description:
+          "O conjunto de atores, práticas e conhecimentos do campo socioambiental brasileiro. Quando uma iniciativa aprende melhor, o campo inteiro ganha repertório.",
+      },
+    ],
   },
-  {
-    number: "05",
-    kind: "closing",
-    eyebrow: "Síntese",
-    title: "Um ciclo que se retroalimenta.",
-    body: "Campo, organizações e pessoas se fortalecem em conjunto. É nesse encontro que o impacto se amplia de verdade.",
-    tone: "black",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80",
-    imageAlt: "Reunião de planejamento estratégico com notas adesivas em um mural",
-    cta: { label: "Ver a teoria de mudança completa", href: "/teoria-da-mudanca" },
+
+  deliverables: {
+    intro: {
+      eyebrow: "O que entregamos",
+      title: "O que fica com quem trabalha com a gente.",
+      description:
+        "Não são relatórios: são deslocamentos concretos na forma como uma organização enxerga e conduz o próprio impacto.",
+    },
+    items: [
+      "Escuta cuidadosa das equipes e dos públicos atendidos em iniciativas",
+      "Conhecimento e reflexão sobre o campo socioambiental",
+      "Evidências para embasar a tomada de decisão",
+      "Alinhamento sobre as estratégias, resultados e impactos esperados",
+      "Lógica de atuação organizacional e programática coerente",
+      "Estratégias de gestão de impacto",
+      "Conexão de organizações e iniciativas do campo",
+      "Soluções inovadoras para endereçamento das necessidades do campo socioambiental",
+    ],
   },
-];
+
+  outcomes: {
+    intro: {
+      eyebrow: "O que queremos",
+      title: "Um ecossistema de impacto mais forte.",
+      description:
+        "Ecossistema de impacto socioambiental fortalecido e transformando positivamente os contextos em que atua — sete mudanças que, juntas, indicam esse avanço. É para elas que cada entrega aponta.",
+    },
+    items: [
+      "Campo socioambiental articulado e com conhecimentos para solucionar problemas complexos",
+      "Iniciativas socioambientais relevantes e eficazes",
+      "Enfrentamento das desigualdades de gênero e étnico-raciais",
+      "Cultura de monitoramento, avaliação e aprendizagem fortalecida",
+      "Intencionalidade na atuação de iniciativas socioambientais ampliada",
+      "Vozes e referenciais diversos incluídos e valorizados",
+      "Profissionais do campo de impacto instrumentalizados e com olhar mais estratégico e integrativo",
+    ],
+  },
+
+  impact: {
+    eyebrow: "Impacto",
+    title: "Justiça social e climática",
+    statement:
+      "Sociedade justa, equitativa, com direitos garantidos e contribuindo para a preservação e regeneração ambiental",
+  },
+};
 
 export const deliverables = [
   {
@@ -438,7 +513,7 @@ export const portfolioProjects = [
 
 export const theoryPdf = {
   href: "/downloads/teoria-da-mudanca-move-social.pdf",
-  label: "Baixar Teoria da Mudança em PDF"
+  label: "Baixar a Teoria de Mudança em PDF"
 };
 
 export const contactAreas = ["Meio Ambiente", "Educação", "Direitos Humanos", "Cultura", "Finanças", "Outro"];
@@ -488,4 +563,10 @@ export const contact = {
   email: "move@move.social",
   phone: "+55 11 3868.4093",
   address: "Rua Fidalga, 154 · conj. 4 · Pinheiros · São Paulo-SP · CEP 05432-000"
+};
+
+/** Perfis oficiais da Move, exibidos como ícones no header. */
+export const social = {
+  instagram: "https://www.instagram.com/move.social/",
+  linkedin: "https://www.linkedin.com/company/movesocial/"
 };

@@ -976,39 +976,87 @@ export interface Home {
   createdAt?: string | null;
 }
 /**
- * As camadas de mudança e o PDF para download.
+ * A cadeia da teoria de mudança, elo a elo, e o PDF para download.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "theory-of-change".
  */
 export interface TheoryOfChange {
   id: string;
+  hero: {
+    eyebrow: string;
+    title: string;
+    description: string;
+  };
+  frontsIntro: {
+    eyebrow: string;
+    title: string;
+    description?: string | null;
+  };
   /**
-   * A numeração 01, 02… é gerada a partir da ordem desta lista.
+   * As quatro frentes do diagrama oficial. O desenho sobrepõe os círculos em cruz, então quatro é o número que o gráfico comporta.
    */
-  goals?:
+  fronts?:
     | {
-        eyebrow: string;
-        title: string;
-        body: string;
-        image: {
-          /**
-           * Tem prioridade sobre a URL externa.
-           */
-          media?: (string | null) | Media;
-          /**
-           * Usada apenas enquanto não houver upload — ex.: placeholders do Unsplash.
-           */
-          externalUrl?: string | null;
-          /**
-           * Descreve a imagem para leitores de tela. Deixe vazio se for decorativa.
-           */
-          alt: string;
-        };
-        tone: 'purple' | 'black' | 'light';
+        label: string;
+        description: string;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Os cards desta seção vêm da coleção Serviços — edite-os por lá.
+   */
+  activitiesIntro: {
+    eyebrow: string;
+    title: string;
+    description?: string | null;
+  };
+  audiencesIntro: {
+    eyebrow: string;
+    title: string;
+    description?: string | null;
+  };
+  /**
+   * Do centro para fora, como no diagrama: pessoas, organizações, campo. A ordem desta lista define os anéis.
+   */
+  audiences?:
+    | {
+        label: string;
+        summary: string;
+        description: string;
+        id?: string | null;
+      }[]
+    | null;
+  deliverablesIntro: {
+    eyebrow: string;
+    title: string;
+    description?: string | null;
+  };
+  deliverables?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  outcomesIntro: {
+    eyebrow: string;
+    title: string;
+    description?: string | null;
+  };
+  /**
+   * Cada resultado recebe uma cor do sistema da marca, na ordem da lista. Com sete itens, cada um fica com uma cor própria.
+   */
+  outcomes?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  impact: {
+    eyebrow: string;
+    title: string;
+    statement: string;
+  };
   pdf: {
     label: string;
     /**
@@ -1191,6 +1239,13 @@ export interface SiteSetting {
     address: string;
   };
   /**
+   * Aparecem como ícones no header. Um campo vazio simplesmente não renderiza o ícone — nunca vira link quebrado.
+   */
+  social?: {
+    instagram?: string | null;
+    linkedin?: string | null;
+  };
+  /**
    * Exibidos no hero da home e na página de contato.
    */
   metrics?:
@@ -1255,21 +1310,81 @@ export interface HomeSelect<T extends boolean = true> {
  * via the `definition` "theory-of-change_select".
  */
 export interface TheoryOfChangeSelect<T extends boolean = true> {
-  goals?:
+  hero?:
     | T
     | {
         eyebrow?: T;
         title?: T;
-        body?: T;
-        image?:
-          | T
-          | {
-              media?: T;
-              externalUrl?: T;
-              alt?: T;
-            };
-        tone?: T;
+        description?: T;
+      };
+  frontsIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  fronts?:
+    | T
+    | {
+        label?: T;
+        description?: T;
         id?: T;
+      };
+  activitiesIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  audiencesIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  audiences?:
+    | T
+    | {
+        label?: T;
+        summary?: T;
+        description?: T;
+        id?: T;
+      };
+  deliverablesIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  deliverables?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  outcomesIntro?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        description?: T;
+      };
+  outcomes?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  impact?:
+    | T
+    | {
+        eyebrow?: T;
+        title?: T;
+        statement?: T;
       };
   pdf?:
     | T
@@ -1412,6 +1527,12 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         email?: T;
         phone?: T;
         address?: T;
+      };
+  social?:
+    | T
+    | {
+        instagram?: T;
+        linkedin?: T;
       };
   metrics?:
     | T
