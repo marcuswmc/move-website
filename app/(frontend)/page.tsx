@@ -52,7 +52,7 @@ export default async function Home() {
 
       <TeamSection teamMembers={team.teamMembers} boardMembers={team.boardMembers} />
 
-      <section className="bg-move-offwhite px-5 py-24 md:px-14 md:py-32">
+      <section className="bg-move-offwhite px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container relative z-10">
           <Reveal>
             <p className="mb-7 text-eyebrow font-bold uppercase text-move-purple/70">Vamos construir junto</p>

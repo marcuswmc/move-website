@@ -50,7 +50,14 @@ export function Header({ navItems, social = [] }: { navItems: NavItem[]; social?
         <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 to-transparent" />
       )}
 
-      <div className="editorial-container relative flex items-center justify-between py-4 md:py-5">
+      {/* Só no mobile o header ganha calha, para alinhar o logo com a primeira coluna
+          do conteúdo — a seção tem `px-4` e o header não tinha nenhum, então o logo
+          começava 20px à esquerda do texto. Vai num wrapper por fora do
+          `.editorial-container`, como nas seções, e não no <header>, que estreitaria
+          junto o fundo do painel mobile. No desktop fica `px-0`, preservando o
+          enquadramento que já existia. */}
+      <div className="px-4 md:px-0">
+        <div className="editorial-container relative flex items-center justify-between py-4 md:py-5">
         <Link href="/" aria-label="Move Social — início" className="relative z-10 block h-8 w-24 md:h-9 md:w-28">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -137,8 +144,9 @@ export function Header({ navItems, social = [] }: { navItems: NavItem[]; social?
                 dark ? "bg-move-purple" : "bg-white"
               } ${mobileOpen ? "-translate-y-[6px] -rotate-45" : ""}`}
             />
-          </span>
-        </button>
+            </span>
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -151,7 +159,8 @@ export function Header({ navItems, social = [] }: { navItems: NavItem[]; social?
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden border-t border-move-purple/10 bg-move-offwhite lg:hidden"
           >
-            <div className="editorial-container flex flex-col gap-1 py-6">
+            <div className="px-4 md:px-0">
+              <div className="editorial-container flex flex-col gap-1 py-6">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
@@ -184,8 +193,9 @@ export function Header({ navItems, social = [] }: { navItems: NavItem[]; social?
                       </a>
                     );
                   })}
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
           </motion.nav>
         )}

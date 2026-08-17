@@ -63,7 +63,7 @@ export default async function ContactPage() {
 
   return (
     <main className="bg-move-offwhite">
-      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-5 pb-16 pt-32 text-white md:px-14 md:pb-20 md:pt-40">
+      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 pb-16 pt-32 text-white md:px-14 md:pb-20 md:pt-40">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -right-32 -top-40 h-[30rem] w-[30rem] rounded-full border-[4rem] border-move-yellow/[0.14] md:-right-24 md:-top-48 md:h-[38rem] md:w-[38rem] md:border-[5.5rem]" />
           <div
@@ -101,7 +101,7 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <section className="px-5 py-24 md:px-14 md:py-32">
+      <section className="px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container grid gap-12 md:grid-cols-[0.8fr_1.2fr] md:gap-10">
           <Reveal className="space-y-10">
             <div className="space-y-8">
@@ -239,7 +239,7 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-white px-5 py-20 md:px-14 md:py-28">
+      <section className="bg-white px-4 py-20 md:px-14 md:py-28">
         <div className="editorial-container">
           <Reveal>
             <SectionLabel dot="purple">Como trabalhamos</SectionLabel>
@@ -260,7 +260,7 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-move-offwhite px-5 py-20 md:px-14 md:py-28">
+      <section className="bg-move-offwhite px-4 py-20 md:px-14 md:py-28">
         <div className="editorial-container">
           <Reveal>
             <SectionLabel dot="purple">O que esperar da parceria</SectionLabel>
@@ -295,7 +295,7 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-white px-5 py-20 md:px-14 md:py-28">
+      <section className="bg-white px-4 py-20 md:px-14 md:py-28">
         <div className="editorial-container grid gap-10 md:grid-cols-2 md:items-center">
           <Reveal>
             <SectionLabel dot="purple">Onde estamos</SectionLabel>
@@ -324,7 +324,7 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-move-offwhite px-5 py-20 md:px-14 md:py-28">
+      <section className="bg-move-offwhite px-4 py-20 md:px-14 md:py-28">
         <div className="editorial-container">
           <MediaFrame
             src={page.heroImage.src}

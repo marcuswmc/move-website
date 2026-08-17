@@ -40,9 +40,38 @@ a {
   outline-offset: 3px;
 }
 
+/* Calha e largura máxima do conteúdo.
+   No mobile a calha é 12px de cada lado, e não 20px: somada ao `px-4` da seção, o
+   conteúdo ficava com 313px numa tela de 393px e as grades de cards espremiam. Do
+   `md` para cima nada muda — 20px e teto de 1340px, o enquadramento já aprovado. */
 .editorial-container {
-  width: min(100% - 40px, 1340px);
+  width: min(100% - 24px, 1340px);
   margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .editorial-container {
+    width: min(100% - 40px, 1340px);
+  }
+}
+
+/* Controles de formulário carregam uma largura intrínseca própria — um `input` pede
+   cerca de 20 caracteres. Como item de grid ou flex, essa medida vira o piso da coluna
+   (`min-width: auto`), a coluna estica além do container e a página inteira ganha
+   rolagem horizontal. Zerar o piso deixa o controle acompanhar a caixa; a largura real
+   segue vindo do layout. */
+input,
+select,
+textarea {
+  min-width: 0;
+}
+
+/* Mídia nunca passa da própria caixa, mesmo que o arquivo seja maior que ela. */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
 }
 
 .text-balance {

@@ -67,7 +67,7 @@ export default async function PublicationPage({ params }: Props) {
 
   return (
     <main className="bg-move-offwhite">
-      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-5 pb-14 pt-28 text-white md:px-14 md:pb-20 md:pt-36">
+      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 pb-14 pt-28 text-white md:px-14 md:pb-20 md:pt-36">
         <div className="editorial-container relative z-10">
           <Reveal>
             <nav aria-label="Trilha de navegação" className="mb-6">
@@ -117,7 +117,7 @@ export default async function PublicationPage({ params }: Props) {
         </div>
       </section>
 
-      <article className="bg-white px-5 py-16 md:px-14 md:py-24">
+      <article className="bg-white px-4 py-16 md:px-14 md:py-24">
         <div className="editorial-container">
           {publication.cover.src && (
             <Reveal>
@@ -179,7 +179,7 @@ export default async function PublicationPage({ params }: Props) {
       </article>
 
       {related.length > 0 && (
-        <section className="bg-move-offwhite px-5 py-16 md:px-14 md:py-24">
+        <section className="bg-move-offwhite px-4 py-16 md:px-14 md:py-24">
           <div className="editorial-container">
             <Reveal>
               <div className="flex flex-wrap items-end justify-between gap-4">

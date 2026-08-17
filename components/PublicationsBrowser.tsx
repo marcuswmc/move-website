@@ -75,7 +75,7 @@ export function PublicationsBrowser({
   };
 
   return (
-    <section className="bg-move-offwhite px-5 py-14 md:px-14 md:py-20">
+    <section className="bg-move-offwhite px-4 py-14 md:px-14 md:py-20">
       <div className="editorial-container">
         <div className="flex flex-wrap items-center gap-3 border-b border-move-purple/12 pb-6">
           <SearchField

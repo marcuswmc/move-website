@@ -39,7 +39,7 @@ export type ShowcaseProject = {
 
 export function PortfolioStack({ projects }: { projects: ShowcaseProject[] }) {
   return (
-    <section id="portfolio" className="relative bg-move-offwhite px-5 py-24 md:px-14 md:py-32">
+    <section id="portfolio" className="relative bg-move-offwhite px-4 py-24 md:px-14 md:py-32">
       {/* No overflow-hidden here — .portfolio-stack-card relies on position: sticky, which an
           overflow-hidden ancestor would break. Grafismo is kept fully inset instead of bled off-edge. */}
       <Grafismo

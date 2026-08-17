@@ -19,7 +19,7 @@ export function Hero({ hero, metrics, affiliations }: HeroProps) {
        * ignorando o `padding-top` — o chapéu ia parar atrás do header. Com `min-h` a
        * seção cresce, o padding volta a valer e o header nunca cobre o texto.
        */
-      className="grain-overlay relative isolate flex min-h-[100dvh] flex-col justify-center overflow-hidden bg-move-purple px-5 pb-8 pt-28 md:px-14 md:pb-10 md:pt-32"
+      className="grain-overlay relative isolate flex min-h-[100dvh] flex-col justify-center overflow-hidden bg-move-purple px-4 pb-8 pt-28 md:px-14 md:pb-10 md:pt-32"
     >
       {/* Move symbol — bled 50% off the right edge, lg+ only so it never competes with the copy on small screens */}
       <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 -z-0 hidden items-center lg:flex">

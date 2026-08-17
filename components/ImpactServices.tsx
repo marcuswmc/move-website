@@ -7,7 +7,7 @@ export type { ServiceCard };
 
 export function ImpactServices({ services }: { services: ServiceCard[] }) {
   return (
-    <section id="entregamos" className="relative overflow-hidden bg-white px-5 py-24 md:px-14 md:py-32">
+    <section id="entregamos" className="relative overflow-hidden bg-white px-4 py-24 md:px-14 md:py-32">
       <Grafismo
         src="/brand/icons/Group 13.svg"
         animate="float"

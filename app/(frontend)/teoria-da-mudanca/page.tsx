@@ -70,7 +70,7 @@ export default async function TheoryPage() {
       <TheoryChainNav links={CHAIN} />
 
       {/* ── Abertura ─────────────────────────────────────────────────────── */}
-      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-5 pb-20 pt-32 text-white md:px-14 md:pb-28 md:pt-40">
+      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 pb-20 pt-32 text-white md:px-14 md:pb-28 md:pt-40">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -right-32 -top-40 h-[30rem] w-[30rem] rounded-full border-[8rem] border-move-yellow/[0.14] md:-right-24 md:-top-48 md:h-[38rem] md:w-[38rem] md:border-[10.5rem]" />
           <div
@@ -120,7 +120,7 @@ export default async function TheoryPage() {
       {/* ── Elo 1 · Como atuamos ─────────────────────────────────────────── */}
       <section
         id="como-atuamos"
-        className="relative overflow-hidden bg-move-offwhite px-5 py-24 md:px-14 md:py-32"
+        className="relative overflow-hidden bg-move-offwhite px-4 py-24 md:px-14 md:py-32"
       >
         <Grafismo
           src="/brand/icons/Group 12.svg"
@@ -142,7 +142,7 @@ export default async function TheoryPage() {
       </section>
 
       {/* ── Elo 2 · O que fazemos ────────────────────────────────────────── */}
-      <section id="o-que-fazemos" className="bg-white px-5 py-24 md:px-14 md:py-32">
+      <section id="o-que-fazemos" className="bg-white px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container">
           <TheoryStep
             step={2}
@@ -168,7 +168,7 @@ export default async function TheoryPage() {
       {/* ── Elo 3 · Para quem fazemos ────────────────────────────────────── */}
       <section
         id="para-quem-fazemos"
-        className="grain-overlay relative overflow-hidden bg-move-purple px-5 py-24 text-white md:px-14 md:py-32"
+        className="grain-overlay relative overflow-hidden bg-move-purple px-4 py-24 text-white md:px-14 md:py-32"
       >
         <div className="editorial-container relative z-10">
           <TheoryStep
@@ -186,7 +186,7 @@ export default async function TheoryPage() {
       </section>
 
       {/* ── Elo 4 · O que entregamos ─────────────────────────────────────── */}
-      <section id="o-que-entregamos" className="bg-move-offwhite px-5 py-24 md:px-14 md:py-32">
+      <section id="o-que-entregamos" className="bg-move-offwhite px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container">
           <TheoryStep
             step={4}
@@ -200,7 +200,7 @@ export default async function TheoryPage() {
       </section>
 
       {/* ── Elo 5 · O que queremos ───────────────────────────────────────── */}
-      <section id="o-que-queremos" className="bg-white px-5 py-24 md:px-14 md:py-32">
+      <section id="o-que-queremos" className="bg-white px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container">
           <TheoryStep
             step={5}
@@ -237,7 +237,7 @@ export default async function TheoryPage() {
       {/* ── Elo 6 · Impacto ──────────────────────────────────────────────── */}
       <section
         id="impacto"
-        className="grain-overlay relative isolate overflow-hidden bg-move-purple px-5 py-28 text-white md:px-14 md:py-36"
+        className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 py-28 text-white md:px-14 md:py-36"
       >
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -bottom-40 -left-32 h-[32rem] w-[32rem] rounded-full border-[9rem] border-move-yellow/[0.12]" />

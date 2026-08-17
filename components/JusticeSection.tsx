@@ -47,7 +47,7 @@ export function JusticeSection() {
     <section
       ref={sectionRef}
       id="queremos"
-      className="overflow-hidden bg-move-purple px-5 py-24 text-white md:px-14 md:py-32"
+      className="overflow-hidden bg-move-purple px-4 py-24 text-white md:px-14 md:py-32"
     >
       <div className="editorial-container grid gap-14 md:grid-cols-[1.05fr_0.95fr] md:items-center">
         <div>

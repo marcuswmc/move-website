@@ -21,7 +21,7 @@ type PageHeroProps = {
  */
 export function PageHero({ eyebrow, title, description, breadcrumbs, children }: PageHeroProps) {
   return (
-    <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-5 pb-14 pt-28 text-white md:px-14 md:pb-20 md:pt-36">
+    <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 pb-14 pt-28 text-white md:px-14 md:pb-20 md:pt-36">
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -right-32 -top-40 h-[26rem] w-[26rem] rounded-full border-[6rem] border-move-yellow/[0.14] md:-right-24 md:h-[34rem] md:w-[34rem] md:border-[9rem]" />
       </div>

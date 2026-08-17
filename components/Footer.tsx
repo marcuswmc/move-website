@@ -16,7 +16,7 @@ export function Footer({ navItems, contact }: FooterProps) {
   const pathname = usePathname();
 
   return (
-    <footer className="relative overflow-hidden bg-move-purple px-5 py-14 text-white md:px-14">
+    <footer className="relative overflow-hidden bg-move-purple px-4 py-14 text-white md:px-14">
       <FlowerGraphic className="pointer-events-none absolute -bottom-16 -right-16 w-64 opacity-[0.06] md:w-80" />
 
       <div className="relative mx-auto grid max-w-[1340px] gap-10 border-t border-white/15 pt-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">

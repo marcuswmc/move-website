@@ -52,7 +52,7 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <main className="bg-move-offwhite">
-      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-5 pb-16 pt-28 text-white md:px-14 md:pb-20 md:pt-36">
+      <section className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 pb-16 pt-28 text-white md:px-14 md:pb-20 md:pt-36">
         <div className="editorial-container relative z-10">
           <Reveal>
             <nav aria-label="Trilha de navegação" className="mb-6">
@@ -104,7 +104,7 @@ export default async function ProjectPage({ params }: Props) {
       </section>
 
       {project.image.src && (
-        <section className="relative bg-move-purple px-5 md:px-14">
+        <section className="relative bg-move-purple px-4 md:px-14">
           <div className="editorial-container">
             <div className="relative aspect-[21/9] w-full translate-y-[-1px] overflow-hidden rounded-t-[1.5rem]">
               <Image
@@ -120,7 +120,7 @@ export default async function ProjectPage({ params }: Props) {
         </section>
       )}
 
-      <section className="bg-white px-5 py-16 md:px-14 md:py-24">
+      <section className="bg-white px-4 py-16 md:px-14 md:py-24">
         <div className="editorial-container grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
           <div>
             <Reveal>
@@ -165,7 +165,7 @@ export default async function ProjectPage({ params }: Props) {
       </section>
 
       {related.length > 0 && (
-        <section className="bg-move-offwhite px-5 py-16 md:px-14 md:py-24">
+        <section className="bg-move-offwhite px-4 py-16 md:px-14 md:py-24">
           <div className="editorial-container">
             <Reveal>
               <div className="flex flex-wrap items-end justify-between gap-4">

@@ -16,7 +16,7 @@ export function TeamSection({ teamMembers, boardMembers }: { teamMembers: Member
       />
 
       {/* ------------------------------------------------------------- Conselho */}
-      <div className="relative px-5 md:px-14">
+      <div className="relative px-4 md:px-14">
         <div className="editorial-container">
           <div className="grid gap-10 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] md:gap-12">
             <Reveal className="flex flex-col justify-center">
@@ -67,7 +67,7 @@ export function TeamSection({ teamMembers, boardMembers }: { teamMembers: Member
       </div>
 
       {/* ---------------------------------------------------------------- Equipe */}
-      <div className="relative mt-20 px-5 md:mt-28 md:px-14">
+      <div className="relative mt-20 px-4 md:mt-28 md:px-14">
         <div className="editorial-container">
           <TeamCarousel
             members={teamMembers}

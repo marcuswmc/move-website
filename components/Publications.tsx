@@ -10,7 +10,7 @@ export function Publications({ publications }: { publications: PublicationCardDa
   if (publications.length === 0) return null;
 
   return (
-    <section id="publicacoes" className="relative overflow-hidden bg-white px-5 py-24 md:px-14 md:py-32">
+    <section id="publicacoes" className="relative overflow-hidden bg-white px-4 py-24 md:px-14 md:py-32">
       <Grafismo
         src="/brand/icons/Group 11.svg"
         animate="spin"

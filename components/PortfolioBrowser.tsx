@@ -185,7 +185,7 @@ export function PortfolioBrowser({ projects }: { projects: ProjectCardData[] }) 
   );
 
   return (
-    <section className="bg-move-offwhite px-5 py-14 md:px-14 md:py-20">
+    <section className="bg-move-offwhite px-4 py-14 md:px-14 md:py-20">
       <div className="editorial-container grid gap-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-10">
         {/* No desktop o filtro acompanha a rolagem; no celular vira um painel que abre,
             para não empurrar a listagem para baixo da dobra. */}
