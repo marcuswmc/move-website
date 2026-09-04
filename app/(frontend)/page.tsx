@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return metadataFromSeo(meta, {
     title: "Move Social | Gestão de impacto socioambiental",
-    description: hero.body,
+    description: hero.bodyText,
   });
 }
 

@@ -3,6 +3,7 @@ import { slugField } from "payload";
 
 import { authenticated, publishedOrAuthenticated } from "@/access";
 import { imageField } from "@/fields/imageField";
+import { projectCardColorField } from "@/fields/toneField";
 // As duas taxonomias fechadas moram em lib/ porque o filtro de /portfolio também as
 // consome, e um componente cliente não pode importar este arquivo.
 import { ECOSYSTEMS, SEGMENTS } from "@/lib/taxonomy";
@@ -88,9 +89,14 @@ export const Projects: CollectionConfig = {
                   "Opcional. Texto longo exibido só na página do projeto, abaixo de Desafio e Resultados.",
               },
             },
+            /**
+             * Opcional desde que o card virou bloco de cor: a imagem só aparece no topo
+             * da página do projeto. Exigi-la travaria o cadastro de um projeto que hoje
+             * não precisa de nenhuma fotografia para existir na listagem.
+             */
             imageField({
-              required: true,
-              description: "Imagem do card e do topo da página do projeto.",
+              description:
+                "Opcional. Aparece só no topo da página do projeto — o card em /portfolio é um bloco de cor, definido em Cor do card.",
             }),
           ],
         },
@@ -108,7 +114,7 @@ export const Projects: CollectionConfig = {
                   required: true,
                   index: true,
                   options: ECOSYSTEMS.map((value) => ({ label: value, value })),
-                  admin: { description: "Define a cor do card." },
+                  admin: { description: "Define a cor padrão do card, quando Cor do card está em automático." },
                 },
                 {
                   name: "year",
@@ -142,6 +148,7 @@ export const Projects: CollectionConfig = {
         },
       ],
     },
+    projectCardColorField(),
     {
       name: "order",
       type: "number",

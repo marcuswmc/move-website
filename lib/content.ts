@@ -1,5 +1,8 @@
+import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext";
 import { cache } from "react";
 
+import { ensureLexical } from "@/lib/lexical";
+import { SURFACE_AUTO } from "@/lib/palette";
 import { getPayloadClient } from "@/lib/payload";
 import { displayNumber, resolveImage } from "@/lib/resolveImage";
 import type { ResolvedImage } from "@/lib/resolveImage";
@@ -60,9 +63,17 @@ export const getHomeContent = cache(async () => {
   const payload = await getPayloadClient();
   const home = await payload.findGlobal({ slug: "home" });
 
+  const heroBody = ensureLexical(home.hero.body);
+
   return {
     meta: home.meta,
-    hero: home.hero,
+    hero: {
+      eyebrow: home.hero.eyebrow,
+      title: home.hero.title,
+      body: heroBody,
+      /** O mesmo texto sem formatação — a descrição de SEO não aceita marcação. */
+      bodyText: convertLexicalToPlaintext({ data: heroBody }),
+    },
     affiliations: (home.affiliations ?? []).map((item) => ({ label: item.label })),
     showcase: (home.showcase ?? []).map((project, index) => {
       const image = resolveImage(project.image) ?? IMAGE_FALLBACK;
@@ -341,7 +352,9 @@ export const getPartners = cache(async () => {
       ? `/portfolio?cliente=${encodeURIComponent(clientKey(partner))}`
       : "/portfolio";
 
-    return { name: partner.name, src: logo.src, href };
+    // As dimensões seguem junto porque o carrossel dimensiona cada logo pela
+    // proporção do arquivo — ver components/LogoLoop.tsx.
+    return { name: partner.name, src: logo.src, href, width: logo.width, height: logo.height };
   });
 });
 
@@ -376,6 +389,11 @@ export type ProjectCard = {
   year: string;
   summary: string;
   image: ResolvedImage;
+  /**
+   * Cor do card escolhida no CMS, ou "auto" para seguir o ecossistema. Chega crua
+   * porque quem traduz nome de cor em classe é lib/palette.ts, do lado do componente.
+   */
+  cardColor: string;
 };
 
 /** Corta no espaço mais próximo para o card não terminar no meio de uma palavra. */
@@ -404,6 +422,7 @@ const toProjectCard = (project: Project): ProjectCard => {
     // substituto. A página do projeto não usa esse fallback — ver `intro` abaixo.
     summary: project.summary ?? excerpt(project.challenge),
     image: resolveImage(project.image) ?? IMAGE_FALLBACK,
+    cardColor: project.cardColor ?? SURFACE_AUTO,
   };
 };
 
@@ -498,7 +517,8 @@ export const getTheoryOfChange = cache(async () => {
     audiences: (theory.audiences ?? []).map((audience, index) => ({
       number: displayNumber(index),
       label: audience.label,
-      summary: audience.summary,
+      // Opcional no CMS: o `null` do Payload vira ausência, que é como o componente lê.
+      summary: audience.summary ?? undefined,
       description: audience.description,
     })),
     deliverablesIntro: theory.deliverablesIntro,
@@ -531,7 +551,7 @@ export const getContactPage = cache(async () => {
       title: step.title,
       body: step.body,
     })),
-    areas: (page.areas ?? []).map((area) => area.label),
+    serviceOptions: (page.serviceOptions ?? []).map((service) => service.label),
     availabilityDays: (page.availabilityDays ?? []).map((day) => day.label),
     availabilityPeriods: (page.availabilityPeriods ?? []).map((period) => period.label),
     heroImage: resolveImage(page.heroImage) ?? IMAGE_FALLBACK,

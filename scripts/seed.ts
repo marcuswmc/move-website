@@ -17,13 +17,15 @@ import { fileURLToPath } from "url";
 import config from "@payload-config";
 import { getPayload } from "payload";
 import type { Payload } from "payload";
-import type { Project, Service } from "../payload-types";
+import type { Home, Project, Publication, Service } from "../payload-types";
 
 import {
   affiliations,
   boardMembers,
   contact,
-  contactAreas,
+  contactAvailabilityDays,
+  contactAvailabilityPeriods,
+  contactServiceOptions,
   contactSteps,
   contracted,
   deliverables,
@@ -40,6 +42,8 @@ import {
   theoryOfChange,
   theoryPdf,
 } from "../data/site";
+import { partners } from "../data/partners";
+import { lexicalFromPlainText } from "../lib/lexical";
 import { images } from "../data/images";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -76,20 +80,6 @@ const slugify = (value: string) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
-
-/** Parceiros do carrossel da home, hardcoded em components/PartnerLogoLoop.tsx. */
-const partners = [
-  { name: "Instituto de Cidadania Empresarial", file: "instituto-cidadania-empresarial.webp" },
-  { name: "GIFE", file: "gife.webp" },
-  { name: "NOSSAS", file: "nossas.webp", caseId: "nossas" },
-  { name: "AMAZ", file: "amaz.webp" },
-  { name: "Instituto ACP", file: "instituto-acp.webp", caseId: "instituto-acp" },
-  { name: "Fundo Vale", file: "fundo-vale.webp" },
-  { name: "Itaú Social", file: "itau-social.webp", caseId: "itau-social" },
-  { name: "Laudes Foundation", file: "laudes-foundation.webp" },
-  { name: "Instituto Alana", file: "instituto-alana.webp", caseId: "instituto-alana" },
-  { name: "Escolas Criativas", file: "escolas-criativas.webp", caseId: "escolas-criativas" },
-];
 
 const payload = await getPayload({ config });
 
@@ -152,7 +142,7 @@ const externalImage = (url: string, alt: string) => ({ externalUrl: url, alt });
 const publicationCategories = [
   { name: "Artigo", slug: "artigo", color: "purple" },
   { name: "Estudo", slug: "estudo", color: "green" },
-  { name: "Avaliação", slug: "avaliacao", color: "coral" },
+  { name: "Ferramenta", slug: "ferramenta", color: "coral" },
   { name: "Guia", slug: "guia", color: "sand" },
 ] as const;
 
@@ -218,6 +208,8 @@ for (const [index, item] of portfolioCases.entries()) {
         challenge: item.challenge,
         results: item.results,
         image: externalImage(projectSphereImages[item.id] ?? item.image, `Imagem do projeto ${item.client}`),
+        // A cor do card sai do ecossistema; quem quiser fugir da tabela troca no admin.
+        cardColor: "auto",
         order: index,
         _status: "published",
       },
@@ -265,12 +257,8 @@ for (const [index, category] of publicationCategories.entries()) {
 
 // ------------------------------------------------------------ Publicações
 payload.logger.info(`Migrando ${publications.length} publicações…`);
-for (const [index, item] of publications.entries()) {
-  // As 3 entradas de data/site.ts são placeholders aguardando o acervo real; entram
-  // como artigo, com datas decrescentes para a ordenação do blog fazer sentido.
-  const publishedAt = new Date(Date.UTC(2026, 6, 20 - index * 11)).toISOString();
-  const categoryName = publicationCategories[index % publicationCategories.length].name;
-  const categoryId = categoryIdByName.get(categoryName);
+for (const item of publications) {
+  const categoryId = categoryIdByName.get(item.category);
 
   await withRetry(`publicação ${item.id}`, () =>
     payload.create({
@@ -279,10 +267,13 @@ for (const [index, item] of publications.entries()) {
         title: item.title,
         slug: item.id,
         synopsis: item.synopsis,
+        content: item.content ? (lexicalFromPlainText(item.content) as unknown as Publication["content"]) : undefined,
         cover: externalImage(item.cover.src, item.cover.alt),
-        type: "article",
-        publishedAt,
-        author: "Move Social",
+        type: "external",
+        externalUrl: item.externalUrl,
+        actionLabel: item.actionLabel,
+        publishedAt: new Date(`${item.publishedAt}T12:00:00.000Z`).toISOString(),
+        author: item.author,
         categories: categoryId ? [categoryId] : [],
         featured: true,
         _status: "published",
@@ -348,7 +339,9 @@ await withRetry("global home", () =>
       hero: {
         eyebrow: hero.eyebrow,
         title: hero.title,
-        body: hero.body,
+        // O tipo gerado para um campo rich text traz assinatura de índice; o
+        // `SerializedEditorState` do Lexical não. É divergência só de tipagem.
+        body: lexicalFromPlainText(hero.body) as unknown as Home["hero"]["body"],
       },
       affiliations: affiliations.map((item) => ({ label: item.label })),
       showcase: portfolioProjects.map((project) => ({
@@ -417,7 +410,9 @@ await withRetry("global contact-page", () =>
     slug: "contact-page",
     data: {
       steps: contactSteps.map((step) => ({ title: step.title, body: step.body })),
-      areas: contactAreas.map((label) => ({ label })),
+      serviceOptions: contactServiceOptions.map((label) => ({ label })),
+      availabilityDays: contactAvailabilityDays.map((label) => ({ label })),
+      availabilityPeriods: contactAvailabilityPeriods.map((label) => ({ label })),
       heroImage: externalImage(images.contactHero.src, images.contactHero.alt),
       principles: principles.map((principle) => ({ title: principle.title, body: principle.body })),
       contracted: contracted.map((label) => ({ label })),

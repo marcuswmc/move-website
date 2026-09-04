@@ -21,17 +21,34 @@ export function Footer({ navItems, contact }: FooterProps) {
 
       <div className="relative mx-auto grid max-w-[1340px] gap-10 border-t border-white/15 pt-10 md:grid-cols-[1.2fr_0.8fr_0.8fr]">
         <div>
-          <div className="relative mb-7 h-9 w-28">
-            <Image src="/brand/move-logo-negativo.svg" alt="Move Social" fill className="object-contain object-left" />
+          <div className="flex">
+            <div className="relative mb-7 h-9 w-28">
+              <Image
+                src="/brand/move-logo-negativo.svg"
+                alt="Move Social"
+                fill
+                className="object-contain object-left"
+              />
+            </div>
+            <div className="relative mb-7 h-12 w-32">
+              <Image
+                src="/brand/empresa-b.webp"
+                alt="Move Social"
+                fill
+                sizes="h-12 w-32"
+                className="object-contain object-left"
+              />
+            </div>
           </div>
           <p className="max-w-xl text-lg leading-relaxed text-white/65">
-            A Move existe para ampliar o que o impacto pode ser. De dentro do campo, com rigor analítico,
-            escuta qualificada e presença.
+            Ampliar e qualificar o impacto socioambiental positivo.
           </p>
         </div>
 
         <div>
-          <p className="mb-5 text-eyebrow font-bold uppercase text-move-yellow">Navegação</p>
+          <p className="mb-5 text-eyebrow font-bold uppercase text-move-yellow">
+            Navegação
+          </p>
           <div className="flex flex-col gap-3 text-white/65">
             {navItems.map((item) => (
               <Link
@@ -48,12 +65,20 @@ export function Footer({ navItems, contact }: FooterProps) {
         </div>
 
         <div>
-          <p className="mb-5 text-eyebrow font-bold uppercase text-move-yellow">Contato</p>
+          <p className="mb-5 text-eyebrow font-bold uppercase text-move-yellow">
+            Contato
+          </p>
           <div className="flex flex-col gap-3 text-white/65">
-            <a href={`mailto:${contact.email}`} className="w-fit transition hover:text-white">
+            <a
+              href={`mailto:${contact.email}`}
+              className="w-fit transition hover:text-white"
+            >
               {contact.email}
             </a>
-            <a href={`tel:${contact.phone.replace(/\D/g, "")}`} className="w-fit transition hover:text-white">
+            <a
+              href={`tel:${contact.phone.replace(/\D/g, "")}`}
+              className="w-fit transition hover:text-white"
+            >
               {contact.phone}
             </a>
             <span className="max-w-xs leading-relaxed">{contact.address}</span>
@@ -62,7 +87,8 @@ export function Footer({ navItems, contact }: FooterProps) {
       </div>
 
       <div className="relative mx-auto mt-12 max-w-[1340px] border-t border-white/10 pt-6 text-sm text-white/40">
-        © {new Date().getFullYear()} Move Social. Gestão de impacto socioambiental.
+        © {new Date().getFullYear()} Move Social. Gestão de impacto
+        socioambiental.
       </div>
     </footer>
   );

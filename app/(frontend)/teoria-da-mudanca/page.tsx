@@ -237,7 +237,7 @@ export default async function TheoryPage() {
       {/* ── Elo 6 · Impacto ──────────────────────────────────────────────── */}
       <section
         id="impacto"
-        className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 py-28 text-white md:px-14 md:py-36"
+        className="grain-overlay relative isolate overflow-hidden bg-move-purple px-4 py-28 text-white md:px-14 md:py-16"
       >
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -bottom-40 -left-32 h-[32rem] w-[32rem] rounded-full border-[9rem] border-move-yellow/[0.12]" />

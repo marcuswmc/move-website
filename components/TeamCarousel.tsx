@@ -189,8 +189,8 @@ export function TeamCarousel({ members, eyebrow, title, body }: TeamCarouselProp
                         </p>
                       </div>
                     )}
-                    <p className="text-eyebrow font-bold uppercase text-move-yellow">{member.specialty}</p>
                     <p className="mt-2 text-xl font-bold leading-tight text-white">{member.name}</p>
+                    <p className="text-[10px] font-bold uppercase text-move-yellow">{member.specialty}</p>
                   </div>
                 </button>
               </li>

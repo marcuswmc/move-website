@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A marketing site redesign for **Move Social**, a Brazilian socio-environmental impact consultancy. All copy is in Portuguese (pt-BR). Routes: `/` (home), `/teoria-da-mudanca`, `/publicacoes` + `/publicacoes/[slug]` (blog), `/portfolio` + `/portfolio/[slug]` (case studies), `/contato`, plus the Payload admin at `/admin`. Built with Next.js App Router, TypeScript, Tailwind CSS, and **Payload CMS 3 on MongoDB**.
 
+Long-form developer documentation (in pt-BR) lives in [`docs/`](docs/README.md) — architecture, how to add collections/fields/globals/pages, the content layer, infra (MongoDB, Vercel Blob, deploy), step-by-step recipes and troubleshooting. This file stays the short version; keep the two consistent when a rule changes.
+
 ## Commands
 
 Package manager is **pnpm** (see `pnpm-lock.yaml` / `pnpm-workspace.yaml`). `node_modules` was linked by pnpm 11 — running `pnpm add` with an older pnpm fails with `ERR_PNPM_UNEXPECTED_STORE`; use the version in `packageManager`.
@@ -14,7 +16,6 @@ Package manager is **pnpm** (see `pnpm-lock.yaml` / `pnpm-workspace.yaml`). `nod
 pnpm dev                 # start dev server (site + /admin)
 pnpm build               # generate import map, then next build
 pnpm start               # serve production build
-pnpm lint                # next lint
 pnpm seed                # RESET + reload all CMS content from data/site.ts
 pnpm generate:types      # regenerate payload-types.ts
 pnpm generate:importmap  # regenerate app/(payload)/admin/importMap.js
@@ -41,7 +42,7 @@ SEO comes from `@payloadcms/plugin-seo`, configured in `payload.config.ts` with 
 
 Publications come in three types (`article`, `download`, `external`), and the type only decides the **action** at the end of the page. Every publication — including external links — has its own page at `/publicacoes/[slug]`, because the rich text field is available to all types and carries the copy that introduces the material. Cards always link to that page, never straight out.
 
-Tones and brand icons are closed `select` fields (`fields/toneField.ts`, `fields/iconField.ts`), never free text: each value maps to classes already written in a component, so an unlisted value would render an unstyled card.
+Tones and brand icons are closed `select` fields (`fields/toneField.ts`, `fields/iconField.ts`), never free text: each value maps to classes already written in a component, so an unlisted value would render an unstyled card. A portfolio card is a **flat block of palette color, never a photo background**: the color comes from the project's "Cor do card" field, which defaults to `auto` — the ecosystem's fixed color. The project image is optional and appears only at the top of `/portfolio/[slug]`.
 
 `next.config.ts` allows remote images from `images.unsplash.com` and local paths (Payload serves uploads from `/api/media/file/**`).
 
@@ -61,7 +62,7 @@ Uploads go to a **public Vercel Blob store**, via `vercelBlobStorage` in `payloa
 
 Custom Tailwind theme in `tailwind.config.ts` under the `move` namespace, holding the brand's full chromatic system — base (`move-black`, `move-offwhite`/`move-gray`), principais (`move-purple` = Açaí, `move-yellow` = Ipê) and apoio (`move-periwinkle` = Lavanda, `move-coral` = Goiaba, `move-sand` = Areia, `move-light` = Luz, `move-mint` = Capim, `move-green` = Mata) — plus a custom type scale (`eyebrow`, `display-1/2/3`, `body-lg`). Use these tokens rather than arbitrary Tailwind values.
 
-**Don't pair a background token with a hand-picked text color.** The brand guide fixes which typography color each background takes, and that table lives in [`lib/palette.ts`](lib/palette.ts) as `SURFACES` — each entry carries its own `text`, `muted`, `border` and `chip` classes. Reach for `surfaceForEcosystem()` / `surfaceByName()`; the class strings are spelled out there because Tailwind can't see names built at runtime. See [`docs/brand-guide-cores.md`](docs/brand-guide-cores.md) for the source table.
+**Don't pair a background token with a hand-picked text color.** The brand guide fixes which typography color each background takes, and that table lives in [`lib/palette.ts`](lib/palette.ts) as `SURFACES` — each entry carries its own `text`, `muted`, `border`, `soft` and `chip` classes (`soft` is the translucent veil for pills sitting *on* a card already painted that color, where `chip` would disappear). Reach for `surfaceForProject()` / `surfaceForEcosystem()` / `surfaceByName()`; the class strings are spelled out there because Tailwind can't see names built at runtime. See [`docs/brand-guide-cores.md`](docs/brand-guide-cores.md) for the source table.
 
 Two traps worth naming: `move-offwhite`/`move-gray` is Off White (`#F2F2F2`) and is **not** `move-light` (Luz, `#FBFFB1`) — Luz is a small graphic accent and never a component background, which is why it has no entry in `SURFACES`. And `move-black` is for typography only, never a dominant background.
 

@@ -40,7 +40,12 @@ const config: Config = {
         "display-1": ["clamp(2.25rem, 1.6rem + 3vw, 5rem)", { lineHeight: "1.02", letterSpacing: "-0.02em" }],
         "display-2": ["clamp(2.25rem, 1.75rem + 2.5vw, 4.25rem)", { lineHeight: "1.05", letterSpacing: "-0.015em" }],
         "display-3": ["clamp(1.75rem, 1.5rem + 1.25vw, 2.75rem)", { lineHeight: "1.1", letterSpacing: "-0.01em" }],
-        "body-lg": ["clamp(1.0625rem, 1rem + 0.3vw, 1.25rem)", { lineHeight: "1.6" }]
+        "body-lg": ["clamp(1.0625rem, 1rem + 0.3vw, 1.25rem)", { lineHeight: "1.6" }],
+        // Corpo de card: 13px com entrelinha curta. Existe porque `text-sm` +
+        // `leading-relaxed` deixava os cards de serviço altos demais na grade de 4
+        // colunas — a coluna tem ~272px úteis, e cada linha economizada vale ~20px
+        // de altura em todos os cards da fileira.
+        "body-sm": ["0.8125rem", { lineHeight: "1.55" }]
       },
       borderRadius: {
         soft: "8px"

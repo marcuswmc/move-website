@@ -22,7 +22,7 @@ export function Publications({ publications }: { publications: PublicationCardDa
             <div>
               <SectionLabel>Publicações</SectionLabel>
               <h2 className="max-w-2xl font-sans text-display-3 font-bold text-move-purple">
-                Conhecimento que sistematiza o que aprendemos no campo.
+                Conhecimento para ampliar o impacto
               </h2>
             </div>
             <Link

@@ -305,50 +305,50 @@ export const deliverables = [
   {
     number: "01",
     title: "Planejamento estratégico",
-    body: "Processos colaborativos que transformam leituras do presente em planos realistas, capazes de responder aos diferentes contextos de cada organização.",
-    icon: "/brand/icons/Group 13.svg"
+    body: "Processos colaborativos que transformam leituras do presente em planos de futuro realistas, capazes de responder às complexidades de contexto e foco de cada organização.",
+    icon: "/brand/services_icons/planejamento.png"
   },
   {
     number: "02",
     title: "Teoria de mudança",
-    body: "Teorias sensíveis e adaptativas para reconhecer sistemas complexos, dar clareza às escolhas e orientar os impactos que se quer alcançar.",
-    icon: "/brand/icons/Group 12.svg"
+    body: "Construções sensíveis e adaptativas que facilitam pactuações acerca das intervenções e as intencionalidades de impacto de uma iniciativa, explicitando de modo encadeado o que se pretende mudar em uma realidade socioambiental e como.",
+    icon: "/brand/services_icons/teoria-de-mudanca.png"
   },
   {
     number: "03",
-    title: "Avaliações",
-    body: "Abordagens de métodos mistos para compreender resultados e impactos, com rigor analítico e atenção às perguntas que importam em cada contexto.",
-    icon: "/brand/icons/Group 11.svg"
+    title: "Avaliação",
+    body: "Estruturação e operação de práticas focadas em compreender resultados e impactos socioambientais, com rigor analítico, amplitude metodológica e atenção aos públicos de interesse e suas demandas.",
+    icon: "/brand/services_icons/avaliacao.png"
   },
   {
     number: "04",
-    title: "Estudos, sistematizações e diagnósticos",
+    title: "Estudo, sistematização e diagnóstico",
     body: "Investigação e narrativa para organizar experiências, ampliar o debate e gerar conhecimento que apoia decisões mais consistentes.",
-    icon: "/brand/icons/Group 4.svg"
+    icon: "/brand/services_icons/estudo.png"
   },
   {
     number: "05",
-    title: "Facilitações",
-    body: "Espaços de diálogo franco, aprendizagem e adaptação, criados para que pessoas e organizações possam alcançar seu potencial.",
-    icon: "/brand/icons/Group 3.svg"
+    title: "Facilitação",
+    body: "Espaços de diálogo franco, aprendizagem e adaptação, criados e conduzidos de modo a apoiar pessoas e organizações em seus processos decisórios e de amadurecimento.",
+    icon: "/brand/services_icons/facilitacoes.png"
   },
   {
     number: "06",
-    title: "Formações",
-    body: "Saberes do campo traduzidos em processos de aprendizagem que unem tendências, repertório prático e as questões vivas de cada equipe.",
-    icon: "/brand/icons/Group 2.svg"
+    title: "Formação",
+    body: "Saberes do campo traduzidos em processos de aprendizagem cuidadosos e estruturados em conexão com tendências, repertório teórico, momentos de prática e questões vivas de cada equipe/público.",
+    icon: "/brand/services_icons/oficinas.png"
   },
   {
     number: "07",
-    title: "Publicações",
+    title: "Publicação",
     body: "Conteúdos que sistematizam aprendizados, ampliam o diálogo público e compartilham experiências relevantes para o campo socioambiental.",
-    icon: "/brand/icons/Group 10.svg"
+    icon: "/brand/services_icons/publicacoes.png"
   },
   {
     number: "08",
-    title: "Painéis de visualização de dados",
-    body: "Painéis construídos a partir de escuta ativa e metodologias sólidas para gerar insights e apoiar decisões alinhadas a propósitos transformadores.",
-    icon: "/brand/icons/Group 16.svg"
+    title: "Painel de monitoramento de dados",
+    body: "Sistemas dinâmicos de visualização de dados construídos a partir de escuta ativa e metodologias sólidas, focados em gerar insights e apoiar decisões cotidianas alinhadas a propósitos transformadores.",
+    icon: "/brand/services_icons/paineis-de-visualizacoes.png"
   }
 ];
 
@@ -393,14 +393,19 @@ export const hero = {
   body: "Há 15 anos apoiando organizações de diferentes setores, tamanhos e temáticas a tomarem decisões com base em evidências, a planejarem e articularem-se para a solução de problemas complexos."
 };
 
-export const metrics = [{ value: "450", label: "iniciativas apoiadas" }];
+export const metrics = [
+  { value: "450", label: "iniciativas apoiadas" },
+  { value: "20", label: "temas de atuação" },
+  { value: "8", label: "tipos de serviços" },
+  { value: "51", label: "publicações" }
+];
 
 // Placeholder labels — swap in the official seal/logo assets when the client sends them,
 // per data/images.ts convention for provisional visuals.
 export const affiliations = [
   { label: "Empresa B" },
-  { label: "Rede Brasileira de Monitoramento e Avaliação" },
-  { label: "Latimpacto" }
+  { label: "Associada à Rede Brasileira de Monitoramento e Avaliação" },
+  { label: "Membro da Latimpacto" }
 ];
 
 // Os resumos vêm da seção "Quem move a Move" do site atual (move.social), que é a
@@ -516,7 +521,22 @@ export const theoryPdf = {
   label: "Baixar a Teoria de Mudança em PDF"
 };
 
-export const contactAreas = ["Meio Ambiente", "Educação", "Direitos Humanos", "Cultura", "Finanças", "Outro"];
+export const contactServiceOptions = [
+  "Planejamento estratégico",
+  "Teoria de mudança",
+  "Avaliação de Impacto",
+  "Monitoramento",
+  "Gestão de Impacto",
+  "Estudo, sistematização e diagnóstico",
+  "Facilitação",
+  "Formação",
+  "Publicação",
+  "Painel de monitoramento de dados"
+];
+
+export const contactAvailabilityDays = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+
+export const contactAvailabilityPeriods = ["Manhã", "Tarde"];
 
 export const contactSteps = [
   {
@@ -536,25 +556,53 @@ export const contactSteps = [
   }
 ];
 
-// PLACEHOLDER — a Move ainda vai enviar a lista real de publicações (título, capa, sinopse).
-// Substitua estas 3 entradas pelos dados reais assim que chegarem; não usar como conteúdo final.
+/**
+ * As três publicações que a Move destaca na home. Os três materiais moram fora do
+ * site — dois links e um download hospedado no site antigo —, então todos entram
+ * como `external`: é o `externalUrl` que a página usa para montar o botão final.
+ *
+ * `synopsis` é a primeira frase do texto enviado pela Move (ela abre a página como
+ * lide e é o que o card mostra) e `content` é o resto — assim o texto aparece
+ * inteiro, sem repetir a abertura logo abaixo dela.
+ *
+ * As datas de b) e c) são provisórias: só a do artigo veio da fonte (RBAval, v. 15,
+ * n. 2, 2026). Ajuste no admin quando a Move confirmar.
+ */
 export const publications = [
   {
-    id: "publicacao-01",
-    title: "Título da publicação",
-    synopsis: "Resumo de uma a duas linhas sobre o que esta publicação aborda e para quem ela é relevante.",
+    id: "responsividade-cultural-e-interseccional-equidade-de-genero-na-moda",
+    title: "Responsividade cultural e interseccional: avaliando equidade de gênero na moda",
+    synopsis: "Avaliação de uma iniciativa que apoiou 21 grupos liderados por mulheres no enfrentamento à violência de gênero na moda brasileira.",
+    content: "Com abordagem interseccional e culturalmente responsiva, a análise ouviu cerca de 30 mulheres e identificou contribuições para a justiça social e o fortalecimento das organizações, destacando o potencial de avaliações inclusivas para promover mudanças sistêmicas.",
+    category: "Artigo",
+    externalUrl: "https://rbaval.org.br/article/doi/10.4322/rbaval.202600182026",
+    actionLabel: "Acessar o artigo",
+    author: "Juliana Kujawski Leite de Moraes e Walquiria Tiburcio Limonti",
+    publishedAt: "2026-05-20",
     cover: { src: "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&q=80", alt: "Capa provisória — substituir pela capa real da publicação" }
   },
   {
-    id: "publicacao-02",
-    title: "Título da publicação",
-    synopsis: "Resumo de uma a duas linhas sobre o que esta publicação aborda e para quem ela é relevante.",
+    id: "modelo-c-2-0",
+    title: "Modelo C 2.0",
+    synopsis: "Um modelo para negócios que querem crescer com propósito e gerar mudanças relevantes.",
+    content: "Na versão 2.0, ele evolui sem perder sua essência: integrar de forma coerente impacto social e ambiental com lógica comercial e financeira.",
+    category: "Ferramenta",
+    externalUrl: "https://www.modeloc.co/",
+    actionLabel: "Acessar o Modelo C",
+    author: "Move Social",
+    publishedAt: "2026-04-01",
     cover: { src: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80", alt: "Capa provisória — substituir pela capa real da publicação" }
   },
   {
-    id: "publicacao-03",
-    title: "Título da publicação",
-    synopsis: "Resumo de uma a duas linhas sobre o que esta publicação aborda e para quem ela é relevante.",
+    id: "avaliacao-da-efetividade-das-aceleradoras",
+    title: "Avaliação da Efetividade das Aceleradoras",
+    synopsis: "Estudo que teve o intuito de investigar as contribuições das aceleradoras para o ecossistema de impacto socioambiental.",
+    content: null,
+    category: "Estudo",
+    externalUrl: "https://move.social/aceleradoras-de-impacto-avaliacao-da-efetividade/",
+    actionLabel: "Baixar o estudo",
+    author: "Move Social",
+    publishedAt: "2026-03-01",
     cover: { src: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80", alt: "Capa provisória — substituir pela capa real da publicação" }
   }
 ];

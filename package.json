@@ -14,6 +14,12 @@
     "generate:importmap": "payload generate:importmap",
     "seed": "payload run scripts/seed.ts",
     "seed:theory": "payload run scripts/seed-theory.ts",
+    "seed:contact": "payload run scripts/seed-contact.ts",
+    "seed:stats": "payload run scripts/seed-stats.ts",
+    "seed:services": "payload run scripts/seed-services.ts",
+    "seed:partners": "payload run scripts/seed-partners.ts",
+    "logos:trim": "node scripts/trim-partner-logos.mjs",
+    "seed:publications": "payload run scripts/seed-publications.ts",
     "migrate:media": "payload run scripts/migrate-media-to-blob.ts"
   },
   "dependencies": {

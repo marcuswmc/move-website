@@ -30,11 +30,26 @@ export const ContactPage: GlobalConfig = {
               ],
             },
             {
-              name: "areas",
+              name: "serviceOptions",
               type: "array",
-              label: "Áreas do formulário",
-              admin: { description: 'Opções do campo "área de atuação" no formulário.' },
-              fields: [{ name: "label", type: "text", label: "Área", required: true }],
+              label: "Serviços de interesse",
+              admin: {
+                description:
+                  'Opções do campo "serviço de interesse" no formulário. É uma lista própria, e não os cards de "O que entregamos" — o formulário oferece frentes que não têm card na home.',
+              },
+              defaultValue: [
+                { label: "Planejamento estratégico" },
+                { label: "Teoria de mudança" },
+                { label: "Avaliação de Impacto" },
+                { label: "Monitoramento" },
+                { label: "Gestão de Impacto" },
+                { label: "Estudo, sistematização e diagnóstico" },
+                { label: "Facilitação" },
+                { label: "Formação" },
+                { label: "Publicação" },
+                { label: "Painel de monitoramento de dados" },
+              ],
+              fields: [{ name: "label", type: "text", label: "Serviço", required: true }],
             },
             {
               name: "availabilityDays",
@@ -42,7 +57,7 @@ export const ContactPage: GlobalConfig = {
               label: "Dias para contato",
               admin: {
                 description:
-                  'Opções do bloco "disponibilidade" no formulário. Tire um dia da lista para deixar de oferecê-lo.',
+                  'Cada dia vira uma linha do bloco "disponibilidade" no formulário, com um botão por período. Tire um dia da lista para deixar de oferecê-lo.',
               },
               defaultValue: [
                 { label: "Segunda" },
@@ -57,8 +72,11 @@ export const ContactPage: GlobalConfig = {
               name: "availabilityPeriods",
               type: "array",
               label: "Períodos para contato",
-              admin: { description: 'Opções de período no bloco "disponibilidade" do formulário.' },
-              defaultValue: [{ label: "Manhã" }, { label: "Tarde" }, { label: "Noite" }],
+              admin: {
+                description:
+                  "Cada período vira um botão em todos os dias da lista acima. O visitante marca os que servem para ele; os que ficarem sem marca contam como indisponível.",
+              },
+              defaultValue: [{ label: "Manhã" }, { label: "Tarde" }],
               fields: [{ name: "label", type: "text", label: "Período", required: true }],
             },
             imageField({ name: "heroImage", label: "Imagem da página", required: true }),

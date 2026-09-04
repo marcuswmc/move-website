@@ -87,7 +87,7 @@ export const TheoryOfChange: GlobalConfig = {
       maxRows: 3,
       fields: [
         { name: "label", type: "text", label: "Camada", required: true },
-        { name: "summary", type: "text", label: "Resumo curto", required: true },
+        { name: "summary", type: "text", label: "Resumo curto", required: false },
         { name: "description", type: "textarea", label: "Descrição", required: true },
       ],
     },
@@ -121,8 +121,8 @@ export const TheoryOfChange: GlobalConfig = {
       label: "6 · Impacto",
       fields: [
         { name: "eyebrow", type: "text", label: "Chapéu", required: true },
-        { name: "title", type: "text", label: "Título", required: true },
-        { name: "statement", type: "textarea", label: "Declaração", required: true },
+        { name: "title", type: "text", label: "Título", required: false },
+        { name: "statement", type: "textarea", label: "Declaração", required: false },
       ],
     },
 

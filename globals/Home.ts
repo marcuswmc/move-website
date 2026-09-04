@@ -1,8 +1,17 @@
+import {
+  BoldFeature,
+  FixedToolbarFeature,
+  InlineToolbarFeature,
+  ItalicFeature,
+  ParagraphFeature,
+  lexicalEditor,
+} from "@payloadcms/richtext-lexical";
 import type { GlobalConfig } from "payload";
 
 import { anyone, authenticated } from "@/access";
 import { imageField } from "@/fields/imageField";
 import { showcaseToneField } from "@/fields/toneField";
+import { ensureLexical } from "@/lib/lexical";
 
 export const Home: GlobalConfig = {
   slug: "home",
@@ -27,7 +36,29 @@ export const Home: GlobalConfig = {
               fields: [
                 { name: "eyebrow", type: "text", label: "Chapéu", required: true },
                 { name: "title", type: "textarea", label: "Título", required: true },
-                { name: "body", type: "textarea", label: "Texto de apoio", required: true },
+                {
+                  name: "body",
+                  type: "richText",
+                  label: "Texto de apoio",
+                  required: true,
+                  admin: {
+                    description:
+                      "Texto curto abaixo do título. Use negrito ou itálico para destacar palavras — o editor só oferece esses dois formatos porque o hero é um parágrafo, não uma página.",
+                  },
+                  editor: lexicalEditor({
+                    features: () => [
+                      ParagraphFeature(),
+                      BoldFeature(),
+                      ItalicFeature(),
+                      FixedToolbarFeature(),
+                      InlineToolbarFeature(),
+                    ],
+                  }),
+                  hooks: {
+                    // O texto foi gravado como string enquanto o campo era `textarea`.
+                    afterRead: [({ value }) => ensureLexical(value)],
+                  },
+                },
               ],
             },
             {

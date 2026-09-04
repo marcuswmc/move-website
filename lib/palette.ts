@@ -27,6 +27,8 @@ export type Surface = {
   muted: string;
   /** Borda discreta sobre o mesmo fundo. */
   border: string;
+  /** Véu translúcido para pastilhas e divisórias *dentro* de um card desta cor. */
+  soft: string;
   /** Chip: fundo da cor com o texto correspondente, para tags e pílulas. */
   chip: string;
 };
@@ -38,6 +40,7 @@ const onDark = (label: string, bg: string, border: string): Surface => ({
   text: "text-white",
   muted: "text-white/70",
   border,
+  soft: "bg-white/15",
   chip: `${bg} text-white`,
 });
 
@@ -48,6 +51,7 @@ const onLight = (label: string, bg: string, border: string): Surface => ({
   text: "text-move-black",
   muted: "text-move-black/65",
   border,
+  soft: "bg-move-black/10",
   chip: `${bg} text-move-black`,
 });
 
@@ -87,3 +91,30 @@ export const surfaceForEcosystem = (ecosystem: string): Surface =>
 /** Superfície por nome, com Açaí como fallback. */
 export const surfaceByName = (name?: string | null): Surface =>
   SURFACES[(name as SurfaceName) ?? "purple"] ?? SURFACES.purple;
+
+/**
+ * Ordem em que a paleta aparece nos selects do admin: principais antes das de apoio,
+ * como no guia. `SURFACES` é um objeto e a ordem das chaves ali não é contrato.
+ */
+const SURFACE_ORDER: SurfaceName[] = ["purple", "yellow", "periwinkle", "coral", "sand", "mint", "green"];
+
+/**
+ * Opções da paleta para campos `select` do Payload, com o rótulo oficial da cor e a
+ * cor de tipografia que vem junto — para quem edita saber o que está escolhendo sem
+ * abrir o guia. Sai daqui para não existir uma segunda lista de cores a manter.
+ */
+export const SURFACE_OPTIONS: { label: string; value: SurfaceName }[] = SURFACE_ORDER.map((value) => ({
+  label: `${SURFACES[value].label} (texto ${SURFACES[value].text === "text-white" ? "claro" : "preto"})`,
+  value,
+}));
+
+/** Valor que devolve a escolha ao ecossistema, em vez de fixar uma cor no documento. */
+export const SURFACE_AUTO = "auto";
+
+/**
+ * Cor de um card de projeto: a escolhida no CMS, ou a do ecossistema quando o campo
+ * está em "automático" — que é o padrão e o que mantém a listagem legível por cor sem
+ * ninguém precisar decidir nada projeto a projeto.
+ */
+export const surfaceForProject = (color: string | null | undefined, ecosystem: string): Surface =>
+  !color || color === SURFACE_AUTO ? surfaceForEcosystem(ecosystem) : surfaceByName(color);

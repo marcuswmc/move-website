@@ -4,11 +4,26 @@ import { Reveal } from "@/components/Reveal";
 import { SectionLabel } from "@/components/SectionLabel";
 import { TeamCarousel } from "@/components/TeamCarousel";
 
-export type Member = { name: string; specialty: string; bio: string; image: string; imageAlt: string };
+export type Member = {
+  name: string;
+  specialty: string;
+  bio: string;
+  image: string;
+  imageAlt: string;
+};
 
-export function TeamSection({ teamMembers, boardMembers }: { teamMembers: Member[]; boardMembers: Member[] }) {
+export function TeamSection({
+  teamMembers,
+  boardMembers,
+}: {
+  teamMembers: Member[];
+  boardMembers: Member[];
+}) {
   return (
-    <section id="equipe" className="relative overflow-hidden bg-white py-20 md:py-28">
+    <section
+      id="equipe"
+      className="relative overflow-hidden bg-white py-20 md:py-28"
+    >
       <Grafismo
         src="/brand/icons/Group 4.svg"
         animate="float"
@@ -22,11 +37,12 @@ export function TeamSection({ teamMembers, boardMembers }: { teamMembers: Member
             <Reveal className="flex flex-col justify-center">
               <SectionLabel>Conselho da Move</SectionLabel>
               <h2 className="font-sans text-display-3 font-bold leading-[1.02] text-move-purple text-balance">
-                Quem orienta a trajetória da Move.
+                Quem ajuda a Move a olhar mais longe
               </h2>
               <p className="mt-5 leading-relaxed text-move-black/65">
-                Conselheiras e conselheiros que sustentam as decisões de longo prazo da consultoria. Cada retrato abre
-                ao passar o cursor — ou ao toque, no celular.
+                Conselheira e conselheiros que contribuem para as decisões
+                estratégicas e os caminhos de longo prazo da Move, trazendo
+                diferentes experiências e perspectivas.
               </p>
             </Reveal>
 
@@ -72,8 +88,8 @@ export function TeamSection({ teamMembers, boardMembers }: { teamMembers: Member
           <TeamCarousel
             members={teamMembers}
             eyebrow="Equipe"
-            title="Quem move a Move."
-            body="Consultoras e consultores que combinam rigor metodológico e escuta para atravessar o ciclo de impacto junto com cada organização."
+            title="Quem move a Move"
+            body="Um time diverso em experiências e competências, que combina diferentes perspectivas para construir soluções diante de desafios complexos."
           />
         </div>
       </div>

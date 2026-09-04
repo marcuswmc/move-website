@@ -1,0 +1,2583 @@
+<title>Manual do Desenvolvedor Move</title>
+
+<style>
+:root {
+  --paper: #F2F2F2;
+  --surface: #FFFFFF;
+  --surface-2: #FAF8FB;
+  --ink: #1A1420;
+  --ink-soft: rgba(26, 20, 32, .70);
+  --ink-faint: rgba(26, 20, 32, .48);
+  --heading: #54355D;
+  --acai: #54355D;
+  --ipe: #FACA77;
+  --lavanda: #CCACFF;
+  --goiaba: #DF6E6E;
+  --mata: #234625;
+  --areia: #CEB187;
+  --line: rgba(84, 53, 93, .14);
+  --line-strong: rgba(84, 53, 93, .28);
+  --rail-bg: #54355D;
+  --rail-ink: #FFFFFF;
+  --rail-soft: rgba(255, 255, 255, .62);
+  --rail-line: rgba(255, 255, 255, .16);
+  --code-bg: #2B1F33;
+  --code-ink: #EFE9F2;
+  --code-comment: #A98FB4;
+  --code-string: #FACA77;
+  --tint-warn: rgba(223, 110, 110, .10);
+  --tint-note: rgba(204, 172, 255, .16);
+  --tint-rule: rgba(250, 202, 119, .18);
+  --shadow: 0 18px 50px rgba(84, 53, 93, .10);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #17121C;
+    --surface: #1F1826;
+    --surface-2: #251D2E;
+    --ink: #EDE8F0;
+    --ink-soft: rgba(237, 232, 240, .72);
+    --ink-faint: rgba(237, 232, 240, .46);
+    --heading: #CCACFF;
+    --line: rgba(204, 172, 255, .16);
+    --line-strong: rgba(204, 172, 255, .32);
+    --rail-bg: #120E17;
+    --rail-line: rgba(204, 172, 255, .16);
+    --code-bg: #120E17;
+    --code-ink: #E7DFEC;
+    --tint-warn: rgba(223, 110, 110, .16);
+    --tint-note: rgba(204, 172, 255, .12);
+    --tint-rule: rgba(250, 202, 119, .12);
+    --shadow: 0 18px 50px rgba(0, 0, 0, .40);
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #17121C;
+  --surface: #1F1826;
+  --surface-2: #251D2E;
+  --ink: #EDE8F0;
+  --ink-soft: rgba(237, 232, 240, .72);
+  --ink-faint: rgba(237, 232, 240, .46);
+  --heading: #CCACFF;
+  --line: rgba(204, 172, 255, .16);
+  --line-strong: rgba(204, 172, 255, .32);
+  --rail-bg: #120E17;
+  --rail-line: rgba(204, 172, 255, .16);
+  --code-bg: #120E17;
+  --code-ink: #E7DFEC;
+  --tint-warn: rgba(223, 110, 110, .16);
+  --tint-note: rgba(204, 172, 255, .12);
+  --tint-rule: rgba(250, 202, 119, .12);
+  --shadow: 0 18px 50px rgba(0, 0, 0, .40);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Avenir Next", Avenir, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--ipe); color: #54355D; }
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--ipe);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- shell ---------- */
+
+.shell {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
+  align-items: start;
+  min-height: 100vh;
+}
+
+/* ---------- rail ---------- */
+
+.rail {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--rail-bg);
+  color: var(--rail-ink);
+  padding: 38px 26px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.mark { display: flex; flex-direction: column; gap: 10px; }
+
+.mark .glyph {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 5px solid var(--ipe);
+}
+
+.mark strong {
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  line-height: 1.25;
+}
+
+.mark span {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .68rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--rail-soft);
+}
+
+.rail nav { display: flex; flex-direction: column; gap: 24px; }
+
+.rail .group { display: flex; flex-direction: column; gap: 3px; }
+
+.rail .group > p {
+  margin: 0 0 7px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .64rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .40);
+}
+
+.rail a {
+  display: block;
+  padding: 5px 10px 5px 12px;
+  border-left: 2px solid transparent;
+  color: var(--rail-soft);
+  font-size: .875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color .15s ease, border-color .15s ease;
+}
+
+.rail a:hover { color: var(--rail-ink); }
+
+.rail a.is-active {
+  color: var(--rail-ink);
+  border-left-color: var(--ipe);
+  font-weight: 700;
+}
+
+.rail footer {
+  margin-top: auto;
+  padding-top: 22px;
+  border-top: 1px solid var(--rail-line);
+  font-size: .75rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, .45);
+}
+
+/* ---------- doc ---------- */
+
+.doc {
+  padding: 76px 64px 140px;
+  max-width: 860px;
+}
+
+section { scroll-margin-top: 28px; }
+
+section + section {
+  margin-top: 84px;
+  padding-top: 78px;
+  border-top: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .68rem;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ipe);
+  flex: none;
+}
+
+h1, h2, h3, h4 {
+  color: var(--heading);
+  text-wrap: balance;
+  letter-spacing: -.018em;
+  line-height: 1.13;
+  margin: 0;
+}
+
+h1 { font-size: clamp(2rem, 1.5rem + 1.8vw, 2.85rem); font-weight: 800; }
+h2 { font-size: 1.42rem; font-weight: 800; margin-top: 2.6em; letter-spacing: -.012em; }
+h3 { font-size: 1.08rem; font-weight: 700; margin-top: 2.2em; letter-spacing: -.005em; }
+h4 { font-size: .95rem; font-weight: 700; margin-top: 1.9em; }
+
+h1 + .lede { margin-top: 18px; }
+
+.lede {
+  font-size: 1.09rem;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 62ch;
+}
+
+p, ul, ol { margin: 1.05em 0 0; max-width: 68ch; }
+
+li { margin-top: .4em; }
+
+ul, ol { padding-left: 1.25em; }
+
+li::marker { color: var(--ink-faint); }
+
+strong { font-weight: 700; color: var(--ink); }
+
+.doc a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--ipe);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  font-weight: 600;
+  transition: text-decoration-color .15s ease;
+}
+
+.doc a:hover { text-decoration-color: var(--heading); }
+
+hr {
+  margin: 3em 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- code ---------- */
+
+code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .855em;
+}
+
+p > code, li > code, td > code, th > code, h2 > code, h3 > code, h4 > code, .lede > code {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: .1em .34em;
+  color: var(--heading);
+  white-space: nowrap;
+}
+
+pre {
+  margin: 1.4em 0 0;
+  padding: 18px 20px;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  border-radius: 10px;
+  border-left: 3px solid var(--ipe);
+  overflow-x: auto;
+  line-height: 1.62;
+  font-size: .845rem;
+  box-shadow: var(--shadow);
+}
+
+pre code { font-size: inherit; background: none; border: 0; padding: 0; color: inherit; white-space: pre; }
+
+.tok-comment { color: var(--code-comment); font-style: italic; }
+.tok-string { color: var(--code-string); }
+
+/* ---------- tables ---------- */
+
+.scroller { overflow-x: auto; margin: 1.5em 0 0; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 420px;
+  font-size: .875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+th, td {
+  text-align: left;
+  padding: 10px 16px 10px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+th {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .68rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 500;
+  border-bottom-color: var(--line-strong);
+  white-space: nowrap;
+}
+
+tbody tr:last-child td { border-bottom: 0; }
+
+/* ---------- callouts ---------- */
+
+.note {
+  margin: 1.6em 0 0;
+  padding: 16px 20px;
+  border-left: 3px solid var(--lavanda);
+  background: var(--tint-note);
+  border-radius: 0 8px 8px 0;
+}
+
+.warn { border-left-color: var(--goiaba); background: var(--tint-warn); }
+.rule { border-left-color: var(--ipe); background: var(--tint-rule); }
+
+.note > :first-child { margin-top: 0; }
+
+.note .tag {
+  display: block;
+  margin-bottom: 6px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: .66rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rule p { font-size: 1.02rem; font-weight: 600; }
+
+/* ---------- checklist ---------- */
+
+.check { list-style: none; padding-left: 0; }
+
+.check li {
+  position: relative;
+  padding-left: 28px;
+  margin-top: .5em;
+}
+
+.check li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .42em;
+  width: 13px;
+  height: 13px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 3px;
+}
+
+/* ---------- swatches ---------- */
+
+.sw {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  margin-right: 7px;
+  vertical-align: -1px;
+  border: 1px solid var(--line-strong);
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1040px) {
+  .shell { grid-template-columns: 1fr; }
+
+  .rail {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .mark { flex-direction: row; align-items: center; gap: 9px; flex: none; }
+  .mark .glyph { width: 20px; height: 20px; border-width: 4px; }
+  .mark strong { font-size: .9rem; white-space: nowrap; }
+  .mark span, .rail footer, .rail .group > p { display: none; }
+
+  .rail nav { flex-direction: row; gap: 6px; }
+  .rail .group { flex-direction: row; gap: 6px; }
+
+  .rail a {
+    white-space: nowrap;
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+    padding: 4px 8px;
+  }
+
+  .rail a.is-active { border-left: 0; border-bottom-color: var(--ipe); }
+
+  .doc { padding: 44px 22px 110px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .001ms !important; animation-duration: .001ms !important; scroll-behavior: auto !important; }
+}
+</style>
+
+<div class="shell">
+
+<aside class="rail">
+  <div class="mark">
+    <div class="glyph" aria-hidden="true"></div>
+    <strong>Manual do<br>Desenvolvedor</strong>
+    <span>Move Social</span>
+  </div>
+
+  <nav aria-label="Seções do manual">
+    <div class="group">
+      <p>Começar</p>
+      <a href="#inicio">Início</a>
+      <a href="#arquitetura">Arquitetura</a>
+    </div>
+    <div class="group">
+      <p>Payload CMS</p>
+      <a href="#collections">Collections</a>
+      <a href="#campos">Campos</a>
+      <a href="#globals">Globals</a>
+      <a href="#conteudo">Camada de conteúdo</a>
+    </div>
+    <div class="group">
+      <p>Next.js</p>
+      <a href="#rotas">Páginas e rotas</a>
+      <a href="#design">Componentes e design</a>
+    </div>
+    <div class="group">
+      <p>Operação</p>
+      <a href="#infra">Infraestrutura</a>
+      <a href="#receitas">Receitas</a>
+      <a href="#troubleshooting">Troubleshooting</a>
+    </div>
+  </nav>
+
+  <footer>
+    Versão viva em <code>docs/</code> no repositório.<br>
+    Esta página é um retrato para leitura e compartilhamento.
+  </footer>
+</aside>
+
+<main class="doc">
+<section id="inicio">
+  <p class="eyebrow">Começar</p>
+  <h1>Manual do desenvolvedor</h1>
+  <p class="lede">Guia para quem for manter, estender ou assumir o desenvolvimento do site da Move Social — uma consultoria brasileira de impacto socioambiental. Site em Next.js, conteúdo em Payload CMS sobre MongoDB.</p>
+
+  <div class="note">
+    <span class="tag">Para quem edita conteúdo</span>
+    <p>Nada aqui é necessário. Texto, imagens, projetos, equipe e publicações são editados em <code>/admin</code>. Esta documentação é para quem mexe em <strong>código</strong>.</p>
+  </div>
+
+  <h2>Setup em cinco minutos</h2>
+
+  <p><strong>Pré-requisitos</strong> — Node <code>^18.20.2 || &gt;=20.9.0</code>, pnpm <strong>11.21.0</strong> (fixado em <code>packageManager</code>), e acesso ao cluster MongoDB Atlas e ao Blob store da Vercel.</p>
+
+<pre data-lang="bash"><code>corepack enable &amp;&amp; corepack prepare pnpm@11.21.0 --activate</code></pre>
+
+  <p><strong>Instalar e rodar</strong></p>
+
+<pre data-lang="bash"><code>pnpm install
+cp .env.example .env   # preencha as três variáveis
+pnpm dev</code></pre>
+
+  <ul>
+    <li>Site: <code>http://localhost:3000</code></li>
+    <li>Admin: <code>http://localhost:3000/admin</code></li>
+  </ul>
+
+  <p>Na primeira execução com um banco vazio, <code>/admin</code> abre a tela de criação do primeiro usuário. Depois disso o Payload bloqueia essa rota sozinho.</p>
+
+  <h3>Variáveis de ambiente</h3>
+
+  <p>As três são obrigatórias, inclusive em dev — o porquê de cada uma está em <a href="#infra">Infraestrutura</a>.</p>
+
+<pre data-lang="bash"><code>DATABASE_URL=mongodb+srv://user:senha@cluster.xxxxx.mongodb.net/move-social?retryWrites=true&amp;w=majority
+PAYLOAD_SECRET=&lt;string aleatória de 32+ bytes&gt;
+BLOB_READ_WRITE_TOKEN=vercel_blob_rw_&lt;store&gt;_&lt;hash&gt;</code></pre>
+
+  <h2>Comandos</h2>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Comando</th><th>O que faz</th></tr></thead>
+    <tbody>
+      <tr><td><code>pnpm dev</code></td><td>Servidor de desenvolvimento (site + admin)</td></tr>
+      <tr><td><code>pnpm build</code></td><td><code>payload generate:importmap</code> seguido de <code>next build</code></td></tr>
+      <tr><td><code>pnpm start</code></td><td>Serve o build de produção</td></tr>
+      <tr><td><code>pnpm lint</code></td><td>ESLint via <code>next lint</code></td></tr>
+      <tr><td><code>pnpm generate:types</code></td><td>Regenera <code>payload-types.ts</code> a partir do config</td></tr>
+      <tr><td><code>pnpm generate:importmap</code></td><td>Regenera <code>app/(payload)/admin/importMap.js</code></td></tr>
+      <tr><td><code>pnpm seed</code></td><td><strong>Apaga e recarrega</strong> todo o conteúdo a partir de <code>data/site.ts</code></td></tr>
+      <tr><td><code>pnpm seed:theory</code></td><td>Recarrega apenas o global da Teoria da Mudança</td></tr>
+      <tr><td><code>pnpm migrate:media</code></td><td>Sobe o conteúdo de <code>./media</code> para o Vercel Blob</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">Destrutivo</span>
+    <p><code>pnpm seed</code> existe para a <strong>carga inicial</strong> e sobrescreve qualquer edição feita no admin. Como dev e produção compartilham o mesmo banco Atlas, rodar em dev apaga o conteúdo de produção.</p>
+  </div>
+
+  <p>Não há suíte de testes neste projeto.</p>
+
+  <h2>As cinco regras que evitam 90% dos problemas</h2>
+
+  <ol>
+    <li><strong>Copy é conteúdo, não código.</strong> Texto, número, imagem e ordem se mudam em <code>/admin</code>. Só se toca no código quando muda a <em>forma</em> do conteúdo — campo novo, seção nova.</li>
+    <li><strong>Componentes nunca importam do Payload.</strong> Eles recebem props simples. <code>lib/content.ts</code> é o único arquivo que lê o CMS.</li>
+    <li><strong>Fundo e cor de texto são uma decisão só.</strong> Use <code>SURFACES</code> em <code>lib/palette.ts</code>, nunca um <code>bg-move-*</code> com uma cor de texto escolhida na hora.</li>
+    <li><strong><code>BLOB_READ_WRITE_TOKEN</code> é obrigatório em dev.</strong> Sem ele o Payload volta a gravar em disco <em>em silêncio</em>, e como o banco é compartilhado o site de produção passa a apontar para arquivos que não existem lá.</li>
+    <li><strong>Depois de mexer em collection, global ou campo, rode <code>pnpm generate:types</code>.</strong> O <code>payload-types.ts</code> é o contrato de tipos de todo o resto.</li>
+  </ol>
+</section>
+
+<section id="arquitetura">
+  <p class="eyebrow">Começar</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Arquitetura</h2>
+
+  <h3>O que é este projeto</h3>
+
+  <p>Site institucional da Move Social. Todo o conteúdo é pt-BR — o site e o painel administrativo.</p>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Rota</th><th>Fonte do conteúdo</th></tr></thead>
+    <tbody>
+      <tr><td><code>/</code></td><td>global <code>home</code> + collections <code>services</code>, <code>partners</code>, <code>publications</code>, <code>team-members</code></td></tr>
+      <tr><td><code>/teoria-da-mudanca</code></td><td>global <code>theory-of-change</code> + collection <code>services</code></td></tr>
+      <tr><td><code>/publicacoes</code></td><td>global <code>publications-page</code> + collection <code>publications</code></td></tr>
+      <tr><td><code>/publicacoes/[slug]</code></td><td>collection <code>publications</code></td></tr>
+      <tr><td><code>/portfolio</code></td><td>global <code>portfolio-page</code> + collection <code>projects</code></td></tr>
+      <tr><td><code>/portfolio/[slug]</code></td><td>collection <code>projects</code></td></tr>
+      <tr><td><code>/contato</code></td><td>global <code>contact-page</code> + global <code>site-settings</code></td></tr>
+      <tr><td><code>/admin</code></td><td>painel do Payload</td></tr>
+      <tr><td><code>/api/*</code></td><td>REST + GraphQL do Payload (gerado, não editar)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Stack</h3>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Camada</th><th>Tecnologia</th><th>Versão</th></tr></thead>
+    <tbody>
+      <tr><td>Framework</td><td>Next.js (App Router)</td><td>16.2.9</td></tr>
+      <tr><td>UI</td><td>React</td><td>19.2</td></tr>
+      <tr><td>CMS</td><td>Payload</td><td>3.88.0</td></tr>
+      <tr><td>Banco</td><td>MongoDB (Atlas) via <code>@payloadcms/db-mongodb</code></td><td>—</td></tr>
+      <tr><td>Uploads</td><td>Vercel Blob (store público)</td><td>—</td></tr>
+      <tr><td>Estilo</td><td>Tailwind CSS</td><td>3.4</td></tr>
+      <tr><td>Rich text</td><td>Lexical</td><td>3.88.0</td></tr>
+      <tr><td>SEO</td><td><code>@payloadcms/plugin-seo</code></td><td>3.88.0</td></tr>
+      <tr><td>Animação</td><td>GSAP + ScrollTrigger, Lenis, Framer Motion</td><td>—</td></tr>
+      <tr><td>Imagens</td><td><code>sharp</code></td><td>0.34.2</td></tr>
+      <tr><td>Hospedagem</td><td>Vercel</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>A regra central</h3>
+
+  <div class="note rule">
+    <p>Conteúdo mora no Payload. Componentes são apresentacionais. <code>lib/content.ts</code> é a única ponte entre os dois.</p>
+  </div>
+
+  <p>Isso tem três consequências práticas que valem para qualquer alteração:</p>
+
+  <ol>
+    <li><strong>Pedido de mudança de texto, número, imagem ou ordem = edição no <code>/admin</code>.</strong> Não abra o editor de código. Se o campo não existir ainda, aí sim é código: você cria o campo, e a Move preenche.</li>
+    <li><strong>Nenhum componente importa <code>payload</code>, <code>@/lib/content</code> ou <code>payload-types</code> para buscar dados.</strong> Componentes recebem props. Isso é o que permite trocar a origem do conteúdo sem reescrever a interface — foi exatamente o que aconteceu quando o conteúdo saiu de <code>data/site.ts</code> e foi para o CMS: <code>lib/content.ts</code> passou a devolver as mesmas formas, e nenhum componente precisou mudar.</li>
+    <li><strong><code>data/site.ts</code> e <code>data/images.ts</code> não são mais lidos pelo site.</strong> Sobrevivem só como entrada do <code>scripts/seed.ts</code>. Não adicione conteúdo novo ali.</li>
+  </ol>
+
+  <h3>Fluxo de dados</h3>
+
+<pre data-lang="text"><code>MongoDB Atlas
+     │
+     │  payload.find() / payload.findGlobal()
+     ▼
+lib/content.ts ──── resolveImage() ──── lib/resolveImage.ts
+     │              (upload &gt; URL externa)
+     │  React cache() — dedupe por request
+     │  filtro _status: 'published'
+     │  devolve objetos planos: { title, image: {src, alt}, ... }
+     ▼
+app/(frontend)/**/page.tsx        (Server Component, revalidate = 60)
+     │
+     │  props simples
+     ▼
+components/*.tsx                  (apresentacional; "use client" só quando precisa)</code></pre>
+
+  <p>O caminho inverso — quem escreve — é <code>/admin</code> → Payload → MongoDB (documento) e Vercel Blob (arquivo do upload).</p>
+
+  <h3>Mapa de pastas</h3>
+
+<pre data-lang="text"><code>app/
+  (frontend)/          Site público. Layout, globals.css e as páginas.
+    layout.tsx         Fontes, SmoothScroll, Header, Footer. Lê site-settings.
+    globals.css        Reset, .editorial-container, .editorial-prose, reduced motion
+    page.tsx           Home
+    portfolio/         Listagem + [slug]
+    publicacoes/       Listagem + [slug]
+    teoria-da-mudanca/
+    contato/
+  (payload)/           GERADO PELO PAYLOAD — não editar à mão
+    admin/             Painel; importMap.js é regenerado por comando
+    api/               REST, GraphQL e GraphQL playground
+    custom.scss        Único ponto de customização visual do admin
+
+collections/           Um arquivo por collection (Projects, Publications, …)
+globals/               Um arquivo por global (Home, ContactPage, …)
+fields/                Helpers de campo (imageField, toneField, iconField)
+access/                Funções de controle de acesso compartilhadas
+
+lib/
+  payload.ts           getPayloadClient() — instância do Payload
+  content.ts           ★ camada de leitura do CMS (a única)
+  resolveImage.ts      upload vs URL externa; displayNumber()
+  seo.ts               metadataFromSeo() — grupo meta do CMS → Metadata do Next
+  palette.ts           SURFACES: tabela de contraste da marca em código
+  taxonomy.ts          ECOSYSTEMS e SEGMENTS (listas fechadas)
+  filterIcons.ts       grafismo de cada ecossistema/filtro
+  utils.ts             cn()
+
+components/            Apresentacionais. Sem acesso a dados.
+  ui/                  Primitivos (shadcn)
+
+data/                  ⚠ legado — só alimenta o seed, não é lido pelo site
+scripts/               seed.ts, seed-theory.ts, migrate-media-to-blob.ts
+docs/                  Esta documentação
+public/brand/icons/    SVGs dos grafismos usados pelo iconField
+media/                 gitignored; sobras da carga inicial (produção usa o Blob)
+
+payload.config.ts      Registro de collections, globals, plugins, banco, i18n
+payload-types.ts       GERADO — tipos de todos os documentos
+next.config.ts         withPayload(), remotePatterns de imagem, turbopack root
+tailwind.config.ts     Tokens da marca no namespace `move`</code></pre>
+
+  <h3><code>payload.config.ts</code> — o registro central</h3>
+
+  <p>Tudo que existe no CMS precisa estar listado aqui.</p>
+
+<pre data-lang="ts"><code>collections: [Projects, Services, Publications, PublicationCategories,
+              TeamMembers, Partners, Media, Users],
+globals: [Home, TheoryOfChange, PublicationsPage, PortfolioPage,
+          ContactPage, SiteSettings],
+editor: lexicalEditor(),
+db: mongooseAdapter({ url: process.env.DATABASE_URL || "" }),
+typescript: { outputFile: path.resolve(dirname, "payload-types.ts") },
+i18n: { supportedLanguages: { pt }, fallbackLanguage: "pt" },
+plugins: [ seoPlugin({...}), vercelBlobStorage({...}) ],</code></pre>
+
+  <ul>
+    <li><strong><code>i18n</code> em pt</strong> — o painel inteiro em português, porque todo o conteúdo é pt-BR. Isso é a <em>interface</em> do admin, não localização de conteúdo (o projeto não usa campos <code>localized</code>).</li>
+    <li><strong><code>sharp: sharp as unknown as SharpDependency</code></strong> — o <code>.d.ts</code> do Payload carrega uma cópia própria dos tipos do sharp que não bate com o sharp 0.34 instalado. É divergência só de tipagem; em runtime é a função certa. Não "conserte".</li>
+    <li><strong><code>seoPlugin</code></strong> com <code>tabbedUI: true</code> adiciona uma aba <strong>SEO</strong> às collections <code>projects</code> e <code>publications</code> e aos globals de página. Os geradores de título e descrição só rodam quando alguém clica em "gerar" — texto escrito à mão sempre vence.</li>
+    <li><strong><code>vercelBlobStorage</code></strong> redireciona os uploads da collection <code>media</code> para o Blob. Este é o ponto que mais causou problema no projeto — ver <a href="#infra">Infraestrutura</a>.</li>
+  </ul>
+
+  <h3>Convenções do repositório</h3>
+
+  <ul>
+    <li><strong>Alias <code>@/</code></strong> aponta para a raiz. <code>@payload-config</code> aponta para <code>payload.config.ts</code>. Ambos em <code>tsconfig.json</code>.</li>
+    <li><strong>Slugs em kebab-case</strong> (<code>publication-categories</code>, <code>theory-of-change</code>) — viram nome de coleção no Mongo e caminho na API.</li>
+    <li><strong>Nomes de campo em inglês, labels em português.</strong> O campo é <code>client</code>, o label é "Cliente".</li>
+    <li><strong>Comentários explicam o <em>porquê</em>, não o <em>o quê</em>.</strong> O código do repositório segue esse padrão de forma consistente; mantenha-o.</li>
+    <li><strong>Ordenação manual via campo <code>order</code></strong> (<code>number</code>, <code>defaultValue: 0</code>, <code>position: "sidebar"</code>) + <code>defaultSort: "order"</code>.</li>
+    <li><strong>Numeração visível (<code>01</code>, <code>02</code>…) é derivada da posição</strong> com <code>displayNumber()</code>. Nunca crie um campo numérico manual: nada o manteria em sincronia.</li>
+  </ul>
+
+  <h3>Fronteira servidor / cliente</h3>
+
+  <p>Páginas são <strong>Server Components</strong> e fazem todo o acesso a dados. Componentes marcados <code>"use client"</code> recebem os dados já prontos.</p>
+
+  <p>O caso mais instrutivo é <code>/portfolio</code>: a página é servidor, busca <strong>todos</strong> os projetos e entrega um array simples ao <code>PortfolioBrowser</code>, que filtra em memória. As collections estão na casa das centenas de itens — filtrar no cliente mantém a página estática e torna cada mudança de filtro instantânea, sem ida ao servidor. Reavaliar se o acervo passar de alguns milhares.</p>
+
+  <p>Um componente cliente <strong>não pode</strong> importar de <code>collections/</code> ou <code>lib/content.ts</code> — isso arrastaria o Payload inteiro para o bundle do navegador. É por isso que <code>ECOSYSTEMS</code> e <code>SEGMENTS</code> moram em <code>lib/taxonomy.ts</code>: as duas pontas precisam deles.</p>
+</section>
+<section id="collections">
+  <p class="eyebrow">Payload CMS</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Collections</h2>
+
+  <p class="lede">Uma collection é um tipo de documento que a Move cria quantas vezes quiser. Se o conteúdo é único na página, não é collection — é <a href="#globals">global</a>.</p>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Slug</th><th>Drafts</th><th>O que é</th></tr></thead>
+    <tbody>
+      <tr><td><code>projects</code></td><td>sim</td><td>Casos do portfólio. Card em <code>/portfolio</code> + página própria</td></tr>
+      <tr><td><code>services</code></td><td>sim</td><td>Cards de "O que entregamos"</td></tr>
+      <tr><td><code>publications</code></td><td>sim</td><td>Acervo de <code>/publicacoes</code></td></tr>
+      <tr><td><code>publication-categories</code></td><td>não</td><td>Rótulos de filtro das publicações</td></tr>
+      <tr><td><code>team-members</code></td><td>sim</td><td>Equipe e conselho</td></tr>
+      <tr><td><code>partners</code></td><td>sim</td><td>Logos de clientes e parceiros</td></tr>
+      <tr><td><code>media</code></td><td>não</td><td>Uploads (imagens e documentos)</td></tr>
+      <tr><td><code>users</code></td><td>não</td><td>Acesso ao admin</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Anatomia</h3>
+
+<pre data-lang="ts"><code>import type { CollectionConfig } from "payload";
+import { slugField } from "payload";
+
+import { authenticated, publishedOrAuthenticated } from "@/access";
+import { imageField } from "@/fields/imageField";
+
+export const Recognitions: CollectionConfig = {
+  // 1. Identidade
+  slug: "recognitions",                    // kebab-case; vira coleção no Mongo e rota na API
+  labels: { singular: "Reconhecimento", plural: "Reconhecimentos" },
+
+  // 2. Como aparece no painel
+  admin: {
+    useAsTitle: "title",                   // o que a lista mostra como nome do documento
+    defaultColumns: ["title", "year", "_status"],
+    listSearchableFields: ["title", "summary"],
+    group: "Conteúdo",                     // "Conteúdo" | "Páginas" | "Configurações"
+    description: "Aparece no bloco de reconhecimentos da home.",
+  },
+
+  // 3. Quem pode o quê
+  access: {
+    read: publishedOrAuthenticated,
+    create: authenticated,
+    update: authenticated,
+    delete: authenticated,
+  },
+
+  // 4. Rascunho e publicação
+  versions: { drafts: true, maxPerDoc: 20 },
+
+  // 5. Ordenação padrão da listagem
+  defaultSort: "order",
+
+  // 6. Campos
+  fields: [
+    { name: "title", type: "text", label: "Título", required: true, index: true },
+    slugField({ useAsSlug: "title" }),
+    imageField({ required: true }),
+    {
+      name: "order",
+      type: "number",
+      label: "Ordem",
+      required: true,
+      defaultValue: 0,
+      admin: { position: "sidebar", description: "Menor número aparece primeiro." },
+    },
+  ],
+};</code></pre>
+
+  <h4><code>admin</code></h4>
+
+  <ul>
+    <li><strong><code>useAsTitle</code></strong> — sem isso a listagem mostra o ID do Mongo, o que torna o painel inutilizável. Sempre defina.</li>
+    <li><strong><code>group</code></strong> — o projeto usa três, e a escolha muda onde a Move procura o item: <code>"Conteúdo"</code> (o que ela cria e edita rotineiramente), <code>"Páginas"</code> (globals de copy de uma página) e <code>"Configurações"</code> (mídia, usuários, ajustes).</li>
+    <li><strong><code>description</code></strong> — a frase que explica <em>onde no site</em> aquilo aparece. Todas as collections do projeto têm uma; é o que evita a pergunta "onde isso vai sair?".</li>
+    <li><strong><code>listSearchableFields</code></strong> — habilita a busca da listagem. Vale em qualquer collection que passe de umas poucas dezenas de documentos.</li>
+  </ul>
+
+  <h4><code>access</code></h4>
+
+  <p>As funções ficam em <code>access/index.ts</code> e são três:</p>
+
+<pre data-lang="ts"><code>anyone                   // leitura pública
+authenticated            // exige usuário logado no admin
+publishedOrAuthenticated // anônimo vê só _status: 'published'; logado vê tudo</code></pre>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Situação</th><th><code>read</code></th></tr></thead>
+    <tbody>
+      <tr><td>Collection com <code>versions.drafts: true</code></td><td><code>publishedOrAuthenticated</code></td></tr>
+      <tr><td>Collection sem drafts (media, categorias)</td><td><code>anyone</code></td></tr>
+      <tr><td><code>users</code></td><td><code>authenticated</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p><code>create</code>, <code>update</code> e <code>delete</code> são sempre <code>authenticated</code>. A exceção é <code>users</code>, cujo <code>create</code> é <code>anyone</code> — mas só até existir o primeiro usuário; depois disso o próprio Payload bloqueia <code>/admin/create-first-user</code>.</p>
+
+  <p>Access control aceita retornar <code>true</code>, <code>false</code> ou uma <strong>query de filtro</strong> — é o que <code>publishedOrAuthenticated</code> faz:</p>
+
+<pre data-lang="ts"><code>export const publishedOrAuthenticated: Access = ({ req: { user } }) =&gt; {
+  if (user) return true;
+  return { _status: { equals: "published" } };
+};</code></pre>
+
+  <h4><code>versions</code> e drafts</h4>
+
+  <p><code>versions: { drafts: true, maxPerDoc: 20 }</code> habilita o botão <strong>Salvar rascunho / Publicar</strong> e guarda as 20 últimas versões do documento. Consequências:</p>
+
+  <ul>
+    <li>Cada documento ganha um campo automático <code>_status</code> (<code>draft</code> | <code>published</code>).</li>
+    <li><strong>Toda leitura pública precisa filtrar por <code>_status: 'published'</code>.</strong> A camada de conteúdo faz isso com a constante <code>PUBLISHED</code>.</li>
+    <li>Um documento novo nasce como rascunho e <strong>não aparece no site</strong> até ser publicado. É intencional; é o mecanismo que permite à Move escrever com calma.</li>
+  </ul>
+
+  <p>Globals usam a forma reduzida <code>versions: { max: 20 }</code> — histórico, sem rascunho.</p>
+
+  <h4><code>slugField</code></h4>
+
+  <p>Vem do próprio Payload. Gera uma <code>row</code> na sidebar com um campo <code>slug</code> texto, único e indexado, mais um checkbox oculto <code>generateSlug</code> que o preenche a partir de outro campo:</p>
+
+<pre data-lang="ts"><code>slugField()                        // gera a partir de `title` (padrão)
+slugField({ useAsSlug: "client" }) // gera a partir de `client` — usado em Projects
+slugField({ useAsSlug: "name" })   // usado em Partners e PublicationCategories</code></pre>
+
+  <p>O slug <strong>estabiliza</strong> depois de criado: o Payload para de regerá-lo se o usuário o editou à mão, e não o reescreve num documento já publicado. Isso protege URLs que já estão no ar.</p>
+
+  <div class="note">
+    <span class="tag">Atenção na atualização</span>
+    <p>A API é marcada como <code>@experimental</code> pelo Payload. Ao subir de versão maior, confira o comportamento antes de assumir que continua idêntico.</p>
+  </div>
+
+  <h4><code>defaultSort</code></h4>
+
+  <p><code>defaultSort: "order"</code> (crescente) ou <code>"-publishedAt"</code> (o <code>-</code> inverte). É a ordem da listagem no admin <strong>e</strong> o padrão de <code>payload.find()</code> quando não se passa <code>sort</code> — mas a camada de conteúdo passa <code>sort</code> explicitamente de qualquer forma, para o comportamento não depender de configuração distante.</p>
+
+  <h3>Relacionamentos</h3>
+
+  <h4><code>relationship</code> — o lado que escreve</h4>
+
+<pre data-lang="ts"><code>{
+  name: "partner",
+  type: "relationship",
+  relationTo: "partners",
+  label: "Cliente (logo)",
+  index: true,
+  admin: { description: "Opcional. Quando preenchido, o logo aparece no card." },
+}</code></pre>
+
+  <p>Com <code>hasMany: true</code> vira lista — é o caso de <code>categories</code> em <code>publications</code>.</p>
+
+  <p><strong>Onde colocar o campo</strong> é decisão de arquitetura, não de gosto. A relação Cliente ↔ Projeto mora em <code>Projects</code>, e não em <code>Partners</code>, porque é durante a publicação do projeto que se sabe de quem ele é — e assim um mesmo cliente acumula vários projetos sem ninguém manter duas listas em sincronia.</p>
+
+  <h4><code>join</code> — o lado que só lê</h4>
+
+<pre data-lang="ts"><code>{
+  name: "projects",
+  type: "join",
+  collection: "projects",
+  on: "partner",              // nome do campo relationship no outro lado
+  label: "Projetos no portfólio",
+  admin: { allowCreate: false, defaultColumns: ["client", "ecosystem", "year"] },
+}</code></pre>
+
+  <p>Mostra, dentro do parceiro, os projetos que apontam para ele. Não é armazenado — é uma consulta. Use <code>join</code> sempre que quiser exibir o lado inverso: assim não existem dois lugares onde a mesma ligação pode ser escrita e discordar.</p>
+
+  <h4>Profundidade (<code>depth</code>) na leitura</h4>
+
+  <p>Um <code>relationship</code> chega como <strong>ID</strong> ou como <strong>documento populado</strong>, dependendo do <code>depth</code> da consulta. O código lida com isso defensivamente:</p>
+
+<pre data-lang="ts"><code>const partner = typeof project.partner === "object" ? project.partner : null;</code></pre>
+
+  <ul>
+    <li><code>depth: 0</code> → só IDs. Mais rápido; use quando não precisar do relacionado (ex.: <code>getProjectSlugs</code>).</li>
+    <li><code>depth: 1</code> (padrão) → popula um nível. É o que o card do projeto precisa para ter o logo do parceiro.</li>
+  </ul>
+
+  <h3>Campos de upload</h3>
+
+<pre data-lang="ts"><code>{ name: "file", type: "upload", relationTo: "media", label: "Arquivo" }</code></pre>
+
+  <p>Aponta sempre para a collection <code>media</code>, que já aceita imagens, PDF, Word, Excel, PowerPoint, CSV, TXT e ZIP, e gera três tamanhos para imagens. Para imagens <strong>de conteúdo</strong>, prefira o helper <code>imageField()</code> — ver <a href="#campos">Campos</a>.</p>
+
+  <h3>Campos condicionais</h3>
+
+<pre data-lang="ts"><code>{
+  name: "externalUrl",
+  type: "text",
+  label: "URL externa",
+  admin: {
+    description: "Para onde o botão da página leva.",
+    condition: (data) =&gt; data?.type === "external",
+  },
+}</code></pre>
+
+  <p><code>condition</code> recebe <code>(data, siblingData)</code>: <code>data</code> é o documento inteiro, <code>siblingData</code> é o objeto do mesmo nível (dentro de um <code>group</code> ou <code>array</code>). <code>Publications</code> usa isso para que o campo <strong>Tipo</strong> decida quais campos aparecem — quem publica um link externo nunca vê o campo de upload de arquivo.</p>
+
+  <h3>Registrar a collection</h3>
+
+<pre data-lang="ts"><code>import { Recognitions } from "@/collections/Recognitions";
+// ...
+collections: [Projects, Services, /* … */, Recognitions],</code></pre>
+
+  <p>Se a collection também deve ter aba de SEO, acrescente o slug ao plugin:</p>
+
+<pre data-lang="ts"><code>seoPlugin({ collections: ["projects", "publications", "recognitions"], /* … */ })</code></pre>
+
+<pre data-lang="bash"><code>pnpm generate:types</code></pre>
+
+  <p>Isso reescreve <code>payload-types.ts</code> e é o que faz o TypeScript enxergar <code>payload.find({ collection: "recognitions" })</code>. <strong>Sem esse passo, o resto não compila.</strong> O MongoDB não exige migração: a coleção nasce quando o primeiro documento é gravado.</p>
+
+  <h3>Hooks</h3>
+
+  <p>Nenhuma collection usa hooks hoje. Quando precisar, o formato é:</p>
+
+<pre data-lang="ts"><code>hooks: {
+  beforeChange: [({ data }) =&gt; ({ ...data, /* … */ })],
+  afterChange: [async ({ doc, operation }) =&gt; { /* … */ }],
+}</code></pre>
+
+  <p>Casos legítimos aqui seriam derivar um campo de outro na gravação ou disparar revalidação sob demanda. <strong>Não</strong> use hook para o que a camada de leitura já resolve: formatação de data, fallback de texto e escolha de imagem acontecem em <code>lib/content.ts</code>, onde são fáceis de mudar sem tocar nos dados gravados.</p>
+
+  <h3>Checklist</h3>
+
+  <ul class="check">
+    <li><code>slug</code> em kebab-case, <code>labels</code> no singular e plural em português</li>
+    <li><code>admin.useAsTitle</code>, <code>group</code> e <code>description</code> preenchidos</li>
+    <li><code>access</code> seguindo o padrão da tabela acima</li>
+    <li><code>versions: { drafts: true }</code> se for conteúdo editorial</li>
+    <li>Campo <code>order</code> + <code>defaultSort</code> se a ordem na página importa</li>
+    <li><code>index: true</code> nos campos usados em filtro, busca ou ordenação</li>
+    <li>Registrada em <code>payload.config.ts</code> (e no <code>seoPlugin</code>, se tiver página própria)</li>
+    <li><code>pnpm generate:types</code> rodado</li>
+    <li>Função de leitura adicionada em <code>lib/content.ts</code></li>
+  </ul>
+</section>
+<section id="campos">
+  <p class="eyebrow">Payload CMS</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Campos</h2>
+
+  <p class="lede">Como escolher, escrever e agrupar campos — e os três helpers que o projeto criou para não repetir decisões.</p>
+
+  <h3>Anatomia</h3>
+
+<pre data-lang="ts"><code>{
+  name: "summary",              // chave no documento (inglês, camelCase)
+  type: "textarea",
+  label: "Resumo",              // o que o editor lê (português)
+  required: true,
+  index: true,                  // cria índice no Mongo — para filtro/busca/ordenação
+  maxLength: 240,
+  defaultValue: "",
+  admin: {
+    description: "Uma a duas linhas para o card da listagem.",
+    position: "sidebar",        // tira do corpo principal
+    condition: (data) =&gt; data?.type === "download",
+  },
+}</code></pre>
+
+  <p>Duas convenções que valem sempre: <strong><code>name</code> em inglês, <code>label</code> em português</strong>, e <strong><code>admin.description</code> como documentação para quem publica</strong>. Escreva o que acontece na tela — inclusive o que acontece se o campo ficar vazio. Compare:</p>
+
+  <div class="note warn">
+    <span class="tag">Descrição fraca</span>
+    <p>"Resumo do projeto."</p>
+  </div>
+
+  <div class="note">
+    <span class="tag">Descrição que evita um chamado</span>
+    <p>"Uma a duas linhas para o card da listagem e para a abertura da página do projeto. Se ficar vazio, o card usa o começo do Desafio e a abertura da página não exibe nada."</p>
+  </div>
+
+  <h3>Tipos em uso</h3>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Tipo</th><th>Onde é usado</th><th>Observações</th></tr></thead>
+    <tbody>
+      <tr><td><code>text</code></td><td>títulos, nomes, URLs, ano</td><td><code>maxLength</code> quando o layout depende disso</td></tr>
+      <tr><td><code>textarea</code></td><td>resumos, descrições curtas</td><td>preferir a <code>text</code> para o que passa de uma linha</td></tr>
+      <tr><td><code>richText</code></td><td>corpo de projeto e publicação</td><td>Lexical; renderizar com <code>&lt;RichText /&gt;</code></td></tr>
+      <tr><td><code>number</code></td><td><code>order</code></td><td>sempre com <code>defaultValue: 0</code></td></tr>
+      <tr><td><code>checkbox</code></td><td><code>featured</code> em publicações</td><td></td></tr>
+      <tr><td><code>select</code></td><td>tom, ecossistema, tipo, grupo, cor</td><td><strong>listas fechadas</strong></td></tr>
+      <tr><td><code>date</code></td><td><code>publishedAt</code></td><td>com <code>admin.date.pickerAppearance</code></td></tr>
+      <tr><td><code>email</code></td><td>contato</td><td>valida formato</td></tr>
+      <tr><td><code>upload</code></td><td>arquivo de publicação</td><td><code>relationTo: "media"</code></td></tr>
+      <tr><td><code>relationship</code></td><td>projeto→parceiro, publicação→categorias</td><td><code>hasMany</code> quando for lista</td></tr>
+      <tr><td><code>join</code></td><td>parceiro→projetos</td><td>só leitura, não é armazenado</td></tr>
+      <tr><td><code>group</code></td><td><code>hero</code>, <code>contact</code>, <code>social</code></td><td>agrupa campos sob uma chave</td></tr>
+      <tr><td><code>array</code></td><td><code>nav</code>, <code>metrics</code>, <code>showcase</code></td><td>lista repetível ordenável</td></tr>
+      <tr><td><code>row</code></td><td>pares lado a lado</td><td>só layout, não cria nível</td></tr>
+      <tr><td><code>tabs</code></td><td>Projects, Publications, Home</td><td>só layout</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3><code>select</code> — sempre lista fechada</h3>
+
+  <p>Nenhum <code>select</code> do projeto aceita texto livre, e a razão é sempre a mesma: <strong>cada valor corresponde a algo já escrito no código.</strong> Um tom fora da lista renderiza um card sem estilo; um ecossistema fora da lista cai no fallback roxo.</p>
+
+  <p>Quando as opções também são necessárias fora do CMS — por exemplo no filtro de <code>/portfolio</code>, que precisa listar todas as opções mesmo as que ainda não têm projeto — a lista mora em <code>lib/</code>:</p>
+
+<pre data-lang="ts"><code>// lib/taxonomy.ts
+export const ECOSYSTEMS = ["Meio Ambiente", "Educação", /* … */] as const;
+
+// collections/Projects.ts
+options: ECOSYSTEMS.map((value) =&gt; ({ label: value, value })),</code></pre>
+
+  <p>Um componente cliente não pode importar <code>collections/Projects.ts</code> sem arrastar o Payload para o bundle do navegador — daí a lista viver em <code>lib/taxonomy.ts</code>.</p>
+
+  <div class="note rule">
+    <span class="tag">Ao acrescentar um ecossistema</span>
+    <p>Mexa em três lugares ou ele fica sem identidade visual: <code>ECOSYSTEMS</code> em <code>lib/taxonomy.ts</code>, <code>ECOSYSTEM_SURFACE</code> em <code>lib/palette.ts</code> (cor) e <code>ECOSYSTEM_ICON</code> em <code>lib/filterIcons.ts</code> (grafismo).</p>
+  </div>
+
+  <h3><code>group</code> vs <code>array</code> vs <code>row</code> vs <code>tabs</code></h3>
+
+  <ul>
+    <li><strong><code>group</code></strong> cria um nível no documento: <code>hero.title</code>, <code>contact.email</code>. Use quando os campos formam uma unidade conceitual.</li>
+    <li><strong><code>array</code></strong> é lista repetível que a Move ordena arrastando. Use <code>maxRows</code> quando o layout tem limite real (<code>showcase</code> tem <code>maxRows: 6</code>).</li>
+    <li><strong><code>row</code></strong> é <em>só layout</em>: coloca campos lado a lado sem criar nível no documento. Repare que não tem <code>name</code>.</li>
+    <li><strong><code>tabs</code></strong> é <em>só layout</em>: separa um formulário longo em abas, também sem <code>name</code>. Vale a partir de ~8 campos; <code>Projects</code> separa "Projeto" de "Classificação", e o plugin de SEO acrescenta a aba "SEO" sozinho.</li>
+  </ul>
+
+  <p>Campos de metadado (ordem, tom, tipo, destaque) vão para <code>admin: { position: "sidebar" }</code> — ficam fora das abas, sempre visíveis.</p>
+
+  <h3>Os três helpers do projeto</h3>
+
+  <p>Ficam em <code>fields/</code> e retornam um objeto de campo. São a forma de não repetir uma decisão que já foi tomada uma vez.</p>
+
+  <h4><code>imageField()</code> — imagem em duas vias</h4>
+
+<pre data-lang="ts"><code>import { imageField } from "@/fields/imageField";
+
+imageField()                                            // grupo "image"
+imageField({ required: true })
+imageField({ name: "cover", label: "Capa", required: true })
+imageField({ name: "photo", label: "Retrato", required: true })
+imageField({ name: "logo", label: "Logo", required: true,
+             description: "Prefira SVG ou PNG com fundo transparente." })</code></pre>
+
+  <p>Gera um <code>group</code> com três campos: <code>media</code> (upload), <code>externalUrl</code> (texto, escondido quando há upload) e <code>alt</code>.</p>
+
+  <p><strong>Por que duas vias:</strong> o redesign ainda usa fotografia do Unsplash como placeholder. Em vez de baixar dezenas de placeholders para o repositório, o campo aceita a URL enquanto for provisória — e no dia em que a Move subir a fotografia própria, <strong>o upload passa a ter prioridade sobre a URL</strong>, sem ninguém tocar no código. Quem aplica essa regra é <code>resolveImage()</code>:</p>
+
+<pre data-lang="ts"><code>// lib/resolveImage.ts
+const src = media?.url ?? image.externalUrl;
+return { src, alt: media?.alt ?? image.alt ?? "" };</code></pre>
+
+  <p>O <code>alt</code> do documento de mídia vence o do campo: quem sobe a imagem descreve a imagem que subiu, e essa descrição acompanha o arquivo onde quer que ele apareça.</p>
+
+  <div class="note">
+    <span class="tag">Regra</span>
+    <p>Sempre use <code>imageField()</code> para imagem de conteúdo. Um <code>upload</code> cru perde o fallback de URL e a regra de <code>alt</code>.</p>
+  </div>
+
+  <h4><code>showcaseToneField()</code> — tom de cor</h4>
+
+<pre data-lang="ts"><code>import { showcaseToneField } from "@/fields/toneField";
+
+showcaseToneField()   // roxo | branco | amarelo — os cards empilhados da home</code></pre>
+
+  <p>Select fechado na sidebar. Cada valor corresponde a uma combinação de classes já escrita em <code>components/PortfolioStack.tsx</code>. Para criar um conjunto de tons para outro componente, exporte uma nova função no mesmo arquivo usando o <code>toneField</code> interno — e escreva as classes correspondentes no componente <strong>antes</strong> de oferecer a opção no admin.</p>
+
+  <h4><code>iconField()</code> — grafismos da marca</h4>
+
+<pre data-lang="ts"><code>import { iconField } from "@/fields/iconField";
+
+iconField()          // campo "icon"
+iconField("glyph")   // outro nome</code></pre>
+
+  <p>Select fechado com os SVGs de <code>public/brand/icons/</code>. O valor gravado é o caminho (<code>/brand/icons/Group 7.svg</code>). Para adicionar um grafismo: coloque o arquivo na pasta <strong>e</strong> acrescente o nome ao array <code>BRAND_ICONS</code>.</p>
+
+  <h4>Quando criar um helper novo</h4>
+
+  <p>Quando a mesma decisão precisar ser repetida em três lugares e errá-la quebrar algo — não por economia de linhas. Os três helpers existentes protegem, respectivamente: a regra de prioridade upload/URL, o vínculo tom→classes CSS e o vínculo ícone→arquivo existente.</p>
+
+  <h3>Validação</h3>
+
+<pre data-lang="ts"><code>{
+  name: "media",
+  type: "upload",
+  relationTo: "media",
+  validate: (value, { siblingData }) =&gt; {
+    if (!required) return true;
+    if (!value &amp;&amp; !siblingData?.externalUrl) {
+      return "Envie uma imagem ou informe uma URL externa.";
+    }
+    return true;
+  },
+}</code></pre>
+
+  <p>Retorne <code>true</code> para válido ou uma <strong>string em português</strong> com a mensagem de erro — ela aparece no admin. É o mecanismo do <code>imageField</code> para exigir "upload <em>ou</em> URL", algo que <code>required</code> sozinho não expressa.</p>
+
+  <h3>Campos automáticos</h3>
+
+  <p>Você não declara, mas eles existem em todo documento:</p>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Campo</th><th>Origem</th></tr></thead>
+    <tbody>
+      <tr><td><code>id</code></td><td>Mongo</td></tr>
+      <tr><td><code>createdAt</code>, <code>updatedAt</code></td><td>Payload</td></tr>
+      <tr><td><code>_status</code></td><td><code>versions.drafts: true</code></td></tr>
+      <tr><td><code>meta</code> (título, descrição, imagem)</td><td><code>seoPlugin</code>, nas collections/globals listados</td></tr>
+      <tr><td><code>url</code>, <code>filename</code>, <code>mimeType</code>, <code>filesize</code>, <code>width</code>, <code>height</code>, <code>sizes</code></td><td>collection com <code>upload</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Depois de mexer em campos</h3>
+
+<pre data-lang="bash"><code>pnpm generate:types</code></pre>
+
+  <p>E confira a camada de leitura: um campo novo só chega ao site depois de ser incluído no retorno da função correspondente em <a href="#conteudo"><code>lib/content.ts</code></a>.</p>
+
+  <div class="note warn">
+    <span class="tag">Renomear ou remover</span>
+    <p>O Mongo não migra sozinho. Ao <strong>renomear</strong> <code>name</code>, o valor antigo continua no documento sob a chave velha e o campo novo nasce vazio — a Move precisa repreencher, ou você escreve um script de migração pontual em <code>scripts/</code>. Ao <strong>remover</strong>, o dado permanece no banco, invisível. Prefira renomear apenas o <code>label</code> sempre que possível.</p>
+  </div>
+</section>
+
+<section id="globals">
+  <p class="eyebrow">Payload CMS</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Globals</h2>
+
+  <p class="lede">Um global é um documento único: existe uma Home, um conjunto de dados de contato, uma Teoria da Mudança. Se a Move precisa criar vários daquilo, é <a href="#collections">collection</a>.</p>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Slug</th><th>Grupo no admin</th><th>O que guarda</th></tr></thead>
+    <tbody>
+      <tr><td><code>home</code></td><td>Páginas</td><td>Hero, selos, cards empilhados de destaque</td></tr>
+      <tr><td><code>theory-of-change</code></td><td>Páginas</td><td>Toda a copy de <code>/teoria-da-mudanca</code></td></tr>
+      <tr><td><code>publications-page</code></td><td>Páginas</td><td>Abertura de <code>/publicacoes</code></td></tr>
+      <tr><td><code>portfolio-page</code></td><td>Páginas</td><td>Abertura de <code>/portfolio</code></td></tr>
+      <tr><td><code>contact-page</code></td><td>Páginas</td><td>Copy de <code>/contato</code></td></tr>
+      <tr><td><code>site-settings</code></td><td>Configurações</td><td>Menu, contato, redes, números</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Anatomia</h3>
+
+<pre data-lang="ts"><code>import type { GlobalConfig } from "payload";
+import { anyone, authenticated } from "@/access";
+
+export const PortfolioPage: GlobalConfig = {
+  slug: "portfolio-page",
+  label: "Página de Portfólio",
+  admin: {
+    group: "Páginas",
+    description: "Abertura da listagem de projetos.",
+  },
+  access: { read: anyone, update: authenticated },
+  versions: { max: 20 },
+  fields: [
+    { name: "eyebrow", type: "text", label: "Chapéu", required: true, defaultValue: "Portfólio" },
+    { name: "title", type: "textarea", label: "Título", required: true },
+    { name: "description", type: "textarea", label: "Texto de apoio" },
+  ],
+};</code></pre>
+
+  <p>Diferenças em relação a uma collection:</p>
+
+  <ul>
+    <li><code>label</code> no singular — não há plural.</li>
+    <li><code>access</code> tem só <strong><code>read</code></strong> e <strong><code>update</code></strong> — não se cria nem se apaga um global. O padrão é <code>{ read: anyone, update: authenticated }</code>.</li>
+    <li><code>versions: { max: 20 }</code> — histórico de versões, <strong>sem</strong> o fluxo de rascunho/publicação. Globals não têm <code>_status</code>; o que está salvo está no ar.</li>
+    <li>Sem <code>defaultSort</code>, sem <code>useAsTitle</code>.</li>
+  </ul>
+
+  <h3>Por que existem globals "de página"</h3>
+
+  <p><code>PortfolioPage</code> e <code>PublicationsPage</code> guardam só três campos de texto. Existem porque o cabeçalho da listagem precisa ser editável como o de qualquer outra página — e porque o <code>seoPlugin</code> injeta a aba de SEO em globals, o que dá à Move controle sobre o título e a descrição de busca dessas rotas. A <strong>listagem</strong> em si continua vindo da collection.</p>
+
+  <div class="note rule">
+    <p>Global = a copy da página. Collection = os itens da página.</p>
+  </div>
+
+  <h3>Estrutura interna</h3>
+
+  <p>Globals grandes ganham <code>tabs</code> para não virar um formulário de rolagem infinita. <code>Home</code> separa "Hero" de "Destaques":</p>
+
+<pre data-lang="ts"><code>fields: [
+  {
+    type: "tabs",
+    tabs: [
+      {
+        label: "Hero",
+        fields: [
+          {
+            name: "hero",
+            type: "group",
+            label: false,                     // o título da aba já nomeia o bloco
+            fields: [
+              { name: "eyebrow", type: "text", label: "Chapéu", required: true },
+              { name: "title", type: "textarea", label: "Título", required: true },
+              { name: "body", type: "textarea", label: "Texto de apoio", required: true },
+            ],
+          },
+          {
+            name: "affiliations",
+            type: "array",
+            label: "Selos e afiliações",
+            fields: [{ name: "label", type: "text", label: "Nome", required: true }],
+          },
+        ],
+      },
+      { label: "Destaques", fields: [ /* … */ ] },
+    ],
+  },
+],</code></pre>
+
+  <p>Repare em <code>label: false</code> no group: a aba já diz "Hero", repetir seria ruído.</p>
+
+  <h4>Arrays em globals</h4>
+
+  <p><code>home.showcase</code> é o caso mais rico do projeto — uma lista de cards com imagem, tom e relacionamento:</p>
+
+<pre data-lang="ts"><code>{
+  name: "showcase",
+  type: "array",
+  label: "Cards de destaque",
+  maxRows: 6,
+  admin: {
+    description: "Os cards empilhados da home. A numeração 01, 02… é gerada a partir da ordem desta lista.",
+  },
+  fields: [
+    { type: "row", fields: [
+      { name: "client", type: "text", label: "Cliente", required: true },
+      { name: "category", type: "text", label: "Categoria", required: true },
+    ]},
+    { name: "title", type: "textarea", label: "Título", required: true },
+    { name: "description", type: "textarea", label: "Descrição", required: true },
+    imageField({ required: true }),
+    showcaseToneField(),
+    { name: "relatedProject", type: "relationship", relationTo: "projects", label: "Projeto relacionado" },
+  ],
+}</code></pre>
+
+  <p>A ordem do array é a ordem na tela, e a numeração vem da posição via <code>displayNumber(index)</code>. Nunca crie um campo "número" ao lado: nada o manteria em sincronia quando a Move arrastasse um card.</p>
+
+  <h3><code>site-settings</code> — o global transversal</h3>
+
+  <p>Guarda o que aparece em mais de uma página: menu de navegação, contato, redes sociais e números. Vale reparar em duas decisões.</p>
+
+  <p><strong>O menu alimenta header e rodapé ao mesmo tempo</strong>, na mesma ordem — um lugar só para editar.</p>
+
+  <p><strong>Rede social vazia não vira link quebrado.</strong> O global tem os campos crus, e a camada de leitura monta a lista só com o que foi preenchido:</p>
+
+<pre data-lang="ts"><code>social: [
+  { name: "Instagram" as const, href: settings.social?.instagram },
+  { name: "LinkedIn" as const, href: settings.social?.linkedin },
+].filter((item) =&gt; Boolean(item.href?.trim())),</code></pre>
+
+  <p>O componente só itera. Sem link cadastrado, não existe item — logo, nunca há ícone apontando para lugar nenhum. É o padrão a seguir para qualquer campo opcional: <strong>resolver a ausência na camada de leitura, não no JSX.</strong></p>
+
+  <h3>Criar um global novo</h3>
+
+  <ol>
+    <li>Arquivo em <code>globals/</code>, seguindo a anatomia acima.</li>
+    <li>Registrar no array <code>globals</code> de <code>payload.config.ts</code>.</li>
+    <li>Se a página tiver rota própria, acrescentar o slug ao <code>seoPlugin</code>.</li>
+    <li><code>pnpm generate:types</code>.</li>
+    <li>Função de leitura em <code>lib/content.ts</code>.</li>
+    <li>Abrir <code>/admin</code>, preencher os campos obrigatórios e <strong>salvar uma vez</strong>.</li>
+  </ol>
+
+<pre data-lang="ts"><code>export const getAboutPage = cache(async () =&gt; {
+  const payload = await getPayloadClient();
+  const page = await payload.findGlobal({ slug: "about-page" });
+  return { meta: page.meta, title: page.title, /* … */ };
+});</code></pre>
+
+  <div class="note warn">
+    <span class="tag">Global nunca salvo</span>
+    <p>Devolve um objeto praticamente vazio; campos <code>required</code> não protegem contra isso na leitura. Trate os opcionais com <code>??</code>.</p>
+  </div>
+
+  <h3>Global ou collection?</h3>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Pergunta</th><th>Global</th><th>Collection</th></tr></thead>
+    <tbody>
+      <tr><td>A Move vai criar vários?</td><td>não</td><td>sim</td></tr>
+      <tr><td>Tem URL própria por item?</td><td>não</td><td>provavelmente</td></tr>
+      <tr><td>Precisa de rascunho antes de publicar?</td><td>não (só histórico)</td><td>sim</td></tr>
+      <tr><td>É a copy de uma página específica?</td><td>sim</td><td>não</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Na dúvida, comece como global: promover a collection depois é mais fácil do que descobrir que existem 6 documentos onde deveria haver 1.</p>
+</section>
+<section id="conteudo">
+  <p class="eyebrow">Payload CMS</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Camada de conteúdo</h2>
+
+  <p class="lede"><code>lib/content.ts</code> é o único arquivo do site que lê o CMS. Tudo que o Payload sabe entra por aqui, sai como objeto simples, e nenhuma outra parte do código descobre que existe um Payload atrás.</p>
+
+  <h3>Por que existe</h3>
+
+  <p>Quando o conteúdo saiu de <code>data/site.ts</code> e foi para o CMS, nenhum componente mudou — porque cada função aqui devolve <strong>exatamente a forma que o componente já consumia</strong>. Essa é a razão de ser do arquivo: ele absorve o formato do Payload para que a interface não precise conhecê-lo.</p>
+
+  <p>Na prática a camada resolve, antes do JSX: filtro de publicados; imagem (upload ou URL externa) reduzida a <code>{ src, alt }</code>; datas já formatadas em pt-BR; campos opcionais com fallback; relacionamentos populados ou não; listas montadas só com o que existe. O componente recebe algo que sempre dá para renderizar.</p>
+
+  <h3>Anatomia de uma função de leitura</h3>
+
+<pre data-lang="ts"><code>export const getServices = cache(async () =&gt; {
+  const payload = await getPayloadClient();
+
+  const { docs } = await payload.find({
+    collection: "services",
+    where: PUBLISHED,      // ① só publicados
+    sort: "order",         // ② ordem explícita
+    limit: 0,              // ③ 0 = sem limite
+    depth: 0,              // ④ não popula relacionamentos
+  });
+
+  return docs.map((service, index) =&gt; ({
+    number: displayNumber(index),   // ⑤ "01", "02"… derivado da posição
+    title: service.title,
+    body: service.body,
+    icon: service.icon,
+  }));
+});</code></pre>
+
+  <p><strong>①</strong> <code>PUBLISHED</code> é a constante do topo do arquivo:</p>
+
+<pre data-lang="ts"><code>const PUBLISHED = { _status: { equals: "published" } } as const;</code></pre>
+
+  <p>Toda leitura de collection com drafts precisa dela. Esquecer isso vaza rascunho para o site.</p>
+
+  <p><strong>②</strong> <code>sort</code> explícito mesmo quando a collection tem <code>defaultSort</code> — o comportamento não deve depender de configuração em outro arquivo.</p>
+
+  <p><strong>③</strong> <code>limit: 0</code> significa "todos". O padrão do Payload é 10, e esse é um erro fácil de não perceber: a listagem simplesmente para no décimo item.</p>
+
+  <p><strong>④</strong> <code>depth</code> — quantos níveis de relacionamento popular. <code>0</code> devolve só IDs. Use <code>0</code> sempre que não precisar do documento relacionado; use o padrão (<code>1</code>) quando precisar.</p>
+
+  <p><strong>⑤</strong> <code>displayNumber(index)</code> produz <code>"01"</code>, <code>"02"</code>… a partir da posição.</p>
+
+  <h3><code>cache()</code></h3>
+
+  <p>Todas as funções são embrulhadas em <code>cache()</code> do React. Isso deduplica chamadas <strong>dentro do mesmo request</strong>: <code>getSiteSettings()</code> é chamado pelo layout, pelo header e pelo rodapé, e vai ao banco uma vez só.</p>
+
+  <p>Não é cache entre requests — isso quem faz é o <code>revalidate = 60</code> das páginas. Consequência prática: <strong>componha funções à vontade.</strong></p>
+
+<pre data-lang="ts"><code>export const getHomePublications = cache(async () =&gt; {
+  const all = await getPublications();          // não custa uma segunda ida ao banco
+  const featured = all.filter((p) =&gt; p.featured);
+  return (featured.length &gt; 0 ? featured : all).slice(0, 3);
+});</code></pre>
+
+  <h3>Padrões que valem repetir</h3>
+
+  <h4>Buscar só o campo necessário</h4>
+
+<pre data-lang="ts"><code>export const getProjectSlugs = cache(async () =&gt; {
+  const { docs } = await payload.find({
+    collection: "projects",
+    where: PUBLISHED,
+    limit: 0,
+    depth: 0,
+    select: { slug: true },     // ← só o slug volta do banco
+  });
+  return docs.map((doc) =&gt; doc.slug);
+});</code></pre>
+
+  <p>Usada pelo <code>generateStaticParams</code>. <code>select</code> importa quando a collection cresce.</p>
+
+  <h4>Imagem: sempre por <code>resolveImage</code></h4>
+
+<pre data-lang="ts"><code>const IMAGE_FALLBACK: ResolvedImage = { src: "", alt: "" };
+const image = resolveImage(project.image) ?? IMAGE_FALLBACK;</code></pre>
+
+  <p><code>resolveImage()</code> aplica a regra "upload vence URL externa" e "alt da mídia vence alt do campo". O fallback garante que o componente sempre receba um objeto — a checagem que sobra para o JSX é <code>image.src &amp;&amp;</code>, não uma cadeia de <code>?.</code>.</p>
+
+  <h4>Relacionamento pode chegar como ID</h4>
+
+<pre data-lang="ts"><code>const partner = typeof project.partner === "object" ? project.partner : null;</code></pre>
+
+  <p>Com <code>depth: 0</code> vem string; com <code>depth: 1</code> vem documento. Tratar os dois casos deixa a função segura contra uma mudança futura de <code>depth</code>.</p>
+
+  <h4>Formatar data no servidor</h4>
+
+<pre data-lang="ts"><code>const DATE_FORMAT = new Intl.DateTimeFormat("pt-BR", {
+  day: "2-digit", month: "long", year: "numeric", timeZone: "America/Sao_Paulo",
+});</code></pre>
+
+  <p>Formatar em componente cliente arriscaria divergência de hidratação quando o fuso do visitante difere do fuso do build. O <code>timeZone</code> fixo é o que garante que a data exibida seja a data brasileira, independentemente de onde o build rodou.</p>
+
+  <h4>Resolver a ausência aqui, não no JSX</h4>
+
+<pre data-lang="ts"><code>social: [
+  { name: "Instagram" as const, href: settings.social?.instagram },
+  { name: "LinkedIn" as const, href: settings.social?.linkedin },
+].filter((item) =&gt; Boolean(item.href?.trim())),</code></pre>
+
+  <h4>Fallback de texto explícito e comentado</h4>
+
+<pre data-lang="ts"><code>// O card precisa de algum texto; sem resumo próprio, o desafio é o melhor
+// substituto. A página do projeto não usa esse fallback — ali o Desafio aparece
+// logo abaixo por extenso, e repetir o parágrafo não informa nada.
+summary: project.summary ?? excerpt(project.challenge),</code></pre>
+
+  <p>O card e a página do projeto usam fallbacks diferentes de propósito. Quando o fallback é uma decisão editorial, escreva o porquê ao lado.</p>
+
+  <h4>Duas consultas em paralelo</h4>
+
+<pre data-lang="ts"><code>const [{ docs }, { docs: projects }] = await Promise.all([
+  payload.find({ collection: "partners", where: PUBLISHED, sort: "order", limit: 0 }),
+  payload.find({ collection: "projects", where: PUBLISHED, limit: 0, depth: 0,
+                 select: { partner: true } }),
+]);</code></pre>
+
+  <p><code>getPartners</code> precisa saber quais clientes têm projeto para montar o <code>href</code> do carrossel — mas não precisa do portfólio inteiro, só do campo <code>partner</code>.</p>
+
+  <h4>Tipos exportados para os componentes</h4>
+
+<pre data-lang="ts"><code>export type ProjectCard = {
+  slug: string;
+  client: string;
+  logo: ResolvedImage | null;
+  ecosystem: string;
+  /* … */
+};</code></pre>
+
+  <p><code>ProjectCard</code> e <code>PublicationCard</code> são o contrato entre a camada e os componentes. Um componente que renderiza card importa <strong>o tipo</strong> daqui — isso não arrasta o Payload para o bundle, porque tipo some na compilação — nunca a função.</p>
+
+  <h3>Consultas do Payload</h3>
+
+<pre data-lang="ts"><code>// listagem
+payload.find({ collection, where, sort, limit, depth, select, page })
+
+// um documento
+payload.findByID({ collection, id })
+
+// global
+payload.findGlobal({ slug, depth })</code></pre>
+
+  <p>Operadores de <code>where</code> mais usados no projeto:</p>
+
+<pre data-lang="ts"><code>{ _status: { equals: "published" } }
+{ slug: { equals: slug } }
+{ slug: { not_equals: slug } }
+{ ecosystem: { equals: ecosystem } }
+{ ...PUBLISHED, slug: { equals: slug } }        // combinação por spread
+{ or: [ { a: { equals: 1 } }, { b: { exists: true } } ] }</code></pre>
+
+  <p>Buscar por slug é <code>find</code> com <code>limit: 1</code>, não <code>findByID</code>:</p>
+
+<pre data-lang="ts"><code>const { docs } = await payload.find({
+  collection: "projects",
+  where: { ...PUBLISHED, slug: { equals: slug } },
+  limit: 1,
+});
+const project = docs[0];
+if (!project) return null;      // a página chama notFound()</code></pre>
+
+  <div class="note rule">
+    <p>Devolva <code>null</code>, não lance exceção. Quem decide o que fazer com "não existe" é a rota, chamando <code>notFound()</code>.</p>
+  </div>
+
+  <h3>Adicionar uma função</h3>
+
+  <ol>
+    <li>Escreva a função no bloco temático correspondente do arquivo — publicações perto de publicações, projetos perto de projetos.</li>
+    <li>Embrulhe em <code>cache()</code>.</li>
+    <li>Filtre por <code>PUBLISHED</code> se a collection tem drafts.</li>
+    <li><code>sort</code>, <code>limit</code> e <code>depth</code> explícitos.</li>
+    <li>Devolva objeto plano — nada de documento cru do Payload.</li>
+    <li>Exporte um <code>type</code> se mais de um componente consumir a forma.</li>
+    <li>Se algum campo for opcional, decida o fallback <strong>aqui</strong> e comente o porquê.</li>
+  </ol>
+
+  <h3>O que não fazer</h3>
+
+  <div class="note warn">
+    <ul>
+      <li>Chamar <code>getPayloadClient()</code> fora deste arquivo (exceto em <code>scripts/</code>).</li>
+      <li>Importar <code>payload-types</code> num componente para tipar props — use os tipos exportados daqui.</li>
+      <li>Devolver o documento cru (<code>return docs</code>). O componente passaria a depender do formato do Payload, que é justamente o que a camada evita.</li>
+      <li>Formatar data, moeda ou número dentro de componente cliente.</li>
+      <li>Esquecer <code>limit: 0</code> numa listagem que deve mostrar tudo.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="rotas">
+  <p class="eyebrow">Next.js</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Páginas e rotas</h2>
+
+  <h3>Route groups</h3>
+
+<pre data-lang="text"><code>app/
+  (frontend)/    site público — layout, fontes, header, rodapé, globals.css
+  (payload)/     admin e API — GERADO pelo Payload, não editar</code></pre>
+
+  <p>Os parênteses agrupam sem entrar na URL. Os dois grupos têm <strong>layouts independentes</strong>: o admin não carrega as fontes, o Lenis nem o CSS do site, e o site não carrega nada do painel.</p>
+
+  <p>Os arquivos de <code>(payload)/</code> trazem no topo um aviso de que foram gerados automaticamente e podem ser reescritos a qualquer momento. A única exceção editável é <code>app/(payload)/custom.scss</code>, para ajustes visuais do painel.</p>
+
+  <h3>Layout do site</h3>
+
+  <p><code>app/(frontend)/layout.tsx</code> é um Server Component assíncrono. Ele carrega as fontes, monta header e rodapé e — importante — é <strong>onde <code>SmoothScroll</code> é montado uma única vez</strong>:</p>
+
+<pre data-lang="ts"><code>const { navItems, contact, social } = await getSiteSettings();
+
+return (
+  &lt;html lang="pt-BR"&gt;
+    &lt;body className={`${raleway.variable} ${fraunces.variable} antialiased`} suppressHydrationWarning&gt;
+      &lt;SmoothScroll /&gt;
+      &lt;HashScrollSync /&gt;
+      &lt;Header navItems={navItems} social={social} /&gt;
+      {children}
+      &lt;Footer navItems={navItems} contact={contact} /&gt;
+    &lt;/body&gt;
+  &lt;/html&gt;
+);</code></pre>
+
+  <ul>
+    <li><strong>Fontes</strong> entram só aqui, via <code>next/font/google</code>. Não adicione outro mecanismo de carregamento de fonte.</li>
+    <li><strong><code>lang="pt-BR"</code></strong> — o site é inteiramente em português.</li>
+    <li><strong><code>SmoothScroll</code></strong> é dono da única instância de Lenis.</li>
+  </ul>
+
+  <h3>Anatomia de uma página</h3>
+
+<pre data-lang="ts"><code>import type { Metadata } from "next";
+
+import { PageHero } from "@/components/PageHero";
+import { getPortfolioPage, getProjects } from "@/lib/content";
+import { metadataFromSeo } from "@/lib/seo";
+
+export const revalidate = 60;                          // ①
+
+export async function generateMetadata(): Promise&lt;Metadata&gt; {   // ②
+  const page = await getPortfolioPage();
+  return metadataFromSeo(page.meta, {
+    title: `${page.title} | Move Social`,
+    description: page.description,
+  });
+}
+
+export default async function PortfolioPage() {        // ③
+  const [page, projects] = await Promise.all([          // ④
+    getPortfolioPage(),
+    getProjects(),
+  ]);
+
+  return (
+    &lt;main className="bg-move-offwhite"&gt;
+      &lt;PageHero eyebrow={page.eyebrow} title={page.title} description={page.description ?? undefined} /&gt;
+      {/* … */}
+    &lt;/main&gt;
+  );
+}</code></pre>
+
+  <p><strong>①</strong> <code>revalidate = 60</code> em todas as páginas: o HTML é regenerado no máximo a cada 60 segundos. Uma edição no admin aparece no site em até um minuto, sem deploy.</p>
+  <p><strong>②</strong> <code>generateMetadata</code> sempre via <code>metadataFromSeo</code>.</p>
+  <p><strong>③</strong> Server Component assíncrono, todo o acesso a dados aqui.</p>
+  <p><strong>④</strong> <code>Promise.all</code> para consultas independentes. Como as funções de conteúdo são <code>cache()</code>, chamar a mesma duas vezes não custa nada — a paralelização é o que importa.</p>
+
+  <h3>Rotas dinâmicas</h3>
+
+<pre data-lang="ts"><code>export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const slugs = await getProjectSlugs();
+  return slugs.map((slug) =&gt; ({ slug }));
+}
+
+type Props = { params: Promise&lt;{ slug: string }&gt; };     // ⚠ params é Promise
+
+export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
+  const { slug } = await params;
+  const project = await getProject(slug);
+
+  if (!project) return { title: "Projeto não encontrado | Move Social" };
+
+  return metadataFromSeo(project.meta, {
+    title: `${project.client} · Portfólio | Move Social`,
+    description: project.summary,
+    image: project.image.src ? project.image : null,
+    type: "article",
+  });
+}
+
+export default async function ProjectPage({ params }: Props) {
+  const { slug } = await params;
+  const project = await getProject(slug);
+
+  if (!project) notFound();
+  // …
+}</code></pre>
+
+  <ul>
+    <li><strong><code>params</code> é uma <code>Promise</code></strong> neste Next e precisa de <code>await</code>. Vale para <code>searchParams</code> também.</li>
+    <li><strong><code>generateStaticParams</code></strong> pré-renderiza as páginas existentes no build. Um projeto publicado depois entra pela revalidação, sem deploy.</li>
+    <li><strong><code>generateMetadata</code> trata o caso "não existe"</strong> antes de <code>notFound()</code>, senão o TypeScript reclama e a página quebra em vez de dar 404.</li>
+  </ul>
+
+  <h3>SEO</h3>
+
+  <p>O plugin injeta um grupo <code>meta</code> (título, descrição, imagem) nas collections <code>projects</code> e <code>publications</code> e nos globals de página. A conversão para <code>Metadata</code> do Next é sempre por <code>lib/seo.ts</code>:</p>
+
+<pre data-lang="ts"><code>metadataFromSeo(meta, { title, description, image, type, publishedTime })</code></pre>
+
+  <div class="note rule">
+    <p>O campo do CMS sempre vence; o fallback é o conteúdo real da página.</p>
+  </div>
+
+  <p>Um documento publicado sem ninguém tocar na aba de SEO já sai com título, descrição e imagem de compartilhamento corretos — e quem quiser afinar o texto para busca tem onde fazê-lo. <code>metadataFromSeo</code> monta <code>title</code>, <code>description</code>, Open Graph e Twitter Card de uma vez, escolhendo <code>summary_large_image</code> quando há imagem.</p>
+
+  <div class="note warn">
+    <p>Não escreva <code>export const metadata = {…}</code> à mão numa rota que tem registro no CMS. Isso tira da Move o controle do SEO daquela página. O <code>metadata</code> estático do <code>layout.tsx</code> é a exceção: é o padrão do site inteiro.</p>
+  </div>
+
+  <h3>Fronteira servidor / cliente</h3>
+
+  <p><strong>Página busca, componente cliente filtra.</strong> <code>/portfolio</code> e <code>/publicacoes</code> carregam tudo no servidor e entregam um array simples:</p>
+
+<pre data-lang="ts"><code>&lt;Suspense fallback={null}&gt;
+  &lt;PortfolioBrowser projects={projects} /&gt;
+&lt;/Suspense&gt;</code></pre>
+
+  <p>O <code>Suspense</code> está ali por um motivo específico: <code>PortfolioBrowser</code> lê <code>?cliente=</code> da URL — para o logo do carrossel cair na listagem já filtrada — e ler search params é o que tiraria a página do prerender. Envolvido em <code>Suspense</code>, os parâmetros só resolvem no cliente e <strong>a listagem completa continua sendo o que sai do build</strong>.</p>
+
+  <p>Um componente cliente <strong>não pode</strong> importar <code>lib/content.ts</code> nem qualquer arquivo de <code>collections/</code>. Constantes compartilhadas entre CMS e cliente moram em <code>lib/</code>: <code>taxonomy.ts</code>, <code>palette.ts</code>, <code>filterIcons.ts</code>.</p>
+
+  <h3>Rich text</h3>
+
+<pre data-lang="ts"><code>import { RichText } from "@/components/RichText";
+
+{project.description &amp;&amp; &lt;RichText data={project.description} /&gt;}</code></pre>
+
+  <p>O componente embrulha o renderizador do Lexical na classe <code>.editorial-prose</code>, definida em <code>globals.css</code>. A tipografia é aplicada no contêiner, por seletor de descendente — não há conversor customizado por nó. O que a Move escreve no admin sai com a mesma medida de leitura e a mesma escala do resto do site.</p>
+
+  <h3>Criar uma rota nova</h3>
+
+  <ol>
+    <li><strong>Onde vive o conteúdo?</strong> Copy da página → <a href="#globals">global</a>. Itens repetíveis → <a href="#collections">collection</a>.</li>
+    <li>Função de leitura em <a href="#conteudo"><code>lib/content.ts</code></a>.</li>
+    <li>Se a página tem SEO próprio, registre o slug no <code>seoPlugin</code>.</li>
+    <li><code>app/(frontend)/minha-rota/page.tsx</code> com <code>revalidate = 60</code>, <code>generateMetadata</code> via <code>metadataFromSeo</code> e o componente assíncrono.</li>
+    <li>Acrescente a rota ao menu em <strong>/admin → Configurações do site → Menu de navegação</strong> — o menu é conteúdo, não código.</li>
+    <li>Rotas dinâmicas: <code>generateStaticParams</code> + <code>notFound()</code>.</li>
+  </ol>
+
+  <h3>Checklist</h3>
+
+  <ul class="check">
+    <li><code>export const revalidate = 60</code></li>
+    <li><code>generateMetadata</code> usando <code>metadataFromSeo</code></li>
+    <li>Consultas independentes em <code>Promise.all</code></li>
+    <li><code>await params</code> nas rotas dinâmicas</li>
+    <li><code>notFound()</code> quando a leitura devolve <code>null</code></li>
+    <li><code>generateStaticParams</code> nas rotas <code>[slug]</code></li>
+    <li><code>Suspense</code> em volta de qualquer componente que leia search params</li>
+    <li>Nenhum texto fixo no JSX que a Move devesse poder editar</li>
+  </ul>
+</section>
+<section id="design">
+  <p class="eyebrow">Next.js</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Componentes e design</h2>
+
+  <div class="note rule">
+    <p>Componentes recebem props simples e não sabem que existe um CMS.</p>
+  </div>
+
+  <p>Nenhum componente importa <code>payload</code>, <code>@/lib/payload</code> ou <code>@/lib/content</code> para buscar dados. Pode importar <strong>tipos</strong> de <code>lib/content.ts</code> — tipo desaparece na compilação e não entra no bundle.</p>
+
+<pre data-lang="ts"><code>// ✓ certo
+type Props = { services: { number: string; title: string; body: string; icon: string }[] };
+export function ImpactServices({ services }: Props) { /* … */ }
+
+// ✗ errado
+export async function ImpactServices() {
+  const services = await getServices();   // acesso a dados dentro do componente
+}</code></pre>
+
+  <p>O que se ganha: o componente é testável e reaproveitável, e a origem do conteúdo pode mudar sem que a interface saiba — foi exatamente o que aconteceu na migração de <code>data/site.ts</code> para o Payload.</p>
+
+  <h3>Tokens da marca</h3>
+
+  <p>Definidos em <code>tailwind.config.ts</code>, no namespace <code>move</code>.</p>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Token</th><th>Hex</th><th>Nome no guia</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><code>move-black</code></td><td><span class="sw" style="background:#000000"></span>#000000</td><td>Preto</td><td><strong>só tipografia</strong> — nunca fundo dominante</td></tr>
+      <tr><td><code>move-offwhite</code></td><td><span class="sw" style="background:#F2F2F2"></span>#F2F2F2</td><td>Off White</td><td>fundo neutro padrão</td></tr>
+      <tr><td><code>move-purple</code></td><td><span class="sw" style="background:#54355D"></span>#54355D</td><td>Açaí</td><td>tinta principal, superfícies escuras</td></tr>
+      <tr><td><code>move-yellow</code></td><td><span class="sw" style="background:#FACA77"></span>#FACA77</td><td>Ipê</td><td>CTAs, destaques, foco</td></tr>
+      <tr><td><code>move-periwinkle</code></td><td><span class="sw" style="background:#CCACFF"></span>#CCACFF</td><td>Lavanda</td><td>apoio</td></tr>
+      <tr><td><code>move-coral</code></td><td><span class="sw" style="background:#DF6E6E"></span>#DF6E6E</td><td>Goiaba</td><td>apoio</td></tr>
+      <tr><td><code>move-sand</code></td><td><span class="sw" style="background:#CEB187"></span>#CEB187</td><td>Areia</td><td>apoio</td></tr>
+      <tr><td><code>move-mint</code></td><td><span class="sw" style="background:#CDCE74"></span>#CDCE74</td><td>Capim</td><td>apoio</td></tr>
+      <tr><td><code>move-green</code></td><td><span class="sw" style="background:#234625"></span>#234625</td><td>Mata</td><td>apoio</td></tr>
+      <tr><td><code>move-light</code></td><td><span class="sw" style="background:#FBFFB1"></span>#FBFFB1</td><td>Luz</td><td><strong>acento gráfico pequeno — nunca fundo</strong></td></tr>
+      <tr><td><code>move-line</code></td><td><span class="sw" style="background:rgba(84,53,93,.12)"></span>rgba roxo 12%</td><td>—</td><td>filetes</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <span class="tag">Duas armadilhas com nome próprio</span>
+    <ol>
+      <li><code>move-offwhite</code>/<code>move-gray</code> (Off White, <code>#F2F2F2</code>) <strong>não é</strong> <code>move-light</code> (Luz, <code>#FBFFB1</code>). Para fundo claro, Off White.</li>
+      <li><code>move-light</code> nunca é fundo de componente ou de página. O guia trata Luz como acento gráfico pequeno, e o cliente pediu isso explicitamente.</li>
+    </ol>
+  </div>
+
+  <h4>Tipografia</h4>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Token</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td><code>text-eyebrow</code></td><td>0.8125rem, tracking <code>0.16em</code></td></tr>
+      <tr><td><code>text-display-1</code></td><td><code>clamp(2.25rem, 1.6rem + 3vw, 5rem)</code></td></tr>
+      <tr><td><code>text-display-2</code></td><td><code>clamp(2.25rem, 1.75rem + 2.5vw, 4.25rem)</code></td></tr>
+      <tr><td><code>text-display-3</code></td><td><code>clamp(1.75rem, 1.5rem + 1.25vw, 2.75rem)</code></td></tr>
+      <tr><td><code>text-body-lg</code></td><td><code>clamp(1.0625rem, 1rem + 0.3vw, 1.25rem)</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>O teto de <code>display-1</code> é 5rem (80px) por medição, não por estimativa: acima disso os títulos reais do site passam a quebrar em três linhas.</p>
+
+  <p><strong>Fontes</strong> — Raleway (<code>font-sans</code>) é a única efetivamente usada. Fraunces (<code>font-serif</code>) continua carregada mas não é referenciada em lugar nenhum. Não reintroduza <code>font-serif</code> em títulos sem falar com o cliente.</p>
+
+  <p>Outros tokens: <code>rounded-soft</code> (8px), <code>shadow-editorial</code>.</p>
+
+  <div class="note">
+    <p>Use os tokens em vez de valores arbitrários (<code>bg-[#54355D]</code>). Se precisa de uma cor que não existe no namespace, a pergunta certa é se ela deveria existir.</p>
+  </div>
+
+  <h3>Paleta e contraste</h3>
+
+  <div class="note rule">
+    <p>Nunca combine um token de fundo com uma cor de texto escolhida na hora.</p>
+  </div>
+
+  <p>O guia da marca fixa qual tipografia cada fundo aceita, e essa tabela está em <code>lib/palette.ts</code> como <code>SURFACES</code>. Cada superfície carrega <code>bg</code>, <code>text</code>, <code>muted</code>, <code>border</code> e <code>chip</code>:</p>
+
+<pre data-lang="ts"><code>import { surfaceForEcosystem, surfaceByName } from "@/lib/palette";
+
+const surface = surfaceForEcosystem(project.ecosystem);
+
+&lt;article className={`${surface.bg} ${surface.text}`}&gt;
+  &lt;span className={`rounded-full px-3 py-1 ${surface.chip}`}&gt;{project.ecosystem}&lt;/span&gt;
+  &lt;p className={surface.muted}&gt;{project.summary}&lt;/p&gt;
+&lt;/article&gt;
+
+// ✗ escolher fundo e texto separadamente
+&lt;div className="bg-move-coral text-move-black"&gt;</code></pre>
+
+  <p>Escolher a cor e escolher o contraste viram <strong>uma decisão só</strong>. As classes estão escritas por extenso no arquivo porque o Tailwind não enxerga nomes montados em runtime — <code>bg-move-${cor}</code> não geraria CSS.</p>
+
+  <p>Mapas relacionados: <code>ECOSYSTEM_SURFACE</code> (cor fixa por ecossistema) em <code>lib/palette.ts</code>, e <code>ECOSYSTEM_ICON</code> / <code>iconForService()</code> em <code>lib/filterIcons.ts</code>.</p>
+
+  <p>Serviço é texto livre no CMS e chega combinado ("Teoria de Mudança e Planejamento Estratégico"), então <code>iconForService</code> decide <strong>por palavra-chave, na ordem das regras</strong>, com um grafismo neutro para o que não casar. Ao editar essa lista, lembre que a ordem importa.</p>
+
+  <h3>Layout</h3>
+
+  <p><code>.editorial-container</code> é o wrapper padrão de largura e calha:</p>
+
+<pre data-lang="css"><code>.editorial-container { width: min(100% - 24px, 1340px); margin-inline: auto; }
+@media (min-width: 768px) {
+  .editorial-container { width: min(100% - 40px, 1340px); }
+}</code></pre>
+
+  <p>Use no lugar de combinações ad hoc de <code>max-w-*</code> + <code>mx-auto</code>. No mobile a calha é 12px, e não 20px, porque somada ao <code>px-4</code> da seção o conteúdo ficava com 313px numa tela de 393px e as grades de cards espremiam.</p>
+
+  <p><code>.editorial-prose</code> é a tipografia do rich text: medida de 68ch, escala própria de títulos, links sublinhados em Ipê. Aplicada pelo componente <code>&lt;RichText /&gt;</code>.</p>
+
+  <h3>Componentes base</h3>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Componente</th><th>Papel</th></tr></thead>
+    <tbody>
+      <tr><td><code>Reveal</code></td><td>fade + slide-up ao entrar na viewport (<code>once: true</code>)</td></tr>
+      <tr><td><code>MediaFrame</code></td><td><code>next/image</code> dentro de <code>Reveal</code>, com proporção e zoom no hover</td></tr>
+      <tr><td><code>RichText</code></td><td>corpo Lexical com <code>.editorial-prose</code></td></tr>
+      <tr><td><code>SectionLabel</code></td><td>rótulo de seção com marcador colorido</td></tr>
+      <tr><td><code>PageHero</code></td><td>abertura padrão das páginas internas</td></tr>
+      <tr><td><code>SmoothScroll</code></td><td>dono da instância global de Lenis</td></tr>
+      <tr><td><code>cn()</code></td><td>merge de classes (clsx + tailwind-merge)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Use <code>MediaFrame</code> para qualquer imagem de conteúdo, em vez de um <code>&lt;Image&gt;</code> cru — é o que mantém proporção, revelação e comportamento de hover consistentes.</p>
+
+  <h3>Animação</h3>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Ferramenta</th><th>Quando</th></tr></thead>
+    <tbody>
+      <tr><td>Framer Motion (<code>Reveal</code>)</td><td>revelação simples ao rolar</td></tr>
+      <tr><td>GSAP + ScrollTrigger + Lenis</td><td>coreografia ligada ao scroll: pin, scrub, timeline</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4>A instância única de Lenis</h4>
+
+  <p><code>SmoothScroll</code> é montado uma vez, no layout, e liga o raf do Lenis ao ticker do GSAP:</p>
+
+<pre data-lang="ts"><code>const lenis = new Lenis({ duration: 1.15, easing: (t) =&gt; …, smoothWheel: true });
+lenis.on("scroll", ScrollTrigger.update);
+gsap.ticker.add((time) =&gt; lenis.raf(time * 1000));
+gsap.ticker.lagSmoothing(0);</code></pre>
+
+  <div class="note warn">
+    <p><strong>Não instancie outro Lenis.</strong> Tudo que reage ao scroll deve se pendurar nessa instância via <code>ScrollTrigger</code>. Um segundo Lenis produz o sintoma clássico: pins que escapam e marcadores do ScrollTrigger fora de lugar.</p>
+  </div>
+
+  <p>Para rolagem programática (âncoras, hash), <code>getLenis()</code> devolve a instância — é o que <code>HashScrollSync</code> usa.</p>
+
+  <h4>Armadilha do <code>overflow-hidden</code></h4>
+
+  <p><code>PortfolioStack</code> (home) empilha os cards com <code>position: sticky</code>. <strong>Nenhum ancestral pode ter <code>overflow-hidden</code></strong> — sticky para de funcionar em silêncio, sem erro no console. É o primeiro lugar para olhar quando a pilha da home "para de grudar".</p>
+
+  <h4>Movimento reduzido</h4>
+
+  <p>Tratado globalmente em <code>globals.css</code>, via <code>@media (prefers-reduced-motion: reduce)</code>. Não replique essa checagem por componente.</p>
+
+  <h3>Componentes cliente</h3>
+
+  <p><code>"use client"</code> só quando o componente precisa de estado, efeito, evento ou API do navegador. Um componente cliente não pode importar <code>lib/content.ts</code> nem nada de <code>collections/</code>.</p>
+
+  <p>Padrão do projeto: a página (servidor) busca tudo e entrega um array pronto; o componente cliente filtra em memória — é como funcionam <code>PortfolioBrowser</code> e <code>PublicationsBrowser</code>.</p>
+
+  <h3>Criar um componente</h3>
+
+  <ol>
+    <li><code>components/MeuComponente.tsx</code>, função nomeada exportada.</li>
+    <li>Props explícitas em <code>type Props = { … }</code>. Sem <code>any</code>.</li>
+    <li>Servidor por padrão; <code>"use client"</code> só se precisar.</li>
+    <li>Cores por <code>SURFACES</code> quando houver fundo colorido; tokens <code>move-*</code> no resto.</li>
+    <li><code>.editorial-container</code> para largura, <code>Reveal</code>/<code>MediaFrame</code> para revelação e imagem.</li>
+    <li>Nenhum texto fixo que a Move devesse poder editar — isso vira campo no CMS.</li>
+    <li>Teste em 375px, 768px e 1440px. O site é lido majoritariamente no celular.</li>
+  </ol>
+</section>
+
+<section id="infra">
+  <p class="eyebrow">Operação</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Infraestrutura</h2>
+
+<pre data-lang="text"><code>GitHub (marcuswmc/move-website)
+        │  push
+        ▼
+   Vercel (build + hosting)
+        ├── MongoDB Atlas  ← documentos (texto, relações, metadados)
+        └── Vercel Blob    ← arquivos (imagens, PDFs, documentos)</code></pre>
+
+  <p>Documento e arquivo são armazenados <strong>separadamente</strong>. O registro da mídia vive no Mongo; o binário vive no Blob. Quando os dois desencontram, o site mostra imagem quebrada e <code>/api/media/file/*</code> responde erro — foi o bug mais custoso do projeto.</p>
+
+  <h3>Variáveis de ambiente</h3>
+
+  <p>As três são obrigatórias em todos os ambientes, dev inclusive.</p>
+
+  <div class="scroller">
+  <table>
+    <thead><tr><th>Variável</th><th>Onde obter</th><th>Sem ela</th></tr></thead>
+    <tbody>
+      <tr><td><code>DATABASE_URL</code></td><td>Atlas → Database → Connect → Drivers</td><td>o Payload não sobe</td></tr>
+      <tr><td><code>PAYLOAD_SECRET</code></td><td>gere você mesmo</td><td>tokens de sessão inválidos</td></tr>
+      <tr><td><code>BLOB_READ_WRITE_TOKEN</code></td><td>Vercel → Storage → o Blob store → aba <code>.env.local</code></td><td><strong>falha silenciosa</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+<pre data-lang="bash"><code>node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"</code></pre>
+
+  <p><code>.env</code> está no <code>.gitignore</code>. O modelo comentado é <code>.env.example</code>.</p>
+
+  <h3>MongoDB</h3>
+
+  <p>Adaptador <code>@payloadcms/db-mongodb</code> (Mongoose), cluster no MongoDB Atlas.</p>
+
+  <h4>A connection string precisa do nome do banco</h4>
+
+<pre data-lang="text"><code>mongodb+srv://USUARIO:SENHA@cluster.xxxxx.mongodb.net/move-social?retryWrites=true&amp;w=majority
+                                                    └──────────┘
+                                                    obrigatório, antes do "?"</code></pre>
+
+  <div class="note warn">
+    <p>Sem o nome, o driver conecta no banco <code>test</code> e o site sobe <strong>vazio, sem erro nenhum</strong>. É a causa número um de "perdi todo o conteúdo". Senha com caractere especial precisa de URL-encoding (<code>@</code> → <code>%40</code>).</p>
+  </div>
+
+  <h4>Não há migrações</h4>
+
+  <p>O Mongo é schemaless: a coleção nasce quando o primeiro documento é gravado, e adicionar um campo ao config não exige nada no banco. Em compensação, renomear um campo deixa o valor antigo órfão sob a chave velha, e remover um campo deixa o dado no documento, invisível. Limpeza, quando necessária, é script pontual em <code>scripts/</code>.</p>
+
+  <h4>Um banco só para dev e produção</h4>
+
+  <p>Hoje o <code>.env</code> local e a Vercel apontam para o <strong>mesmo cluster</strong>. Isso tem consequências que precisam estar na cabeça de quem desenvolve:</p>
+
+  <ul>
+    <li>Conteúdo criado em dev aparece em produção.</li>
+    <li><code>pnpm seed</code> rodado em dev <strong>apaga o conteúdo de produção</strong>.</li>
+    <li>Upload feito em dev sem <code>BLOB_READ_WRITE_TOKEN</code> grava o documento no banco compartilhado com um arquivo que só existe na sua máquina.</li>
+  </ul>
+
+  <p>Se for trabalhar em mudanças estruturais de conteúdo, o certo é criar um banco separado no Atlas e apontar o <code>.env</code> local para ele — basta trocar o nome do banco na connection string.</p>
+
+  <h4>Acesso de rede e índices</h4>
+
+  <p>No Atlas, <strong>Network Access</strong> precisa liberar os IPs da Vercel. Como as functions não têm IP fixo, na prática se usa <code>0.0.0.0/0</code> — a proteção real é a credencial da connection string. Não comite essa string.</p>
+
+  <p><code>index: true</code> num campo cria índice no Mongo. O projeto indexa o que participa de filtro, busca ou ordenação: <code>client</code>, <code>slug</code>, <code>ecosystem</code>, <code>service</code>, <code>segment</code>, <code>title</code>, <code>type</code>, <code>name</code>, <code>group</code>. Indexar por indexar custa escrita.</p>
+
+  <h3>Vercel Blob</h3>
+
+<pre data-lang="ts"><code>vercelBlobStorage({
+  collections: { media: true },
+  token: process.env.BLOB_READ_WRITE_TOKEN,
+})</code></pre>
+
+  <h4>Por que existe</h4>
+
+  <p>A collection <code>media</code> nasceu com <code>staticDir: "media"</code>, gravando em disco local. Isso <strong>só funciona em dev</strong>: o filesystem das functions da Vercel é efêmero e somente-leitura. Em produção o documento existia no Mongo, o arquivo não existia em lugar nenhum, e <code>/api/media/file/*</code> respondia 500.</p>
+
+  <p>As URLs não mudaram com a migração: o adaptador continua servindo por <code>/api/media/file/**</code> e faz o streaming a partir do store. Nem os componentes nem os documentos gravados precisam saber de onde o arquivo vem.</p>
+
+  <div class="note warn">
+    <span class="tag">O token é obrigatório em dev</span>
+    <p>Sem <code>BLOB_READ_WRITE_TOKEN</code> o plugin se desativa em silêncio e volta a gravar em disco local. Não há erro, não há aviso. E como dev e produção compartilham o banco, isso recria exatamente o bug original: o registro chega ao Mongo de produção, o arquivo fica na sua máquina, e a imagem quebra no site publicado.</p>
+  </div>
+
+  <p>O token precisa ser da forma <code>vercel_blob_rw_&lt;store&gt;_&lt;hash&gt;</code> — o adaptador extrai o id do store dele. As variáveis OIDC que a Vercel injeta por padrão (<code>BLOB_STORE_ID</code>, <code>VERCEL_OIDC_TOKEN</code>) <strong>não servem</strong>.</p>
+
+  <h4>Migrar arquivos locais para o store</h4>
+
+<pre data-lang="bash"><code>pnpm migrate:media</code></pre>
+
+  <p>Sobe o que estiver em <code>./media</code> para o Blob. É idempotente e conservador: pula nomes que já existem, nunca sobrescreve — uma foto que a Move tenha subido pelo admin não é revertida para o placeholder. O script não escreve no banco; ele só coloca o binário no lugar de onde o site já lê.</p>
+
+  <h4>A collection <code>media</code></h4>
+
+  <p>Aceita imagens, PDF, Word, Excel, PowerPoint, CSV, TXT e ZIP. Para imagens gera três tamanhos — <code>thumbnail</code> (480×640), <code>card</code> (900) e <code>hero</code> (1800) — com <code>focalPoint</code> e <code>crop</code> habilitados no admin. O <code>alt</code> é obrigatório. Documentos são servidos como estão; o <code>sharp</code> só processa imagens.</p>
+
+  <h3>Next.js</h3>
+
+  <h4>Cache e revalidação</h4>
+
+  <p>Todas as páginas declaram <code>export const revalidate = 60</code>. Uma edição no admin aparece no site em até um minuto, <strong>sem deploy</strong>. Não há revalidação sob demanda configurada — se um dia for preciso publicação instantânea, o caminho é um hook <code>afterChange</code> chamando <code>revalidatePath</code>.</p>
+
+  <h4>Imagens</h4>
+
+<pre data-lang="ts"><code>images: {
+  remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+  localPatterns: [{ pathname: "/api/media/file/**" }, { pathname: "/**" }],
+}</code></pre>
+
+  <p>O Unsplash está liberado porque os placeholders do redesign vêm de lá. <strong>Uma imagem de domínio não listado não renderiza</strong> — dá erro do <code>next/image</code>, não fallback. Ao introduzir uma fonte externa nova, acrescente o host aqui.</p>
+
+  <h4><code>withPayload</code></h4>
+
+  <p>O config é exportado por <code>withPayload(nextConfig, { devBundleServerPackages: false })</code>. O <code>extensionAlias</code> no webpack existe para resolver os imports com extensão <code>.js</code> que o Payload emite. Mexa nisso só com motivo.</p>
+
+  <h3>Deploy</h3>
+
+  <ol>
+    <li><code>git push</code> na branch de produção</li>
+    <li>A Vercel roda <code>pnpm build</code>, que é <code>payload generate:importmap &amp;&amp; next build</code></li>
+    <li>Deploy</li>
+  </ol>
+
+  <p>O <code>generate:importmap</code> <strong>precisa</strong> rodar antes do <code>next build</code>: ele regenera <code>app/(payload)/admin/importMap.js</code>, que lista os componentes customizados do painel. Não altere o script de build para pular essa etapa.</p>
+
+  <h4>Antes de subir</h4>
+
+<pre data-lang="bash"><code>pnpm generate:types    # se mexeu em collection, global ou campo
+pnpm lint
+pnpm build             # o build local pega o que o dev não pega</code></pre>
+
+  <ul class="check">
+    <li>As três variáveis existem no ambiente da Vercel (Production <strong>e</strong> Preview)</li>
+    <li><code>BLOB_READ_WRITE_TOKEN</code> na forma <code>vercel_blob_rw_…</code></li>
+    <li><code>DATABASE_URL</code> com o nome do banco antes do <code>?</code></li>
+    <li><code>payload-types.ts</code> commitado junto com a mudança de schema</li>
+    <li>Se acrescentou um domínio de imagem, ele está em <code>next.config.ts</code></li>
+  </ul>
+
+  <h4>Configuração na Vercel</h4>
+
+  <ul>
+    <li><strong>Install Command</strong>: <code>pnpm install</code> (a versão vem de <code>packageManager</code>)</li>
+    <li><strong>Build Command</strong>: padrão do <code>package.json</code></li>
+    <li><strong>Node</strong>: 20 ou superior</li>
+    <li><strong>Variáveis</strong>: as três, em todos os ambientes que devem funcionar</li>
+  </ul>
+
+  <div class="note warn">
+    <span class="tag">Deploys de preview</span>
+    <p>Compartilham o mesmo banco e o mesmo Blob de produção. Um preview <strong>não é um ambiente isolado</strong>: conteúdo criado ali é conteúdo de produção.</p>
+  </div>
+
+  <h4>Rollback</h4>
+
+  <p>O rollback da Vercel volta o <strong>código</strong>, não o conteúdo. Se o problema foi editorial, a recuperação é pelo histórico de versões do documento no admin — collections com drafts guardam as 20 últimas versões.</p>
+
+  <h4>pnpm</h4>
+
+  <p><code>node_modules</code> foi linkado por pnpm 11. Rodar <code>pnpm add</code> com uma versão mais antiga falha com <code>ERR_PNPM_UNEXPECTED_STORE</code>.</p>
+
+<pre data-lang="bash"><code>corepack enable &amp;&amp; corepack prepare pnpm@11.21.0 --activate</code></pre>
+</section>
+<section id="receitas">
+  <p class="eyebrow">Operação</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Receitas</h2>
+
+  <p class="lede">Passo a passo completo das tarefas mais comuns. Cada receita vai do CMS ao pixel.</p>
+
+  <h3>1 · "Muda esse texto / esse número / essa foto"</h3>
+
+  <p><strong>Não é código.</strong> Abra <code>/admin</code> e edite. Vale para copy, estatísticas, imagens, ordem dos itens, links do menu, dados de contato, redes sociais. A mudança aparece no site em até 60 segundos, sem deploy.</p>
+
+  <p>Se o campo não existir ainda, aí é código — vá para a receita 2 ou 3.</p>
+
+  <h3>2 · Adicionar um campo a algo que já existe</h3>
+
+  <p>Exemplo: um campo "Duração" nos projetos.</p>
+
+  <p><strong>1.</strong> Declare o campo em <code>collections/Projects.ts</code>, na aba certa:</p>
+
+<pre data-lang="ts"><code>{
+  name: "duration",
+  type: "text",
+  label: "Duração",
+  admin: { description: 'Ex.: "8 meses". Vazio não exibe a linha na ficha do projeto.' },
+}</code></pre>
+
+  <p><strong>2.</strong> Regenere os tipos:</p>
+
+<pre data-lang="bash"><code>pnpm generate:types</code></pre>
+
+  <p><strong>3.</strong> Inclua no retorno da função de leitura em <code>lib/content.ts</code>:</p>
+
+<pre data-lang="ts"><code>return {
+  ...toProjectCard(project),
+  duration: project.duration ?? null,     // decida o fallback aqui
+  // …
+};</code></pre>
+
+  <p>Se outros componentes consomem o tipo exportado, atualize <code>type ProjectCard</code>.</p>
+
+  <p><strong>4.</strong> Renderize — como o campo é opcional, o JSX só precisa de uma guarda:</p>
+
+<pre data-lang="ts"><code>const facts = [
+  { label: "Ecossistema", value: project.ecosystem },
+  { label: "Duração", value: project.duration },
+  // …
+].filter((fact): fact is { label: string; value: string } =&gt; Boolean(fact.value));</code></pre>
+
+  <p><strong>5.</strong> Preencha no admin e confira em <code>/portfolio/[slug]</code>.</p>
+
+  <h3>3 · Criar uma collection nova, do zero ao ar</h3>
+
+  <p>Exemplo: <strong>Reconhecimentos</strong> — prêmios e certificações, com listagem na home.</p>
+
+  <h4>3.1 Collection</h4>
+
+<pre data-lang="ts"><code>import type { CollectionConfig } from "payload";
+
+import { authenticated, publishedOrAuthenticated } from "@/access";
+import { imageField } from "@/fields/imageField";
+
+export const Recognitions: CollectionConfig = {
+  slug: "recognitions",
+  labels: { singular: "Reconhecimento", plural: "Reconhecimentos" },
+  admin: {
+    useAsTitle: "title",
+    defaultColumns: ["title", "year", "order", "_status"],
+    listSearchableFields: ["title", "issuer"],
+    group: "Conteúdo",
+    description: "Prêmios e certificações. Aparecem no bloco de reconhecimentos da home.",
+  },
+  access: {
+    read: publishedOrAuthenticated,
+    create: authenticated,
+    update: authenticated,
+    delete: authenticated,
+  },
+  versions: { drafts: true, maxPerDoc: 20 },
+  defaultSort: "order",
+  fields: [
+    { name: "title", type: "text", label: "Título", required: true, index: true },
+    { name: "issuer", type: "text", label: "Concedido por", required: true },
+    { name: "year", type: "text", label: "Ano", required: true },
+    imageField({ name: "seal", label: "Selo", description: "Opcional. PNG ou SVG com fundo transparente." }),
+    {
+      name: "order",
+      type: "number",
+      label: "Ordem",
+      required: true,
+      defaultValue: 0,
+      admin: { position: "sidebar", description: "Menor número aparece primeiro." },
+    },
+  ],
+};</code></pre>
+
+  <h4>3.2 Registrar</h4>
+
+<pre data-lang="ts"><code>import { Recognitions } from "@/collections/Recognitions";
+// ...
+collections: [Projects, Services, Publications, PublicationCategories,
+              TeamMembers, Partners, Recognitions, Media, Users],</code></pre>
+
+<pre data-lang="bash"><code>pnpm generate:types</code></pre>
+
+  <h4>3.3 Leitura</h4>
+
+<pre data-lang="ts"><code>export type RecognitionCard = {
+  title: string;
+  issuer: string;
+  year: string;
+  seal: ResolvedImage | null;
+};
+
+export const getRecognitions = cache(async (): Promise&lt;RecognitionCard[]&gt; =&gt; {
+  const payload = await getPayloadClient();
+  const { docs } = await payload.find({
+    collection: "recognitions",
+    where: PUBLISHED,
+    sort: "order",
+    limit: 0,
+    depth: 1,             // precisa popular o upload do selo
+  });
+
+  return docs.map((recognition) =&gt; ({
+    title: recognition.title,
+    issuer: recognition.issuer,
+    year: recognition.year,
+    seal: resolveImage(recognition.seal),
+  }));
+});</code></pre>
+
+  <h4>3.4 Componente</h4>
+
+<pre data-lang="ts"><code>import Image from "next/image";
+
+import { Reveal } from "@/components/Reveal";
+import { SectionLabel } from "@/components/SectionLabel";
+import type { RecognitionCard } from "@/lib/content";
+
+export function Recognitions({ recognitions }: { recognitions: RecognitionCard[] }) {
+  if (recognitions.length === 0) return null;
+
+  return (
+    &lt;section className="bg-move-offwhite px-4 py-24 md:px-14"&gt;
+      &lt;div className="editorial-container"&gt;
+        &lt;Reveal&gt;
+          &lt;SectionLabel dot="purple"&gt;Reconhecimentos&lt;/SectionLabel&gt;
+        &lt;/Reveal&gt;
+
+        &lt;ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"&gt;
+          {recognitions.map((item) =&gt; (
+            &lt;li key={`${item.title}-${item.year}`} className="rounded-[1.25rem] border border-move-line bg-white p-6"&gt;
+              {item.seal?.src &amp;&amp; (
+                &lt;Image src={item.seal.src} alt={item.seal.alt} width={80} height={80}
+                       className="mb-4 h-16 w-auto object-contain" /&gt;
+              )}
+              &lt;h3 className="text-lg font-bold text-move-purple"&gt;{item.title}&lt;/h3&gt;
+              &lt;p className="mt-1 text-sm text-move-black/65"&gt;{item.issuer} · {item.year}&lt;/p&gt;
+            &lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  );
+}</code></pre>
+
+  <p>Repare no <code>if (recognitions.length === 0) return null</code> — enquanto a Move não cadastrar nada, a seção simplesmente não existe, em vez de aparecer vazia.</p>
+
+  <h4>3.5 Página</h4>
+
+<pre data-lang="ts"><code>const [home, settings, services, partners, publications, team, recognitions] =
+  await Promise.all([
+    getHomeContent(), getSiteSettings(), getServices(), getPartners(),
+    getHomePublications(), getTeam(), getRecognitions(),
+  ]);
+
+// …
+&lt;Recognitions recognitions={recognitions} /&gt;</code></pre>
+
+  <h4>3.6 Verificar</h4>
+
+  <p><code>/admin</code> → Conteúdo → Reconhecimentos → criar um → <strong>Publicar</strong> (rascunho não aparece) → conferir a home.</p>
+
+  <h3>4 · Criar uma página nova com conteúdo editável</h3>
+
+  <p>Exemplo: <code>/sobre</code>.</p>
+
+  <ol>
+    <li><strong>Global</strong> <code>globals/AboutPage.ts</code> com a copy.</li>
+    <li><strong>Registrar</strong> em <code>payload.config.ts</code>, no array <code>globals</code> <strong>e</strong> no <code>seoPlugin</code>.</li>
+    <li><code>pnpm generate:types</code>.</li>
+    <li><strong>Leitura</strong> em <code>lib/content.ts</code>.</li>
+    <li><strong>Rota</strong> <code>app/(frontend)/sobre/page.tsx</code>.</li>
+    <li>Abrir <code>/admin</code> → Páginas → Sobre e <strong>salvar uma vez</strong>.</li>
+    <li><strong>Menu</strong>: <code>/admin</code> → Configurações do site → Menu de navegação.</li>
+  </ol>
+
+<pre data-lang="ts"><code>import type { Metadata } from "next";
+
+import { PageHero } from "@/components/PageHero";
+import { getAboutPage } from "@/lib/content";
+import { metadataFromSeo } from "@/lib/seo";
+
+export const revalidate = 60;
+
+export async function generateMetadata(): Promise&lt;Metadata&gt; {
+  const page = await getAboutPage();
+  return metadataFromSeo(page.meta, {
+    title: `${page.title} | Move Social`,
+    description: page.description,
+  });
+}
+
+export default async function AboutPage() {
+  const page = await getAboutPage();
+
+  return (
+    &lt;main className="bg-move-offwhite"&gt;
+      &lt;PageHero
+        eyebrow={page.eyebrow}
+        title={page.title}
+        description={page.description ?? undefined}
+        breadcrumbs={[{ label: "Início", href: "/" }]}
+      /&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+
+  <h3>5 · Adicionar um ecossistema</h3>
+
+  <p>Três arquivos, sempre os três:</p>
+
+<pre data-lang="ts"><code>// 1. lib/taxonomy.ts — a opção
+export const ECOSYSTEMS = [ /* … */, "Trabalho e Renda" ] as const;
+
+// 2. lib/palette.ts — a cor (escolha uma superfície ainda não usada)
+export const ECOSYSTEM_SURFACE: Record&lt;string, SurfaceName&gt; = {
+  /* … */
+  "Trabalho e Renda": "sand",
+};
+
+// 3. lib/filterIcons.ts — o grafismo
+export const ECOSYSTEM_ICON: Record&lt;string, string&gt; = {
+  /* … */
+  "Trabalho e Renda": ICON("Group 16"),
+};</code></pre>
+
+  <p>Faltando o 2 ou o 3, o ecossistema funciona mas cai no fallback (Açaí + grafismo neutro) e perde a identidade visual que faz a listagem ser navegável. Se as superfícies acabarem, repita uma cor <strong>conscientemente</strong> — não invente um token fora do guia.</p>
+
+  <h3>6 · Adicionar um grafismo da marca</h3>
+
+  <ol>
+    <li>Coloque o SVG em <code>public/brand/icons/</code>, monocromático, no mesmo padrão dos existentes.</li>
+    <li>Acrescente o nome ao array <code>BRAND_ICONS</code> em <code>fields/iconField.ts</code>.</li>
+    <li><code>pnpm generate:types</code>.</li>
+  </ol>
+
+  <p>O valor gravado é o caminho completo (<code>/brand/icons/Group 17.svg</code>).</p>
+
+  <h3>7 · Publicação com arquivo para download</h3>
+
+  <p>Fluxo só de conteúdo, sem código:</p>
+
+  <ol>
+    <li><code>/admin</code> → Conteúdo → Publicações → Criar</li>
+    <li><strong>Tipo</strong> (sidebar) = "Publicação para download" — isso revela o campo Arquivo</li>
+    <li>Título, sinopse, capa, texto de apresentação</li>
+    <li><strong>Arquivo</strong>: PDF, DOCX, XLSX, PPTX, CSV, TXT ou ZIP</li>
+    <li>Texto do botão (opcional; vazio usa "Baixar publicação")</li>
+    <li>Data, autoria, categorias</li>
+    <li><strong>Publicar</strong></li>
+  </ol>
+
+  <div class="note">
+    <p>A publicação ganha página própria em <code>/publicacoes/[slug]</code> mesmo sendo download ou link externo — a página carrega o texto que apresenta o material, e a ação final mora nela. <strong>Cards nunca apontam direto para fora.</strong></p>
+  </div>
+
+  <h3>8 · Ligar um projeto ao logo do cliente</h3>
+
+  <ol>
+    <li><code>/admin</code> → Parceiros e clientes → criar o parceiro com <strong>Nome</strong> e <strong>Logo</strong></li>
+    <li>Abrir o projeto → campo <strong>Cliente (logo)</strong> → selecionar o parceiro</li>
+    <li>Publicar os dois</li>
+  </ol>
+
+  <p>A ligação é feita <strong>no projeto</strong>. Em Parceiros, o bloco "Projetos no portfólio" é um <code>join</code> — só leitura, para não existirem dois lugares onde a mesma ligação pode ser escrita e discordar.</p>
+
+  <p>O logo do carrossel da home leva sempre a <code>/portfolio?cliente=…</code>, mesmo quando há um projeto só: quem clica quer ver o que a Move fez com aquela organização, e cair direto num caso esconderia que possam existir outros.</p>
+
+  <h3>9 · Mudar a cor de um componente</h3>
+
+  <p><strong>Nunca</strong> escolha fundo e texto separadamente. Use <code>SURFACES</code>:</p>
+
+<pre data-lang="ts"><code>import { surfaceByName } from "@/lib/palette";
+
+const surface = surfaceByName(category.color);
+
+&lt;span className={`rounded-full px-3 py-1 text-xs font-bold ${surface.chip}`}&gt;
+  {category.name}
+&lt;/span&gt;</code></pre>
+
+  <p>Se a cor precisa ser escolhida no CMS, o campo é um <code>select</code> cujas opções saem do próprio <code>SURFACES</code> — como faz <code>PublicationCategories</code>:</p>
+
+<pre data-lang="ts"><code>options: Object.entries(SURFACES).map(([value, surface]) =&gt; ({
+  label: surface.label,
+  value,
+})),</code></pre>
+
+  <p>Assim é impossível cadastrar uma cor que não existe no guia.</p>
+
+  <h3>10 · Recarregar o conteúdo do zero</h3>
+
+<pre data-lang="bash"><code>pnpm seed</code></pre>
+
+  <div class="note warn">
+    <span class="tag">Destrutivo</span>
+    <p>Apaga as collections que ele popula e recria tudo a partir de <code>data/site.ts</code>. Sobrescreve qualquer edição feita no admin — e como dev e produção compartilham o banco, rodar em dev apaga o conteúdo publicado.</p>
+  </div>
+
+  <p>Existe para a carga inicial. Se precisar rodar depois disso, aponte o <code>.env</code> local para outro banco antes — basta trocar o nome do banco na <code>DATABASE_URL</code>. <code>pnpm seed:theory</code> recarrega só o global da Teoria da Mudança, com o mesmo cuidado em escopo menor.</p>
+</section>
+<section id="troubleshooting">
+  <p class="eyebrow">Operação</p>
+  <h2 style="margin-top:0;font-size:clamp(1.8rem,1.4rem+1.4vw,2.4rem)">Troubleshooting</h2>
+
+  <p class="lede">Erros já vistos neste projeto e o que os causa.</p>
+
+  <h3>Conteúdo e CMS</h3>
+
+  <h4>O conteúdo publicado não aparece no site</h4>
+
+  <p>Três causas, nesta ordem de frequência:</p>
+
+  <ol>
+    <li><strong>O documento está como rascunho.</strong> Collections com <code>versions.drafts: true</code> nascem em <code>draft</code> e só entram no site depois de <strong>Publicar</strong>.</li>
+    <li><strong>Passaram-se menos de 60 segundos.</strong> <code>revalidate = 60</code>. Recarregue.</li>
+    <li><strong>A função de leitura não filtra o que você espera.</strong> Confira <code>where</code>, <code>sort</code> e principalmente <code>limit</code> em <code>lib/content.ts</code>.</li>
+  </ol>
+
+  <h4>A listagem para no décimo item</h4>
+
+  <p>Falta <code>limit: 0</code> na consulta. O padrão do Payload é 10.</p>
+
+<pre data-lang="ts"><code>payload.find({ collection: "projects", where: PUBLISHED, sort: "order", limit: 0 })</code></pre>
+
+  <h4>O site subiu vazio, sem erro nenhum</h4>
+
+  <p>A <code>DATABASE_URL</code> está sem o nome do banco antes do <code>?</code> — o driver conectou no banco <code>test</code>.</p>
+
+  <h4>Um campo novo não chega ao componente</h4>
+
+  <p>Ele precisa passar por três lugares: declarado na collection → incluído no <code>return</code> da função em <code>lib/content.ts</code> → passado como prop. Pular o segundo é o esquecimento mais comum. E rode <code>pnpm generate:types</code> — sem isso o TypeScript nem enxerga o campo.</p>
+
+  <h4>Renomeei um campo e o conteúdo sumiu</h4>
+
+  <p>O Mongo não migra. O valor antigo continua no documento sob a chave velha e o campo novo nasceu vazio. Opções: repreencher no admin, ou escrever um script pontual em <code>scripts/</code>. Prefira renomear só o <code>label</code>.</p>
+
+  <h4>O global volta vazio</h4>
+
+  <p>Um global nunca salvo devolve um objeto praticamente sem campos — <code>required</code> não protege a leitura. Abra <code>/admin</code>, preencha e salve uma vez. Na camada de conteúdo, trate campos opcionais com <code>??</code>.</p>
+
+  <h4>O seed apagou conteúdo de produção</h4>
+
+  <p><code>pnpm seed</code> é destrutivo por design e o banco é compartilhado entre dev e produção. Recuperação:</p>
+
+  <ul>
+    <li>Collections com drafts guardam as <strong>20 últimas versões</strong> por documento — dá para restaurar documento a documento pelo histórico no admin.</li>
+    <li>Se houver backup do Atlas (depende do tier do cluster), restaure por lá.</li>
+  </ul>
+
+  <p>Prevenção: aponte o <code>.env</code> local para outro banco antes de rodar qualquer script destrutivo.</p>
+
+  <h3>Imagens e uploads</h3>
+
+  <h4>A imagem quebra em produção mas funciona em dev</h4>
+
+  <p>Quase sempre <code>BLOB_READ_WRITE_TOKEN</code> ausente ou errado em algum ambiente. <strong>Sem o token o plugin se desativa em silêncio</strong> e grava em disco local; o documento chega ao banco compartilhado e o arquivo fica só na sua máquina.</p>
+
+  <ol>
+    <li>O token existe em dev <strong>e</strong> na Vercel (Production e Preview).</li>
+    <li>O formato é <code>vercel_blob_rw_&lt;store&gt;_&lt;hash&gt;</code>. <code>BLOB_STORE_ID</code> e <code>VERCEL_OIDC_TOKEN</code> <strong>não servem</strong>.</li>
+    <li>Para os arquivos que já ficaram para trás: <code>pnpm migrate:media</code>.</li>
+  </ol>
+
+  <h4><code>/api/media/file/*</code> responde 500</h4>
+
+  <p>O documento existe no Mongo, o arquivo não existe no Blob. Mesmo diagnóstico acima. <code>pnpm migrate:media</code> sobe o que estiver em <code>./media</code> — idempotente, nunca sobrescreve.</p>
+
+  <h4><code>Invalid src prop … hostname is not configured</code></h4>
+
+  <p>Erro do <code>next/image</code>. O domínio precisa estar em <code>remotePatterns</code> no <code>next.config.ts</code>. Hoje só <code>images.unsplash.com</code> está liberado.</p>
+
+  <h4>Subi uma foto e o placeholder continua aparecendo</h4>
+
+  <p>O upload tem prioridade sobre a URL externa, então isso normalmente é cache — espere a revalidação (60s). Se persistir, confira se o upload foi no campo <strong>Imagem</strong> do grupo, e não em outro lugar.</p>
+
+  <h3>Build e tipos</h3>
+
+  <h4><code>Property 'x' does not exist on type …</code></h4>
+
+  <p><code>pnpm generate:types</code>. Sempre que mexer em collection, global ou campo.</p>
+
+  <h4>O build falha na Vercel e passa localmente</h4>
+
+  <ul>
+    <li>Variáveis de ambiente faltando no ambiente da Vercel.</li>
+    <li><code>payload-types.ts</code> não commitado depois de uma mudança de schema.</li>
+    <li>Build command alterado: precisa ser <code>payload generate:importmap &amp;&amp; next build</code> — o <code>importMap.js</code> do admin é gerado nessa etapa.</li>
+  </ul>
+
+  <h4><code>ERR_PNPM_UNEXPECTED_STORE</code></h4>
+
+  <p><code>node_modules</code> foi linkado por pnpm 11 e você está usando uma versão mais antiga.</p>
+
+<pre data-lang="bash"><code>corepack enable &amp;&amp; corepack prepare pnpm@11.21.0 --activate</code></pre>
+
+  <h4>Erro de tipo envolvendo <code>sharp</code></h4>
+
+  <p>O <code>.d.ts</code> do Payload traz uma cópia própria dos tipos do sharp, cujas sobrecargas não batem com o sharp 0.34 instalado. Por isso o config tem <code>sharp: sharp as unknown as SharpDependency</code>. É divergência só de tipagem — não "conserte" removendo o cast.</p>
+
+  <h4>Mudei um componente do admin e ele não aparece</h4>
+
+<pre data-lang="bash"><code>pnpm generate:importmap</code></pre>
+
+  <p>O <code>app/(payload)/admin/importMap.js</code> é gerado. Também roda automaticamente no <code>pnpm build</code>.</p>
+
+  <h3>Layout e animação</h3>
+
+  <h4>A pilha de cards da home parou de grudar</h4>
+
+  <p><code>PortfolioStack</code> usa <code>position: sticky</code>. <strong>Algum ancestral ganhou <code>overflow-hidden</code></strong> — sticky para de funcionar em silêncio, sem erro no console. Procure a classe subindo a árvore a partir da seção.</p>
+
+  <h4>Scroll travando, pin escapando, marcadores fora de lugar</h4>
+
+  <p>Sintoma clássico de <strong>duas instâncias de Lenis</strong>. A única legítima é a de <code>SmoothScroll</code>, montada no layout. Para rolagem programática use <code>getLenis()</code>.</p>
+
+  <h4>A página ganhou rolagem horizontal no mobile</h4>
+
+  <p>Controles de formulário (<code>input</code>, <code>select</code>, <code>textarea</code>) carregam largura intrínseca própria — um <code>input</code> pede cerca de 20 caracteres. Como item de grid ou flex isso vira o piso da coluna (<code>min-width: auto</code>), a coluna estica além do container e a página inteira rola. O <code>globals.css</code> já zera esse piso; se reaparecer, procure um elemento novo com largura mínima implícita.</p>
+
+  <h4>Texto ilegível sobre um fundo colorido</h4>
+
+  <p>Fundo e cor de texto foram escolhidos separadamente. Use <code>SURFACES</code> em <code>lib/palette.ts</code>.</p>
+
+  <h4>A cor não aplica, a classe existe no código</h4>
+
+  <p>Tailwind não enxerga nomes de classe montados em runtime: <code>bg-move-${cor}</code> não gera CSS. É por isso que <code>SURFACES</code> escreve as classes por extenso. Se criou um mapa novo, escreva as classes completas. Confira também <code>content</code> em <code>tailwind.config.ts</code> — <code>lib/</code> está incluído justamente porque <code>palette.ts</code> guarda classes.</p>
+
+  <h3>Admin</h3>
+
+  <h4><code>/admin</code> pede para criar o primeiro usuário de novo</h4>
+
+  <p>O banco está vazio ou é outro. Confira a <code>DATABASE_URL</code> — em especial o nome do banco.</p>
+
+  <h4>Não consigo entrar no admin</h4>
+
+  <p><code>PAYLOAD_SECRET</code> mudou: os tokens de sessão emitidos com o segredo anterior ficam inválidos. Limpe os cookies e entre de novo. <strong>Não troque o segredo em produção sem necessidade.</strong></p>
+
+  <h4>O painel está em inglês</h4>
+
+  <p><code>i18n: { supportedLanguages: { pt }, fallbackLanguage: "pt" }</code> em <code>payload.config.ts</code>. Se voltou ao inglês, essa configuração foi alterada.</p>
+
+  <h3>Diagnóstico rápido</h3>
+
+<pre data-lang="bash"><code>pnpm lint
+pnpm generate:types
+pnpm build                       # o build local pega o que o dev não pega</code></pre>
+
+  <p>Para inspecionar o que o CMS realmente devolve, a API REST responde direto:</p>
+
+<pre data-lang="text"><code>http://localhost:3000/api/projects?limit=1&amp;depth=1
+http://localhost:3000/api/globals/site-settings</code></pre>
+
+  <p>Há também o GraphQL playground em <code>/api/graphql-playground</code>.</p>
+
+  <div class="note">
+    <p>Leituras anônimas nessas rotas respeitam o access control — rascunho não aparece, do mesmo jeito que no site.</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var esc = function (s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  };
+
+  var TS = /(\/\/[^\n]*)|(\/\*[\s\S]*?\*\/)|("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)*')|(`(?:[^`\\]|\\.)*`)/g;
+  var SH = /(^[ \t]*#[^\n]*)/gm;
+
+  document.querySelectorAll("pre[data-lang] > code").forEach(function (code) {
+    var lang = code.parentNode.getAttribute("data-lang");
+    var raw = esc(code.textContent);
+
+    if (lang === "ts" || lang === "css") {
+      code.innerHTML = raw.replace(TS, function (m) {
+        var cls = m.charAt(0) === "/" ? "tok-comment" : "tok-string";
+        return '<span class="' + cls + '">' + m + "</span>";
+      });
+    } else if (lang === "bash") {
+      code.innerHTML = raw.replace(SH, '<span class="tok-comment">$1</span>');
+    }
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll(".rail a"));
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute("href").slice(1)] = a; });
+
+  var setActive = function (id) {
+    links.forEach(function (a) { a.classList.remove("is-active"); });
+    if (byId[id]) {
+      byId[id].classList.add("is-active");
+      byId[id].setAttribute("aria-current", "true");
+    }
+  };
+
+  var sections = Array.prototype.slice.call(document.querySelectorAll("section[id]"));
+
+  if ("IntersectionObserver" in window) {
+    var visible = {};
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        visible[entry.target.id] = entry.isIntersecting;
+      });
+      for (var i = 0; i < sections.length; i++) {
+        if (visible[sections[i].id]) { setActive(sections[i].id); break; }
+      }
+    }, { rootMargin: "-10% 0px -70% 0px" });
+
+    sections.forEach(function (s) { observer.observe(s); });
+  }
+
+  setActive("inicio");
+})();
+</script>

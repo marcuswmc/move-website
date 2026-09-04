@@ -214,9 +214,12 @@ export function PortfolioBrowser({ projects }: { projects: ProjectCardData[] }) 
             // sobe para ~240px num monitor de 1440. Abaixo disso vai direto para duas:
             // descontada a barra lateral, três colunas em 1024 deixariam cada card com
             // 189px — estreito a ponto de o nome do cliente quebrar em três linhas.
-            <div className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-              {filtered.map((project, index) => (
-                <ProjectCard key={project.slug} project={project} priority={index < 4} />
+            // O card é quadrado (components/ProjectCard.tsx), então essas larguras são
+            // também a altura: a listagem inteira ficou um quinto mais baixa do que na
+            // proporção 4:5 anterior.
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4">
+              {filtered.map((project) => (
+                <ProjectCard key={project.slug} project={project} />
               ))}
             </div>
           ) : (

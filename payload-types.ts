@@ -190,9 +190,9 @@ export interface Project {
     [k: string]: unknown;
   } | null;
   /**
-   * Imagem do card e do topo da página do projeto.
+   * Opcional. Aparece só no topo da página do projeto — o card em /portfolio é um bloco de cor, definido em Cor do card.
    */
-  image: {
+  image?: {
     /**
      * Tem prioridade sobre a URL externa.
      */
@@ -204,10 +204,10 @@ export interface Project {
     /**
      * Descreve a imagem para leitores de tela. Deixe vazio se for decorativa.
      */
-    alt: string;
+    alt?: string | null;
   };
   /**
-   * Define a cor do card.
+   * Define a cor padrão do card, quando Cor do card está em automático.
    */
   ecosystem: 'Meio Ambiente' | 'Educação' | 'Direitos Humanos' | 'Cultura' | 'Finanças' | 'Saúde' | 'Empreendedorismo';
   /**
@@ -242,6 +242,10 @@ export interface Project {
      */
     image?: (string | null) | Media;
   };
+  /**
+   * Fundo do card em /portfolio. Em automático, segue a cor do ecossistema.
+   */
+  cardColor: 'auto' | 'purple' | 'yellow' | 'periwinkle' | 'coral' | 'sand' | 'mint' | 'green';
   /**
    * Menor número aparece primeiro.
    */
@@ -356,24 +360,17 @@ export interface Service {
   title: string;
   body: string;
   /**
-   * SVG da marca exibido no card.
+   * Ícone exibido no card do serviço.
    */
   icon:
-    | '/brand/icons/Group 2.svg'
-    | '/brand/icons/Group 3.svg'
-    | '/brand/icons/Group 4.svg'
-    | '/brand/icons/Group 5.svg'
-    | '/brand/icons/Group 6.svg'
-    | '/brand/icons/Group 7.svg'
-    | '/brand/icons/Group 8.svg'
-    | '/brand/icons/Group 9.svg'
-    | '/brand/icons/Group 10.svg'
-    | '/brand/icons/Group 11.svg'
-    | '/brand/icons/Group 12.svg'
-    | '/brand/icons/Group 13.svg'
-    | '/brand/icons/Group 14.svg'
-    | '/brand/icons/Group 15.svg'
-    | '/brand/icons/Group 16.svg';
+    | '/brand/services_icons/planejamento.png'
+    | '/brand/services_icons/teoria-de-mudanca.png'
+    | '/brand/services_icons/avaliacao.png'
+    | '/brand/services_icons/estudo.png'
+    | '/brand/services_icons/facilitacoes.png'
+    | '/brand/services_icons/oficinas.png'
+    | '/brand/services_icons/publicacoes.png'
+    | '/brand/services_icons/paineis-de-visualizacoes.png';
   /**
    * Menor número aparece primeiro. A numeração 01, 02… do card é gerada a partir daqui.
    */
@@ -687,6 +684,7 @@ export interface ProjectsSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  cardColor?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -922,7 +920,24 @@ export interface Home {
   hero: {
     eyebrow: string;
     title: string;
-    body: string;
+    /**
+     * Texto curto abaixo do título. Use negrito ou itálico para destacar palavras — o editor só oferece esses dois formatos porque o hero é um parágrafo, não uma página.
+     */
+    body: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
   };
   /**
    * Exibidos abaixo do hero.
@@ -1022,7 +1037,7 @@ export interface TheoryOfChange {
   audiences?:
     | {
         label: string;
-        summary: string;
+        summary?: string | null;
         description: string;
         id?: string | null;
       }[]
@@ -1054,8 +1069,8 @@ export interface TheoryOfChange {
     | null;
   impact: {
     eyebrow: string;
-    title: string;
-    statement: string;
+    title?: string | null;
+    statement?: string | null;
   };
   pdf: {
     label: string;
@@ -1142,16 +1157,16 @@ export interface ContactPage {
       }[]
     | null;
   /**
-   * Opções do campo "área de atuação" no formulário.
+   * Opções do campo "serviço de interesse" no formulário. É uma lista própria, e não os cards de "O que entregamos" — o formulário oferece frentes que não têm card na home.
    */
-  areas?:
+  serviceOptions?:
     | {
         label: string;
         id?: string | null;
       }[]
     | null;
   /**
-   * Opções do bloco "disponibilidade" no formulário. Tire um dia da lista para deixar de oferecê-lo.
+   * Cada dia vira uma linha do bloco "disponibilidade" no formulário, com um botão por período. Tire um dia da lista para deixar de oferecê-lo.
    */
   availabilityDays?:
     | {
@@ -1160,7 +1175,7 @@ export interface ContactPage {
       }[]
     | null;
   /**
-   * Opções de período no bloco "disponibilidade" do formulário.
+   * Cada período vira um botão em todos os dias da lista acima. O visitante marca os que servem para ele; os que ficarem sem marca contam como indisponível.
    */
   availabilityPeriods?:
     | {
@@ -1454,7 +1469,7 @@ export interface ContactPageSelect<T extends boolean = true> {
         body?: T;
         id?: T;
       };
-  areas?:
+  serviceOptions?:
     | T
     | {
         label?: T;

@@ -1,9 +1,11 @@
+import { RichText as LexicalRichText } from "@payloadcms/richtext-lexical/react";
+import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import Link from "next/link";
 import { MoveSymbol } from "@/components/MoveSymbol";
 import { Reveal } from "@/components/Reveal";
 
 type HeroProps = {
-  hero: { eyebrow: string; title: string; body: string };
+  hero: { eyebrow: string; title: string; body: SerializedEditorState };
   metrics: { value: string; label: string }[];
   affiliations: { label: string }[];
 };
@@ -43,15 +45,21 @@ export function Hero({ hero, metrics, affiliations }: HeroProps) {
           </Reveal>
 
           <Reveal delay={0.16}>
-            <p className="mt-5 max-w-lg text-pretty text-body-lg leading-relaxed text-white/75">{hero.body}</p>
+            {/* Rich text, não string: o texto de apoio é editado no admin com negrito e
+                itálico. A tipografia continua vindo do contêiner — não do `editorial-prose`,
+                que é escuro e feito para corpo de página — e o negrito sobe para branco
+                pleno, que é o destaque que ele precisa ter sobre o roxo. */}
+            <div className="mt-5 max-w-lg text-pretty text-body-lg leading-relaxed text-white/75 [&_p+p]:mt-4 [&_strong]:font-bold [&_strong]:text-white">
+              <LexicalRichText data={hero.body} />
+            </div>
           </Reveal>
 
           <Reveal delay={0.24} className="mt-7 flex flex-wrap items-center gap-5">
             <Link
-              href="#entregamos"
+              href="/portfolio"
               className="rounded-full bg-move-yellow px-7 py-3.5 text-sm font-bold text-move-purple transition hover:bg-white active:scale-[0.96]"
             >
-              Conhecer nossos serviços
+              Conheça nosso portfólio
             </Link>
             <Link
               href="/teoria-da-mudanca"
@@ -62,26 +70,31 @@ export function Hero({ hero, metrics, affiliations }: HeroProps) {
           </Reveal>
         </div>
 
-        <Reveal
-          delay={0.32}
-          className="mt-8 flex w-full max-w-3xl flex-col gap-5 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:gap-8"
-        >
-          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <Reveal delay={0.32} className="mt-8 w-full max-w-3xl border-t border-white/15 pt-6">
+          {/* Grade, não linha de baseline: com quatro números o par valor+legenda
+              lado a lado estourava a largura e quebrava em pontos arbitrários. Empilhados
+              em colunas, os quatro cabem numa faixa só a partir de `sm` e em 2×2 no
+              celular, sem encolher o valor a ponto de ele deixar de ser o destaque. */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
             {metrics.map((metric) => (
-              <div key={metric.label} className="flex items-baseline gap-3">
-                <span className="font-sans text-4xl font-bold tabular-nums text-white md:text-5xl">{metric.value}</span>
-                <span className="text-sm font-medium text-white/70">{metric.label}</span>
+              <div key={metric.label}>
+                <div className="font-sans text-3xl font-bold tabular-nums leading-none text-white md:text-4xl">
+                  {metric.value}
+                </div>
+                <p className="mt-1.5 text-sm font-medium leading-snug text-white/70">{metric.label}</p>
               </div>
             ))}
           </div>
 
-          <div aria-hidden="true" className="hidden h-8 w-px shrink-0 bg-white/15 sm:block" />
-
-          <div className="flex flex-wrap items-center gap-3">
+          {/* Os selos passam a ocupar a própria faixa: as legendas agora são frases
+              ("Associada à…"), largas demais para dividir a linha com os números. Sem
+              caixa alta nem tracking pelo mesmo motivo — a versão maiúscula de uma frase
+              inteira pesa e quebra pior. */}
+          <div className="mt-6 flex flex-wrap items-center gap-2.5 border-t border-white/10 pt-5">
             {affiliations.map((item) => (
               <span
                 key={item.label}
-                className="rounded-soft border border-white/20 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.06em] text-white/70"
+                className="rounded-soft border border-white/20 px-3.5 py-2 text-xs font-semibold text-white/70"
               >
                 {item.label}
               </span>

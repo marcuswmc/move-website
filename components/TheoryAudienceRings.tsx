@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useId, useState } from "react";
 
-export type Audience = { number: string; label: string; summary: string; description: string };
+export type Audience = { number: string; label: string; summary?: string; description: string };
 
 /**
  * Os três públicos como anéis concêntricos, como no diagrama oficial: pessoas no
@@ -174,7 +174,9 @@ export function TheoryAudienceRings({ audiences }: { audiences: Audience[] }) {
             <h3 className="mt-3 font-sans text-2xl font-medium leading-tight text-white md:text-3xl">
               {current.label}
             </h3>
-            <p className="mt-2 text-body-lg leading-relaxed text-white/85">{current.summary}</p>
+            {current.summary && (
+              <p className="mt-2 text-body-lg leading-relaxed text-white/85">{current.summary}</p>
+            )}
             <p className="mt-4 max-w-md leading-relaxed text-white/65">{current.description}</p>
           </motion.div>
         )}

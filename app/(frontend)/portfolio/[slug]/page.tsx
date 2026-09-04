@@ -8,7 +8,7 @@ import { Reveal } from "@/components/Reveal";
 import { RichText } from "@/components/RichText";
 import { SectionLabel } from "@/components/SectionLabel";
 import { getProject, getProjectSlugs, getRelatedProjects } from "@/lib/content";
-import { surfaceForEcosystem } from "@/lib/palette";
+import { surfaceForProject } from "@/lib/palette";
 import { metadataFromSeo } from "@/lib/seo";
 
 export const revalidate = 60;
@@ -41,7 +41,8 @@ export default async function ProjectPage({ params }: Props) {
   if (!project) notFound();
 
   const related = await getRelatedProjects(project.slug, project.ecosystem);
-  const surface = surfaceForEcosystem(project.ecosystem);
+  // Mesma cor do card na listagem, inclusive quando ela foi escolhida à mão no CMS.
+  const surface = surfaceForProject(project.cardColor, project.ecosystem);
 
   const facts = [
     { label: "Ecossistema", value: project.ecosystem },
