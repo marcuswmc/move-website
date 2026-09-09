@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type MouseEvent } from "react";
+import { useLayoutEffect, type MouseEvent } from "react";
 import { usePathname } from "next/navigation";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/components/SmoothScroll";
@@ -20,6 +20,7 @@ function scrollToHash(hash: string, immediate = false) {
 }
 
 /**
+ * New pages start at the top; explicit hash destinations keep their anchor behavior.
  * Routes hash-anchor navigation through Lenis instead of the browser's native jump.
  * Without this, landing on a page via `/#id` (e.g. from another route) scrolls the
  * document directly, Lenis's own raf loop then lerps back toward its stale target,
@@ -36,11 +37,21 @@ function scrollToHash(hash: string, immediate = false) {
 export function HashScrollSync() {
   const pathname = usePathname();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const hash = window.location.hash;
-    if (!hash) return;
+    if (!hash) {
+      // Reset both the document and Lenis's destination, including an active tween.
+      getLenis()?.scrollTo(0, { immediate: true, force: true });
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
 
-    const frame = requestAnimationFrame(() => scrollToHash(hash, true));
+    const frame = requestAnimationFrame(() => {
+      if (hash) scrollToHash(hash, true);
+      else {
+        getLenis()?.scrollTo(0, { immediate: true, force: true });
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      }
+    });
     return () => cancelAnimationFrame(frame);
   }, [pathname]);
 

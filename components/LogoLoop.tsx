@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -46,16 +49,29 @@ function logoHeight({ width, height }: Pick<Logo, "width" | "height">): number {
 }
 
 export function LogoLoop({ logos }: LogoLoopProps) {
+  const trackRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    let cancelled = false;
+    track.style.animationPlayState = "paused";
+    // Decode every repeated image before the strip starts moving into view.
+    Promise.allSettled(Array.from(track.querySelectorAll("img"), (image) => image.decode())).then(() => {
+      if (!cancelled) track.style.removeProperty("animation-play-state");
+    });
+    return () => { cancelled = true; };
+  }, [logos]);
   const loopedLogos = [...logos, ...logos];
 
   return (
     <div className="logo-loop overflow-hidden" aria-label="Organizações parceiras">
-      <ul className="logo-loop-track flex w-max items-center" role="list">
+      <ul ref={trackRef} className="logo-loop-track flex w-max items-center" role="list">
         {loopedLogos.map((logo, index) => {
           const image = (
             <Image
               src={logo.src}
               alt={logo.name}
+              loading="eager"
               width={logo.width ?? 220}
               height={logo.height ?? 110}
               sizes="(min-width: 640px) 184px, 144px"
@@ -68,7 +84,7 @@ export function LogoLoop({ logos }: LogoLoopProps) {
           return (
             <li key={`${logo.name}-${index}`} className="flex h-24 w-48 shrink-0 items-center justify-center px-6 sm:h-28 sm:w-60 sm:px-7" aria-hidden={index >= logos.length}>
               {logo.href ? (
-                <Link href={logo.href} aria-label={logo.name} className="transition-opacity hover:opacity-70">
+                <Link href={logo.href} aria-label={logo.name} tabIndex={index >= logos.length ? -1 : undefined} className="flex w-full items-center justify-center transition-opacity hover:opacity-70">
                   {image}
                 </Link>
               ) : (
