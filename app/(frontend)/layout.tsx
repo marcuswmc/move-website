@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Raleway } from "next/font/google";
+import { Raleway } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { HashScrollSync } from "@/components/HashScrollSync";
@@ -11,15 +11,6 @@ const raleway = Raleway({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-raleway",
-  display: "swap"
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: "variable",
-  style: ["normal", "italic"],
-  axes: ["opsz", "SOFT"],
-  variable: "--font-fraunces",
   display: "swap"
 });
 
@@ -38,7 +29,7 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR">
-      <body className={`${raleway.variable} ${fraunces.variable} antialiased`} suppressHydrationWarning>
+      <body className={`${raleway.variable} antialiased`} suppressHydrationWarning>
         <SmoothScroll />
         <HashScrollSync />
         <Header navItems={navItems} social={social} />

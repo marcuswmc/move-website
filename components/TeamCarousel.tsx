@@ -153,6 +153,8 @@ export function TeamCarousel({ members, eyebrow, title, body }: TeamCarouselProp
                   <Image
                     src={member.image}
                     alt={member.imageAlt}
+                    placeholder={member.blurDataURL ? "blur" : "empty"}
+                    blurDataURL={member.blurDataURL}
                     fill
                     sizes="(min-width: 768px) 272px, 74vw"
                     className={`object-cover transition duration-700 group-hover:scale-[1.04] group-hover:grayscale-0 group-focus-visible:grayscale-0 ${

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import { useRef, useEffect, useState, useCallback, CSSProperties, KeyboardEvent, MouseEvent } from 'react';
 import { gsap } from 'gsap';
 
@@ -7,6 +8,7 @@ import './AccordionGallery.css';
 
 export interface AccordionGalleryItem {
   image: string;
+  blurDataURL?: string;
   label?: string;
   /** Ajuste sobre o original: segunda linha do label — aqui, a especialidade da pessoa. */
   sublabel?: string;
@@ -235,7 +237,13 @@ const AccordionGallery = ({
               panelRefs.current[i] = el;
             }}
             className={`ag-panel${isActive ? ' ag-panel--active' : ''}`}
-            style={{ borderRadius: `${radius}px` }}
+            style={{
+              borderRadius: `${radius}px`,
+              // Mesma proporção usada pelo GSAP, já reservada no HTML inicial.
+              flexGrow: isActive && count > 1
+                ? (Math.min(Math.max(expandRatio, 0.2), 0.9) * (count - 1)) / (1 - Math.min(Math.max(expandRatio, 0.2), 0.9))
+                : 1,
+            }}
             href={item.link || undefined}
             onClick={e => handleClick(i, e)}
             onMouseEnter={() => handleEnter(i)}
@@ -253,7 +261,15 @@ const AccordionGallery = ({
                   mediaRefs.current[i] = el;
                 }}
               >
-                <img src={item.image} alt={item.alt || item.label || ''} draggable={false} />
+                {item.image && <Image
+                  src={item.image}
+                  alt={item.alt || item.label || ''}
+                  fill
+                  sizes="(min-width: 1440px) 540px, (min-width: 768px) 42vw, 92vw"
+                  placeholder={item.blurDataURL ? 'blur' : 'empty'}
+                  blurDataURL={item.blurDataURL}
+                  draggable={false}
+                />}
               </span>
               <span className="ag-panel__overlay" aria-hidden="true" />
             </span>

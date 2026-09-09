@@ -1,0 +1,34 @@
+[
+  {
+    "check": "SSR sem JavaScript e filtro inicial",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "all": 94,
+    "filtered": 2,
+    "clientURL": "/portfolio?cliente=unicef"
+  },
+  {
+    "check": "SSR sem JavaScript e filtro inicial",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "all": 94,
+    "filtered": 2,
+    "clientURL": "/portfolio?cliente=unicef"
+  },
+  {
+    "check": "Busca, limpeza e navegação entre clientes/voltar/avançar",
+    "passed": true
+  },
+  {
+    "check": "Âncora equipe, imagens do conselho, teclado e mobile sem overflow",
+    "passed": true
+  },
+  {
+    "check": "Imagem otimizada de publicação persistida no cache",
+    "cache": "HIT"
+  }
+]

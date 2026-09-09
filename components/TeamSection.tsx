@@ -10,6 +10,7 @@ export type Member = {
   bio: string;
   image: string;
   imageAlt: string;
+  blurDataURL?: string;
 };
 
 export function TeamSection({
@@ -52,6 +53,7 @@ export function TeamSection({
                   items={boardMembers.map((member) => ({
                     image: member.image,
                     alt: member.imageAlt,
+                    blurDataURL: member.blurDataURL,
                     label: member.name,
                     sublabel: member.specialty,
                   }))}

@@ -58,6 +58,7 @@ export function LogoLoop({ logos }: LogoLoopProps) {
               alt={logo.name}
               width={logo.width ?? 220}
               height={logo.height ?? 110}
+              sizes="(min-width: 640px) 184px, 144px"
               // A altura calculada entra como variável para o `sm:` poder crescê-la
               // junto com a célula, sem recalcular nada.
               style={{ "--logo-height": `${logoHeight(logo)}px` } as React.CSSProperties}

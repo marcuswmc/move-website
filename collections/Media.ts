@@ -1,6 +1,8 @@
 import type { CollectionConfig } from "payload";
 
 import { anyone, authenticated } from "@/access";
+import { addImagePlaceholder } from "@/lib/image-placeholder";
+import { compactMediaETag } from "@/lib/media-response-headers";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -16,8 +18,10 @@ export const Media: CollectionConfig = {
     update: authenticated,
     delete: authenticated,
   },
+  hooks: { beforeChange: [addImagePlaceholder] },
   upload: {
     staticDir: "media",
+    modifyResponseHeaders: compactMediaETag,
     // Imagens + os formatos em que uma publicação costuma circular. O sharp só gera
     // as variações de tamanho para imagens; os demais são servidos como estão.
     mimeTypes: [
@@ -49,6 +53,12 @@ export const Media: CollectionConfig = {
     crop: true,
   },
   fields: [
+    {
+      name: "blurDataURL",
+      type: "text",
+      maxLength: 2048,
+      admin: { hidden: true, readOnly: true },
+    },
     {
       name: "alt",
       type: "text",

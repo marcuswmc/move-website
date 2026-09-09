@@ -34,7 +34,7 @@ Copy, images, projects, team, partners and publications are edited in the admin 
 - `lib/content.ts` is the only place that reads the CMS. Each function returns the exact shape the components already consumed, so the components never learn Payload exists. It filters to `_status: 'published'` and wraps everything in React `cache()` to dedupe per request.
 - `lib/resolveImage.ts` collapses the two-track `imageField()` (Media upload **or** external URL) into `{ src, alt }`. **Upload always wins over the external URL** — that's how a Unsplash placeholder gets replaced with real photography without touching code.
 - Display numbers (`01`, `02`…) are derived from array position via `displayNumber()`. Never add a manual number field; there would be nothing keeping it in sync.
-- Pages are server components with `export const revalidate = 60`.
+- Pages are server components with `export const revalidate = 60`. `/portfolio` renders per request to apply `searchParams` in its initial HTML; its project data, page settings and shared site settings use a 60-second persistent cache.
 
 `data/site.ts` and `data/images.ts` are **no longer read by the site** — they survive only as the input to `scripts/seed.ts`, which performs the one-time load. Re-running `pnpm seed` wipes the content collections and reloads them, so it overwrites anything the client edited in the admin.
 
@@ -50,12 +50,12 @@ Uploads go to a **public Vercel Blob store**, via `vercelBlobStorage` in `payloa
 
 **`BLOB_READ_WRITE_TOKEN` is required in every environment, dev included.** Without it the plugin disables itself *silently* and falls back to writing to local disk — and since dev and production share one Atlas database, that recreates the exact bug above. The token must be the `vercel_blob_rw_<store>_<hash>` form (the adapter parses the store id out of it); the OIDC variables Vercel now injects by default, `BLOB_STORE_ID` and `VERCEL_OIDC_TOKEN`, are not enough. `pnpm migrate:media` pushes whatever is in `./media` to the store, skipping names that already exist.
 
-### Animation stack: GSAP+Lenis for scroll choreography, Framer Motion for simple reveals
+### Animation stack: GSAP+Lenis for scroll choreography, visible initial content
 
 - `SmoothScroll` (mounted once, in `app/(frontend)/layout.tsx`) owns the single global `Lenis` instance and pipes its raf loop into `gsap.ticker`, calling `ScrollTrigger.update` on scroll. Don't instantiate another `Lenis` elsewhere — everything scroll-driven should hook into this one instance via `ScrollTrigger`.
 - `PortfolioStack` (home) stacks its cards with `position: sticky`, so no ancestor may set `overflow-hidden`.
-- `/portfolio` and `/publicacoes` are server components that fetch everything, then hand a plain array to a small client component (`PortfolioBrowser`, `PublicationsBrowser`) that filters in memory. The collections are in the low hundreds of items — filtering client-side keeps the pages static and makes every filter change instant, with no round trip. Revisit if the acervo grows past a few thousand.
-- `Reveal` (Framer Motion `whileInView`, `once: true`) is the standard fade/slide-up-on-scroll wrapper used for simple content reveals. `MediaFrame` wraps `next/image` in a `Reveal` with a consistent aspect ratio and hover zoom — use it for any content image instead of a bare `Image`.
+- `/portfolio` and `/publicacoes` are server components that fetch everything, then hand a plain array to a small client component (`PortfolioBrowser`, `PublicationsBrowser`) that filters in memory. The collections are in the low hundreds of items — the portfolio receives its initial client filter from the server and renders its cards in the initial HTML. Other filters remain client-side and instant, with no round trip; publications remains static. Revisit if the acervo grows past a few thousand.
+- `Reveal` is a plain, server-compatible wrapper: content is visible in the initial HTML, including without JavaScript. Its legacy `delay` prop no longer delays rendering. `MediaFrame` wraps `next/image` in a `Reveal` with a consistent aspect ratio and hover zoom — use it for any content image instead of a bare `Image`.
 - Reduced motion is handled globally via a `prefers-reduced-motion` media query in `app/(frontend)/globals.css`, not per-component.
 
 ### Design tokens
@@ -66,10 +66,14 @@ Custom Tailwind theme in `tailwind.config.ts` under the `move` namespace, holdin
 
 Two traps worth naming: `move-offwhite`/`move-gray` is Off White (`#F2F2F2`) and is **not** `move-light` (Luz, `#FBFFB1`) — Luz is a small graphic accent and never a component background, which is why it has no entry in `SURFACES`. And `move-black` is for typography only, never a dominant background.
 
-Fonts are loaded once via `next/font/google` in `app/(frontend)/layout.tsx` (Raleway → `--font-raleway`, Fraunces variable → `--font-fraunces`). Raleway (`font-sans`) is the only typeface actually used on the site; Fraunces (`font-serif`) is still loaded but no longer referenced anywhere — don't reintroduce `font-serif` on headings without checking with the client first, and don't add other font-loading mechanisms.
+Fonts are loaded once via `next/font/google` in `app/(frontend)/layout.tsx` (Raleway → `--font-raleway`, Fraunces variable → `--font-fraunces`). Raleway (`font-sans`) is the only typeface actually used on the site; Fraunces is not loaded because it was unused. Do not reintroduce `font-serif` on headings without checking with the client first, and do not add other font-loading mechanisms.
 
 `.editorial-container` (in `app/(frontend)/globals.css`) is the shared max-width/gutter wrapper used for page content instead of ad hoc `max-w-*`/`mx-auto` combos.
 
 ### `.agents/skills/`
 
 Bundled agent skill packs (GSAP, typography, UI polish, etc.) used to assist development in this repo. Not application code.
+
+### Image delivery
+
+Photos receive an optional persisted `blurDataURL` generated by `lib/image-placeholder.ts` during upload. `lib/resolveImage.ts` passes it to the UI; missing previews use the existing reserved backgrounds. `scripts/backfill-image-placeholders.ts` defaults to a read-only count; `MOVE_WRITE_PLACEHOLDERS=1` fills missing previews with concurrency protection. The performance task generated previews for all 86 eligible existing images and confirmed zero pending images. Long Blob ETags are shortened by `lib/media-response-headers.ts` so Next image cache filenames stay within filesystem limits. See `docs/performance-renderizacao.md` for validation and operation details.

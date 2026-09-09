@@ -125,6 +125,8 @@ export default async function PublicationPage({ params }: Props) {
                 <Image
                   src={publication.cover.src}
                   alt={publication.cover.alt}
+                  placeholder={publication.cover.blurDataURL ? "blur" : "empty"}
+                  blurDataURL={publication.cover.blurDataURL}
                   fill
                   priority
                   sizes="(min-width: 1340px) 1340px, 100vw"
@@ -134,11 +136,13 @@ export default async function PublicationPage({ params }: Props) {
             </Reveal>
           )}
 
-          <Reveal delay={0.06}>
-            <p className="mt-12 max-w-[68ch] border-l-2 border-move-yellow pl-5 text-body-lg font-medium leading-relaxed text-move-purple">
-              {publication.synopsis}
-            </p>
-          </Reveal>
+          {publication.synopsis && (
+            <Reveal delay={0.06}>
+              <p className="mt-12 max-w-[68ch] border-l-2 border-move-yellow pl-5 text-body-lg font-medium leading-relaxed text-move-purple">
+                {publication.synopsis}
+              </p>
+            </Reveal>
+          )}
 
           {publication.content && (
             <Reveal delay={0.1}>

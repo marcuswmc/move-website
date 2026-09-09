@@ -13,7 +13,7 @@ export const Projects: CollectionConfig = {
   labels: { singular: "Projeto", plural: "Portfólio" },
   admin: {
     useAsTitle: "client",
-    defaultColumns: ["client", "ecosystem", "service", "year", "_status"],
+    defaultColumns: ["client", "ecosystems", "services", "year", "_status"],
     listSearchableFields: ["client", "service", "summary"],
     group: "Conteúdo",
     description: "Cada projeto vira um card em /portfolio e uma página própria em /portfolio/[slug].",
@@ -26,7 +26,18 @@ export const Projects: CollectionConfig = {
   },
   versions: { drafts: true, maxPerDoc: 20 },
   defaultSort: "order",
+  hooks: {
+    beforeValidate: [({ data }) => {
+      if (!data) return data;
+      // Keep scalar fields readable by the deployed site during rollout.
+      if (Array.isArray(data.ecosystems)) data.ecosystem = data.ecosystems[0] ?? "";
+      if (Array.isArray(data.services)) data.service = data.services.join("; ");
+      if (Array.isArray(data.segments)) data.segment = data.segments[0] ?? null;
+      return data;
+    }],
+  },
   fields: [
+    { name: "migrationNotes", type: "textarea", label: "Observações da migração", admin: { position: "sidebar" } },
     {
       type: "tabs",
       tabs: [
@@ -108,13 +119,21 @@ export const Projects: CollectionConfig = {
               type: "row",
               fields: [
                 {
+                  name: "ecosystems",
+                  type: "select",
+                  hasMany: true,
+                  label: "Ecossistemas",
+                  options: ECOSYSTEMS.map((value) => ({ label: value, value })),
+                  admin: { description: "O primeiro aparece no card e define a cor automática. Os demais aparecem como +N e também entram nos filtros." },
+                },
+                {
                   name: "ecosystem",
                   type: "select",
                   label: "Ecossistema",
                   required: true,
                   index: true,
                   options: ECOSYSTEMS.map((value) => ({ label: value, value })),
-                  admin: { description: "Define a cor padrão do card, quando Cor do card está em automático." },
+                  admin: { hidden: true },
                 },
                 {
                   name: "year",
@@ -126,15 +145,29 @@ export const Projects: CollectionConfig = {
               ],
             },
             {
+              name: "services",
+              type: "select",
+              hasMany: true,
+              label: "Serviços",
+              options: ["Avaliações de Impacto e Resultados", "Diagnósticos Sociais", "Estudos e Sistematizações", "Facilitações", "Formações", "Planejamento Estratégico", "Sistemas de Monitoramento", "Teoria de Mudança"],
+            },
+            {
               name: "service",
               type: "text",
               label: "Serviço",
-              required: true,
               index: true,
               admin: {
+                hidden: true,
                 description:
                   "Alimenta o filtro por serviço. Reaproveite exatamente o mesmo texto entre projetos do mesmo tipo, senão viram duas opções distintas no filtro.",
               },
+            },
+            {
+              name: "segments",
+              type: "select",
+              hasMany: true,
+              label: "Segmentos",
+              options: SEGMENTS.map((value) => ({ label: value, value })),
             },
             {
               name: "segment",
@@ -142,7 +175,7 @@ export const Projects: CollectionConfig = {
               label: "Segmento",
               index: true,
               options: SEGMENTS.map((value) => ({ label: value, value })),
-              admin: { description: "Natureza da organização atendida." },
+              admin: { hidden: true },
             },
           ],
         },

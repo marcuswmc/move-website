@@ -1,7 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { ALL, FilterGroup } from "@/components/FilterGroup";
 import type { FilterOption } from "@/components/FilterGroup";
@@ -28,10 +27,10 @@ const LABELS: Record<Dimension, string> = {
   segment: "Segmento",
 };
 
-const PICK: Record<Dimension, (project: ProjectCardData) => string | null> = {
-  ecosystem: (project) => project.ecosystem,
-  service: (project) => project.service,
-  segment: (project) => project.segment,
+const PICK: Record<Dimension, (project: ProjectCardData) => string[]> = {
+  ecosystem: (project) => project.ecosystems,
+  service: (project) => project.services,
+  segment: (project) => project.segments,
 };
 
 const ICON: Record<Dimension, ((value: string) => string) | null> = {
@@ -54,30 +53,29 @@ const byName = (a: string, b: string) => a.localeCompare(b, "pt-BR");
  * Ecossistema e Segmento são listas fechadas no CMS, então aparecem inteiras — inclusive
  * o que ainda não tem projeto, apagado e com contagem zero. Isso é intencional: os
  * rótulos dizem em que campos a Move atua, e uma lista que encolhe conforme o acervo
- * esconderia metade dessa mensagem. Serviço é texto livre no admin, então não há lista
- * canônica para exibir — ali as opções só podem sair dos projetos cadastrados.
+ * esconderia metade dessa mensagem. Serviços mostram somente as opções utilizadas
+ * pelos projetos cadastrados, incluindo os valores dos registros anteriores à migração.
  */
 const optionsFor = (projects: ProjectCardData[], dimension: Dimension): string[] => {
   if (dimension === "ecosystem") return [...ECOSYSTEMS].sort(byName);
   if (dimension === "segment") return [...SEGMENTS].sort(byName);
 
   return Array.from(
-    new Set(projects.map(PICK[dimension]).filter((value): value is string => Boolean(value))),
+    new Set(projects.flatMap(PICK[dimension]).filter((value): value is string => Boolean(value))),
   ).sort(byName);
 };
 
-export function PortfolioBrowser({ projects }: { projects: ProjectCardData[] }) {
+export function PortfolioBrowser({ projects, initialClient = null }: { projects: ProjectCardData[]; initialClient?: string | null }) {
   const [query, setQuery] = useState("");
   const [selection, setSelection] = useState<Selection>(NOTHING_SELECTED);
 
   /**
    * O logo de um cliente com vários projetos leva para cá com `?cliente=slug`. O filtro
    * mora no estado, e não na URL, para o resto da navegação não empilhar histórico a
-   * cada clique — mas segue o parâmetro quando ele muda, para voltar/avançar funcionar.
+   * cada clique. A página fornece o cliente no SSR e reinicia o componente quando
+   * esse parâmetro muda, inclusive ao voltar/avançar.
    */
-  const clientParam = useSearchParams().get("cliente");
-  const [client, setClient] = useState<string | null>(clientParam);
-  useEffect(() => setClient(clientParam), [clientParam]);
+  const [client, setClient] = useState<string | null>(initialClient);
 
   const clientName = useMemo(
     () => (client ? (projects.find((project) => project.clientSlug === client)?.client ?? null) : null),
@@ -93,7 +91,7 @@ export function PortfolioBrowser({ projects }: { projects: ProjectCardData[] }) 
 
       for (const dimension of DIMENSIONS) {
         if (dimension === ignore) continue;
-        if (current[dimension] !== ALL && PICK[dimension](project) !== current[dimension]) return false;
+        if (current[dimension] !== ALL && !PICK[dimension](project).includes(current[dimension])) return false;
       }
 
       if (!term) return true;
@@ -121,7 +119,7 @@ export function PortfolioBrowser({ projects }: { projects: ProjectCardData[] }) 
 
         const options: FilterOption[] = optionsFor(projects, dimension).map((value) => ({
           value,
-          count: pool.filter((project) => PICK[dimension](project) === value).length,
+          count: pool.filter((project) => PICK[dimension](project).includes(value)).length,
           icon: icon?.(value),
         }));
 

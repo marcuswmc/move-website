@@ -12,7 +12,7 @@ export type ImageGroup = {
  * upload — uma URL externa não tem dimensão conhecida aqui. Quem precisa da
  * proporção (o carrossel de parceiros) trata a ausência com um padrão.
  */
-export type ResolvedImage = { src: string; alt: string; width?: number; height?: number };
+export type ResolvedImage = { src: string; alt: string; width?: number; height?: number; blurDataURL?: string };
 
 /**
  * O upload tem prioridade sobre a URL externa — é o que permite a Move trocar um
@@ -32,6 +32,7 @@ export function resolveImage(image: ImageGroup | null | undefined): ResolvedImag
   return {
     src,
     alt: media?.alt ?? image.alt ?? "",
+    ...(media?.blurDataURL ? { blurDataURL: media.blurDataURL } : {}),
     ...(media?.width && media?.height ? { width: media.width, height: media.height } : {}),
   };
 }

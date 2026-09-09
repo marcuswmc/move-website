@@ -66,7 +66,7 @@ O teto de `display-1` é 5rem (80px) por medição, não por estimativa: acima d
 os títulos reais do site passam a quebrar em três linhas.
 
 **Fontes** — Raleway (`font-sans`) é a única efetivamente usada. Fraunces
-(`font-serif`) continua carregada mas não é referenciada em lugar nenhum. Não
+(`font-serif`) deixou de ser carregada porque não é usada. Não
 reintroduza `font-serif` em títulos sem falar com o cliente.
 
 Outros tokens: `rounded-soft` (8px), `shadow-editorial`.
@@ -142,7 +142,7 @@ títulos, links sublinhados em Ipê. Aplicada pelo componente `<RichText />`.
 
 | Componente | Papel |
 | --- | --- |
-| [`Reveal`](../components/Reveal.tsx) | fade + slide-up ao entrar na viewport (`once: true`) |
+| [`Reveal`](../components/Reveal.tsx) | wrapper visível no HTML inicial, sem espera por JavaScript |
 | [`MediaFrame`](../components/MediaFrame.tsx) | `next/image` dentro de `Reveal`, com proporção e zoom no hover |
 | [`RichText`](../components/RichText.tsx) | corpo Lexical com `.editorial-prose` |
 | [`SectionLabel`](../components/SectionLabel.tsx) | rótulo de seção com marcador colorido |
@@ -151,7 +151,7 @@ títulos, links sublinhados em Ipê. Aplicada pelo componente `<RichText />`.
 | `cn()` em [`lib/utils.ts`](../lib/utils.ts) | merge de classes (clsx + tailwind-merge) |
 
 **Use `MediaFrame` para qualquer imagem de conteúdo**, em vez de um `<Image>` cru
-— é o que mantém proporção, revelação e comportamento de hover consistentes.
+— é o que mantém proporção, prévia de carregamento e comportamento de hover consistentes.
 
 ## Animação
 
@@ -159,7 +159,7 @@ Duas ferramentas, com divisão clara:
 
 | Ferramenta | Quando |
 | --- | --- |
-| **Framer Motion** (`Reveal`) | revelação simples ao rolar |
+| **Framer Motion** | interações pontuais; `Reveal` não depende de animação |
 | **GSAP + ScrollTrigger + Lenis** | coreografia ligada ao scroll: pin, scrub, timeline |
 
 ### A instância única de Lenis
@@ -221,7 +221,7 @@ componente cliente filtra em memória — é como funcionam `PortfolioBrowser` e
 2. Props explícitas em `type Props = { … }`. Sem `any`.
 3. Servidor por padrão; `"use client"` só se precisar.
 4. Cores por `SURFACES` quando houver fundo colorido; tokens `move-*` no resto.
-5. `.editorial-container` para largura, `Reveal`/`MediaFrame` para revelação e
+5. `.editorial-container` para largura, `Reveal`/`MediaFrame` para estrutura e
    imagem.
 6. Nenhum texto fixo que a Move devesse poder editar — isso vira campo no CMS.
 7. Teste em 375px, 768px e 1440px. O site é lido majoritariamente no celular.

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { containImage } from "@/lib/image-dimensions";
 import Link from "next/link";
 
 import { BrandGlyph } from "@/components/BrandGlyph";
@@ -52,13 +53,22 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
 
             A pastilha não pode mais usar `surface.chip`: a cor dela é a cor do card,
             e chapado sobre chapado não aparece. Daí o véu translúcido `surface.soft`. */}
-        <div className="relative">
+        <div className="relative flex items-center gap-1.5">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full py-1 pl-1.5 pr-2.5 text-[0.6rem] font-bold uppercase leading-tight tracking-[0.08em] ${surface.soft}`}
           >
             <BrandGlyph src={iconForEcosystem(project.ecosystem)} className="h-3 w-3" />
             {project.ecosystem}
           </span>
+          {project.ecosystems.length > 1 && (
+            <span
+              className={`inline-flex shrink-0 rounded-full px-2 py-1 text-[0.6rem] font-bold ${surface.soft}`}
+              aria-label={`Mais ${project.ecosystems.length - 1} ${project.ecosystems.length === 2 ? "ecossistema" : "ecossistemas"}: ${project.ecosystems.slice(1).join(", ")}`}
+              title={project.ecosystems.slice(1).join(", ")}
+            >
+              +{project.ecosystems.length - 1}
+            </span>
+          )}
         </div>
 
         <div className="relative">
@@ -72,8 +82,10 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
               <Image
                 src={project.logo.src}
                 alt={project.logo.alt || `Logo ${project.client}`}
-                width={220}
-                height={72}
+                width={project.logo.width ?? 220}
+                height={project.logo.height ?? 72}
+                sizes="120px"
+                style={containImage(project.logo.width ?? 220, project.logo.height ?? 72, 120, 32)}
                 className="h-auto max-h-8 w-auto max-w-[7.5rem] object-contain"
               />
             </span>
@@ -84,7 +96,7 @@ export function ProjectCard({ project }: { project: ProjectCardData }) {
           <div className={`mt-2.5 flex items-center justify-between gap-2 border-t pt-2.5 ${surface.border}`}>
             <p className={`line-clamp-2 text-[0.68rem] font-semibold leading-snug ${surface.muted}`}>
               {project.service}
-              <span className="opacity-70"> · {project.year}</span>
+              <span className="opacity-70">{project.service ? " · " : ""}{project.year}</span>
             </p>
             <span aria-hidden="true" className="shrink-0 transition-transform duration-200 group-hover:translate-x-1">
               →

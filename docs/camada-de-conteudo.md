@@ -74,18 +74,14 @@ Todas as funções são embrulhadas em `cache()` do React. Isso deduplica chamad
 **dentro do mesmo request**: `getSiteSettings()` é chamado pelo layout, pelo
 header e pelo rodapé, e vai ao banco uma vez só.
 
-Não é cache entre requests — isso quem faz é o `revalidate = 60` das páginas
-(ver [Páginas e rotas](paginas-e-rotas.md)).
+React `cache()` não é cache entre requests. As páginas estáticas usam ISR de
+60 segundos. `getProjects`, `getPortfolioPage` e `getSiteSettings` também usam
+`unstable_cache` por 60 segundos, pois `/portfolio` resolve parâmetros no servidor
+sem precisar consultar o banco a cada visitante.
 
-Consequência prática: **componha funções à vontade.**
-
-```ts
-export const getHomePublications = cache(async () => {
-  const all = await getPublications();          // não custa uma segunda ida ao banco
-  const featured = all.filter((p) => p.featured);
-  return (featured.length > 0 ? featured : all).slice(0, 3);
-});
-```
+`getHomePublications` consulta apenas três destaques, com `select` e `depth: 1`.
+Somente se não houver destaques faz a segunda consulta às três mais recentes.
+Evite buscar todo o acervo para descartá-lo após a leitura.
 
 ## Padrões que valem repetir
 

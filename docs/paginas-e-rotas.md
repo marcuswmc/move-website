@@ -35,7 +35,7 @@ const { navItems, contact, social } = await getSiteSettings();
 
 return (
   <html lang="pt-BR">
-    <body className={`${raleway.variable} ${fraunces.variable} antialiased`} suppressHydrationWarning>
+    <body className={`${raleway.variable} antialiased`} suppressHydrationWarning>
       <SmoothScroll />
       <HashScrollSync />
       <Header navItems={navItems} social={social} />
@@ -54,7 +54,9 @@ return (
 
 ## Anatomia de uma página
 
-Toda página do site segue esta forma:
+As páginas públicas seguem esta estrutura geral. `/portfolio` também aguarda
+`searchParams` para aplicar o cliente antes de gerar o HTML; por isso é dinâmica,
+com dados públicos em cache por 60 segundos:
 
 ```tsx
 import type { Metadata } from "next";

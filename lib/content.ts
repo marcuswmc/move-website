@@ -1,9 +1,11 @@
 import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
 
 import { ensureLexical } from "@/lib/lexical";
 import { SURFACE_AUTO } from "@/lib/palette";
 import { getPayloadClient } from "@/lib/payload";
+import { taxonomyValues } from "@/lib/project-taxonomy";
 import { displayNumber, resolveImage } from "@/lib/resolveImage";
 import type { ResolvedImage } from "@/lib/resolveImage";
 import type { Project, Publication, PublicationCategory } from "@/payload-types";
@@ -39,7 +41,7 @@ const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("pt-BR", {
 
 const formatDate = (value: string) => DATE_FORMAT.format(new Date(value));
 
-export const getSiteSettings = cache(async () => {
+export const getSiteSettings = cache(unstable_cache(async () => {
   const payload = await getPayloadClient();
   const settings = await payload.findGlobal({ slug: "site-settings" });
 
@@ -57,7 +59,7 @@ export const getSiteSettings = cache(async () => {
     ].filter((item): item is { name: "Instagram" | "LinkedIn"; href: string } => Boolean(item.href?.trim())),
     metrics: (settings.metrics ?? []).map((metric) => ({ value: metric.value, label: metric.label })),
   };
-});
+}, ["public-site-settings"], { revalidate: 60 }));
 
 export const getHomeContent = cache(async () => {
   const payload = await getPayloadClient();
@@ -85,6 +87,7 @@ export const getHomeContent = cache(async () => {
         description: project.description,
         image: image.src,
         imageAlt: image.alt,
+        blurDataURL: image.blurDataURL,
         tone: project.tone,
       };
     }),
@@ -151,7 +154,9 @@ const CARD_ACTION_LABEL: Record<PublicationCard["type"], string> = {
   external: "Acessar",
 };
 
-const toPublicationCard = (publication: Publication): PublicationCard => {
+type PublicationSummary = Pick<Publication, "slug" | "title" | "synopsis" | "cover" | "type" | "publishedAt" | "author" | "categories" | "featured">;
+
+const toPublicationCard = (publication: PublicationSummary): PublicationCard => {
   const cover = resolveImage(publication.cover) ?? IMAGE_FALLBACK;
 
   const categories = (publication.categories ?? [])
@@ -165,7 +170,7 @@ const toPublicationCard = (publication: Publication): PublicationCard => {
   return {
     slug: publication.slug,
     title: publication.title,
-    synopsis: publication.synopsis,
+    synopsis: publication.synopsis ?? "",
     cover,
     type: publication.type,
     publishedAt: publication.publishedAt,
@@ -195,9 +200,24 @@ export const getPublications = cache(async () => {
 
 /** As 3 destacadas mais recentes; sem destaques, as 3 mais recentes. */
 export const getHomePublications = cache(async () => {
-  const all = await getPublications();
-  const featured = all.filter((publication) => publication.featured);
-  return (featured.length > 0 ? featured : all).slice(0, 3);
+  const payload = await getPayloadClient();
+  const query = {
+    collection: "publications" as const,
+    sort: "-publishedAt",
+    limit: 3,
+    depth: 1,
+    pagination: false,
+    select: {
+      slug: true, title: true, synopsis: true, cover: true, type: true,
+      publishedAt: true, author: true, categories: true, featured: true,
+    },
+  } as const;
+  const featured = await payload.find({
+    ...query,
+    where: { and: [PUBLISHED, { featured: { equals: true } }] },
+  });
+  const { docs } = featured.docs.length ? featured : await payload.find({ ...query, where: PUBLISHED });
+  return docs.map(toPublicationCard);
 });
 
 export const getPublicationsPage = cache(async () => {
@@ -212,7 +232,7 @@ export const getPublicationsPage = cache(async () => {
   };
 });
 
-export const getPortfolioPage = cache(async () => {
+export const getPortfolioPage = cache(unstable_cache(async () => {
   const payload = await getPayloadClient();
   const page = await payload.findGlobal({ slug: "portfolio-page" });
 
@@ -222,7 +242,7 @@ export const getPortfolioPage = cache(async () => {
     title: page.title,
     description: page.description ?? null,
   };
-});
+}, ["public-portfolio-page"], { revalidate: 60 }));
 
 export const getPublicationCategories = cache(async () => {
   const payload = await getPayloadClient();
@@ -273,7 +293,7 @@ export const getPublication = cache(async (slug: string) => {
    * renderizar um botão que não leva a lugar nenhum.
    */
   const target =
-    publication.type === "download" ? file?.url : publication.type === "external" ? publication.externalUrl : null;
+    publication.type === "download" ? (file?.url || publication.externalUrl) : publication.type === "external" ? publication.externalUrl : null;
 
   return {
     ...toPublicationCard(publication),
@@ -283,7 +303,7 @@ export const getPublication = cache(async (slug: string) => {
       ? {
           label,
           href: target,
-          isDownload: publication.type === "download",
+          isDownload: publication.type === "download" && Boolean(file?.url),
           fileSize: publication.type === "download" ? (file?.filesize ?? null) : null,
           fileType: publication.type === "download" ? (file?.mimeType ?? null) : null,
         }
@@ -308,6 +328,7 @@ export const getTeam = cache(async () => {
       bio: member.bio ?? "",
       image: photo.src,
       imageAlt: photo.alt,
+      blurDataURL: photo.blurDataURL,
     };
   };
 
@@ -339,8 +360,8 @@ export const getPartners = cache(async () => {
       .filter((id): id is string => Boolean(id)),
   );
 
-  return docs.map((partner) => {
-    const logo = resolveImage(partner.logo) ?? IMAGE_FALLBACK;
+  return docs.filter((partner) => Boolean(resolveImage(partner.logo))).map((partner) => {
+    const logo = resolveImage(partner.logo)!;
 
     /**
      * O logo sempre leva à listagem filtrada por aquele cliente, mesmo quando ele tem um
@@ -384,8 +405,11 @@ export type ProjectCard = {
   /** Slug do parceiro, que identifica o cliente em /portfolio?cliente=… */
   clientSlug: string | null;
   ecosystem: string;
+  ecosystems: string[];
   service: string;
+  services: string[];
   segment: string | null;
+  segments: string[];
   year: string;
   summary: string;
   image: ResolvedImage;
@@ -414,9 +438,12 @@ const toProjectCard = (project: Project): ProjectCard => {
     client: project.client,
     logo: partner ? resolveImage(partner.logo) : null,
     clientSlug: partner ? clientKey(partner) : null,
-    ecosystem: project.ecosystem,
-    service: project.service,
-    segment: project.segment ?? null,
+    ecosystem: taxonomyValues(project.ecosystems, project.ecosystem)[0] ?? "",
+    ecosystems: taxonomyValues(project.ecosystems, project.ecosystem),
+    service: taxonomyValues(project.services, project.service).join("; "),
+    services: taxonomyValues(project.services, project.service),
+    segment: taxonomyValues(project.segments, project.segment).join("; ") || null,
+    segments: taxonomyValues(project.segments, project.segment),
     year: project.year,
     // O card precisa de algum texto; sem resumo próprio, o desafio é o melhor
     // substituto. A página do projeto não usa esse fallback — ver `intro` abaixo.
@@ -426,7 +453,7 @@ const toProjectCard = (project: Project): ProjectCard => {
   };
 };
 
-export const getProjects = cache(async () => {
+export const getProjects = cache(unstable_cache(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "projects",
@@ -436,7 +463,7 @@ export const getProjects = cache(async () => {
   });
 
   return docs.map(toProjectCard);
-});
+}, ["public-projects"], { revalidate: 60 }));
 
 export const getProjectSlugs = cache(async () => {
   const payload = await getPayloadClient();
@@ -478,13 +505,16 @@ export const getProject = cache(async (slug: string) => {
 });
 
 /** Outros projetos do mesmo ecossistema, para o rodapé da página do projeto. */
-export const getRelatedProjects = cache(async (slug: string, ecosystem: string, limit = 3) => {
+export const getRelatedProjects = cache(async (slug: string, ecosystems: string[], limit = 3) => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "projects",
     where: {
       ...PUBLISHED,
-      ecosystem: { equals: ecosystem },
+      or: [
+        { ecosystems: { in: ecosystems } },
+        { and: [{ ecosystems: { exists: false } }, { ecosystem: { in: ecosystems } }] },
+      ],
       slug: { not_equals: slug },
     },
     sort: "order",

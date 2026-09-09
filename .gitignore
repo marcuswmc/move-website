@@ -5,10 +5,16 @@ dist
 .env
 .env.local
 .env.example
+.agents
+.claude
 
 # Uploads da collection Media do Payload (arquivos ficam fora do git)
 /media
+/tmp/
 .DS_Store
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
+/docs
+CLAUDE.md
+/scripts

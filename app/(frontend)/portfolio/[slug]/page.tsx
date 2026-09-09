@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { containImage } from "@/lib/image-dimensions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -40,12 +41,12 @@ export default async function ProjectPage({ params }: Props) {
 
   if (!project) notFound();
 
-  const related = await getRelatedProjects(project.slug, project.ecosystem);
+  const related = await getRelatedProjects(project.slug, project.ecosystems);
   // Mesma cor do card na listagem, inclusive quando ela foi escolhida à mão no CMS.
   const surface = surfaceForProject(project.cardColor, project.ecosystem);
 
   const facts = [
-    { label: "Ecossistema", value: project.ecosystem },
+    { label: "Ecossistemas", value: project.ecosystems.join("; ") },
     { label: "Serviço", value: project.service },
     { label: "Segmento", value: project.segment },
     { label: "Ano", value: project.year },
@@ -77,7 +78,7 @@ export default async function ProjectPage({ params }: Props) {
             <span
               className={`inline-block rounded-full px-3.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.1em] ${surface.chip}`}
             >
-              {project.ecosystem}
+              {project.ecosystems.join(" · ")}
             </span>
 
             {/* Logo do cliente acima do título, mesma pastilha clara do card: a arte do
@@ -87,8 +88,10 @@ export default async function ProjectPage({ params }: Props) {
                 <Image
                   src={project.logo.src}
                   alt={project.logo.alt || `Logo ${project.client}`}
-                  width={320}
-                  height={104}
+                  width={project.logo.width ?? 320}
+                  sizes="240px"
+                  style={containImage(project.logo.width ?? 320, project.logo.height ?? 104, 240, 64)}
+                  height={project.logo.height ?? 104}
                   className="h-auto max-h-16 w-auto max-w-[15rem] object-contain"
                 />
               </span>
@@ -111,6 +114,8 @@ export default async function ProjectPage({ params }: Props) {
               <Image
                 src={project.image.src}
                 alt={project.image.alt}
+                placeholder={project.image.blurDataURL ? "blur" : "empty"}
+                blurDataURL={project.image.blurDataURL}
                 fill
                 priority
                 sizes="(min-width: 1340px) 1340px, 100vw"
@@ -171,7 +176,7 @@ export default async function ProjectPage({ params }: Props) {
             <Reveal>
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <SectionLabel dot="purple">Também em {project.ecosystem}</SectionLabel>
+                  <SectionLabel dot="purple">Projetos relacionados</SectionLabel>
                   <h2 className="max-w-2xl font-sans text-display-3 font-bold text-move-purple text-balance">
                     Outros projetos do mesmo ecossistema.
                   </h2>

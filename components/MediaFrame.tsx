@@ -8,10 +8,11 @@ type MediaFrameProps = {
   aspect?: string;
   className?: string;
   priority?: boolean;
+  blurDataURL?: string;
   delay?: number;
 };
 
-export function MediaFrame({ src, alt, caption, aspect = "aspect-[4/5]", className = "", priority, delay }: MediaFrameProps) {
+export function MediaFrame({ src, alt, caption, aspect = "aspect-[4/5]", className = "", priority, blurDataURL, delay }: MediaFrameProps) {
   return (
     <Reveal delay={delay} className={className}>
       <figure className={`group relative ${aspect} overflow-hidden rounded-soft bg-move-black/5`}>
@@ -21,6 +22,8 @@ export function MediaFrame({ src, alt, caption, aspect = "aspect-[4/5]", classNa
           fill
           sizes="(min-width: 768px) 50vw, 100vw"
           priority={priority}
+          placeholder={blurDataURL ? "blur" : "empty"}
+          blurDataURL={blurDataURL}
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
         />
         {caption && (

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 
 import { PageHero } from "@/components/PageHero";
 import { PortfolioBrowser } from "@/components/PortfolioBrowser";
@@ -17,8 +16,13 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function PortfolioPage() {
-  const [page, projects] = await Promise.all([getPortfolioPage(), getProjects()]);
+export default async function PortfolioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ cliente?: string | string[] }>;
+}) {
+  const [page, projects, params] = await Promise.all([getPortfolioPage(), getProjects(), searchParams]);
+  const initialClient = (Array.isArray(params.cliente) ? params.cliente[0] : params.cliente) || null;
 
   return (
     <main className="bg-move-offwhite">
@@ -29,12 +33,9 @@ export default async function PortfolioPage() {
         breadcrumbs={[{ label: "Início", href: "/" }]}
       />
 
-      {/* O browser lê `?cliente=` para o logo do carrossel poder cair aqui já filtrado.
-          O Suspense é o que mantém a página estática: os parâmetros só resolvem no
-          cliente, e a listagem completa é o que sai do prerender. */}
-      <Suspense fallback={null}>
-        <PortfolioBrowser projects={projects} />
-      </Suspense>
+      {/* Os dados públicos têm cache, mas o HTML respeita o cliente da URL desde
+          a primeira resposta. A key reinicia o filtro ao navegar entre clientes. */}
+      <PortfolioBrowser key={initialClient ?? "all"} projects={projects} initialClient={initialClient} />
     </main>
   );
 }

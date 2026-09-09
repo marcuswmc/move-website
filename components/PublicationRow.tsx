@@ -43,9 +43,11 @@ export function PublicationRow({
             <Image
               src={publication.cover.src}
               alt={publication.cover.alt}
+              placeholder={publication.cover.blurDataURL ? "blur" : "empty"}
+              blurDataURL={publication.cover.blurDataURL}
               fill
               priority={priority}
-              sizes="(min-width: 640px) 10rem, 92vw"
+              sizes="(min-width: 640px) 160px, calc(100vw - 104px)"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
             />
           )}

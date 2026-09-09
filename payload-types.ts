@@ -155,6 +155,7 @@ export interface UserAuthOperations {
  */
 export interface Project {
   id: string;
+  migrationNotes?: string | null;
   client: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -207,20 +208,45 @@ export interface Project {
     alt?: string | null;
   };
   /**
-   * Define a cor padrão do card, quando Cor do card está em automático.
+   * O primeiro aparece no card e define a cor automática. Os demais aparecem como +N e também entram nos filtros.
    */
+  ecosystems?:
+    | ('Meio Ambiente' | 'Educação' | 'Direitos Humanos' | 'Cultura' | 'Finanças' | 'Saúde' | 'Empreendedorismo')[]
+    | null;
   ecosystem: 'Meio Ambiente' | 'Educação' | 'Direitos Humanos' | 'Cultura' | 'Finanças' | 'Saúde' | 'Empreendedorismo';
   /**
    * Aceita texto livre, ex.: "2024 — em andamento".
    */
   year: string;
+  services?:
+    | (
+        | 'Avaliações de Impacto e Resultados'
+        | 'Diagnósticos Sociais'
+        | 'Estudos e Sistematizações'
+        | 'Facilitações'
+        | 'Formações'
+        | 'Planejamento Estratégico'
+        | 'Sistemas de Monitoramento'
+        | 'Teoria de Mudança'
+      )[]
+    | null;
   /**
    * Alimenta o filtro por serviço. Reaproveite exatamente o mesmo texto entre projetos do mesmo tipo, senão viram duas opções distintas no filtro.
    */
-  service: string;
-  /**
-   * Natureza da organização atendida.
-   */
+  service?: string | null;
+  segments?:
+    | (
+        | 'Agência de Cooperação Internacional'
+        | 'Empresa'
+        | 'Fundação ou Instituto Empresarial'
+        | 'Fundação ou Instituto Familiar'
+        | 'Governo'
+        | 'Negócio de Impacto'
+        | 'Organização de Sociedade Civil'
+        | 'Organismo Internacional'
+        | 'Outros'
+      )[]
+    | null;
   segment?:
     | (
         | 'Agência de Cooperação Internacional'
@@ -234,14 +260,6 @@ export interface Project {
         | 'Outros'
       )
     | null;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (string | null) | Media;
-  };
   /**
    * Fundo do card em /portfolio. Em automático, segue a cor do ecossistema.
    */
@@ -250,6 +268,14 @@ export interface Project {
    * Menor número aparece primeiro.
    */
   order: number;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (string | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -271,7 +297,7 @@ export interface Partner {
   /**
    * Aparece no carrossel da home e, pequeno, no card de cada projeto ligado a este cliente. Prefira SVG ou PNG com fundo transparente.
    */
-  logo: {
+  logo?: {
     /**
      * Tem prioridade sobre a URL externa.
      */
@@ -283,7 +309,7 @@ export interface Partner {
     /**
      * Descreve a imagem para leitores de tela. Deixe vazio se for decorativa.
      */
-    alt: string;
+    alt?: string | null;
   };
   /**
    * A ligação é feita no projeto, em Portfólio → Cliente (logo). Um cliente pode ter vários projetos: o logo do carrossel leva ao projeto quando há só um, e à listagem filtrada quando há mais.
@@ -307,6 +333,7 @@ export interface Partner {
  */
 export interface Media {
   id: string;
+  blurDataURL?: string | null;
   /**
    * Descreve a imagem para leitores de tela e para quando ela não carrega.
    */
@@ -396,7 +423,7 @@ export interface Publication {
   /**
    * Uma a duas linhas. Aparece no card da listagem.
    */
-  synopsis: string;
+  synopsis?: string | null;
   cover: {
     /**
      * Tem prioridade sobre a URL externa.
@@ -434,7 +461,7 @@ export interface Publication {
    */
   file?: (string | null) | Media;
   /**
-   * Para onde o botão da página leva.
+   * Destino do botão. Em downloads, usada enquanto não houver arquivo na biblioteca — por exemplo, um material no Google Drive.
    */
   externalUrl?: string | null;
   /**
@@ -658,6 +685,7 @@ export interface PayloadMigration {
  * via the `definition` "projects_select".
  */
 export interface ProjectsSelect<T extends boolean = true> {
+  migrationNotes?: T;
   client?: T;
   generateSlug?: T;
   slug?: T;
@@ -673,10 +701,15 @@ export interface ProjectsSelect<T extends boolean = true> {
         externalUrl?: T;
         alt?: T;
       };
+  ecosystems?: T;
   ecosystem?: T;
   year?: T;
+  services?: T;
   service?: T;
+  segments?: T;
   segment?: T;
+  cardColor?: T;
+  order?: T;
   meta?:
     | T
     | {
@@ -684,8 +717,6 @@ export interface ProjectsSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
-  cardColor?: T;
-  order?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -799,6 +830,7 @@ export interface PartnersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  blurDataURL?: T;
   alt?: T;
   updatedAt?: T;
   createdAt?: T;

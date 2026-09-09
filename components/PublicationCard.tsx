@@ -31,9 +31,11 @@ export function PublicationCard({
             <Image
               src={publication.cover.src}
               alt={publication.cover.alt}
+              placeholder={publication.cover.blurDataURL ? "blur" : "empty"}
+              blurDataURL={publication.cover.blurDataURL}
               fill
               priority={priority}
-              sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
+              sizes="(min-width: 1440px) 427px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
             />
           )}

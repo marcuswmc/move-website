@@ -36,7 +36,7 @@ export const Partners: CollectionConfig = {
     imageField({
       name: "logo",
       label: "Logo",
-      required: true,
+      required: false,
       description:
         "Aparece no carrossel da home e, pequeno, no card de cada projeto ligado a este cliente. Prefira SVG ou PNG com fundo transparente.",
     }),
@@ -53,7 +53,7 @@ export const Partners: CollectionConfig = {
       label: "Projetos no portfólio",
       admin: {
         allowCreate: false,
-        defaultColumns: ["client", "ecosystem", "year", "_status"],
+        defaultColumns: ["client", "ecosystems", "year", "_status"],
         description:
           "A ligação é feita no projeto, em Portfólio → Cliente (logo). Um cliente pode ter vários projetos: o logo do carrossel leva ao projeto quando há só um, e à listagem filtrada quando há mais.",
       },

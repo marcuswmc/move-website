@@ -17,6 +17,7 @@ Guia para quem for manter, estender ou assumir o desenvolvimento deste site.
 | [Camada de conteúdo](camada-de-conteudo.md) | `lib/content.ts`, a única ponte entre o CMS e o site |
 | [Páginas e rotas](paginas-e-rotas.md) | App Router, server/client components, SEO, cache |
 | [Componentes e design](componentes-e-design.md) | Tokens da marca, paleta, animação, componentes base |
+| [Carregamento e renderização](performance-renderizacao.md) | Melhorias, medições e operação das prévias de imagens |
 | [Infra](infra.md) | MongoDB, Vercel Blob, variáveis de ambiente, deploy |
 | [Receitas](receitas.md) | Passo a passo completo das tarefas mais comuns |
 | [Troubleshooting](troubleshooting.md) | Erros conhecidos e o que os causa |

@@ -53,7 +53,6 @@ export const Publications: CollectionConfig = {
               name: "synopsis",
               type: "textarea",
               label: "Sinopse",
-              required: true,
               maxLength: 320,
               admin: { description: "Uma a duas linhas. Aparece no card da listagem." },
             },
@@ -82,8 +81,8 @@ export const Publications: CollectionConfig = {
               type: "text",
               label: "URL externa",
               admin: {
-                description: "Para onde o botão da página leva.",
-                condition: (data) => data?.type === "external",
+                description: "Destino do botão. Em downloads, usada enquanto não houver arquivo na biblioteca — por exemplo, um material no Google Drive.",
+                condition: (data) => data?.type === "external" || data?.type === "download",
               },
             },
             {

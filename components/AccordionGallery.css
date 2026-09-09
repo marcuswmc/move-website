@@ -61,6 +61,8 @@
   height: 100%;
   filter: grayscale(var(--ag-gray));
   will-change: transform, filter;
+  /* A fotografia já fica centrada antes de o GSAP inicializar. */
+  transform: translate(-50%, -50%);
 }
 
 .accordion-gallery--vertical .ag-panel__media {

@@ -34,6 +34,7 @@ export type ShowcaseProject = {
   description: string;
   image: string;
   imageAlt: string;
+  blurDataURL?: string;
   tone: PortfolioTone;
 };
 
@@ -96,8 +97,10 @@ export function PortfolioStack({ projects }: { projects: ShowcaseProject[] }) {
                     <Image
                       src={project.image}
                       alt={project.imageAlt}
+                      placeholder={project.blurDataURL ? "blur" : "empty"}
+                      blurDataURL={project.blurDataURL}
                       fill
-                      sizes="(min-width: 768px) 55vw, 100vw"
+                      sizes="(min-width: 1440px) 718px, (min-width: 768px) 54vw, 100vw"
                       className="object-cover transition-transform duration-700 hover:scale-[1.03]"
                     />
                     <div className="absolute inset-0 ring-1 ring-inset ring-black/10" />
