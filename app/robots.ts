@@ -10,6 +10,9 @@ export default function robots(): MetadataRoute.Robots {
         "/portfolio?*_ecossistema=",
         "/portfolio?*_segmento=",
         "/portfolio?*_servico=",
+        "/portfolio/?*_ecossistema=",
+        "/portfolio/?*_segmento=",
+        "/portfolio/?*_servico=",
       ],
     },
   };

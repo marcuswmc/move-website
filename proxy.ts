@@ -2,16 +2,24 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const LEGACY_FILTERS = ["_ecossistema", "_segmento", "_servico"] as const;
 
-/** URLs dos filtros do site anterior continuam a ser rastreadas. Normalizá-las
- * antes do SSR evita carregar o portfólio para cada combinação obsoleta. */
+/** Os filtros do WordPress foram desativados. Uma resposta terminal evita que
+ * crawlers sigam um redirecionamento e provoquem outra renderização do portfólio. */
 export function proxy(request: NextRequest) {
   if (request.method !== "GET" && request.method !== "HEAD") return NextResponse.next();
 
-  const url = request.nextUrl.clone();
-  if (!LEGACY_FILTERS.some((key) => url.searchParams.has(key))) return NextResponse.next();
+  if (!LEGACY_FILTERS.some((key) => request.nextUrl.searchParams.has(key))) return NextResponse.next();
 
-  for (const key of LEGACY_FILTERS) url.searchParams.delete(key);
-  return NextResponse.redirect(url, 308);
+  return new NextResponse(
+    request.method === "HEAD" ? null : "Estes filtros antigos foram desativados. O portfólio está disponível em /portfolio.",
+    {
+      status: 410,
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "X-Robots-Tag": "noindex, nofollow",
+        "Cache-Control": "public, max-age=3600",
+      },
+    },
+  );
 }
 
 export const config = {
