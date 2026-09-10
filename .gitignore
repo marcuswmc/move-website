@@ -18,3 +18,5 @@ yarn-debug.log*
 /docs
 CLAUDE.md
 /scripts
+.vercel
+.env*

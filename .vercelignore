@@ -1,0 +1,13 @@
+.env*
+.git
+.agents
+.claude
+.codex
+CLAUDE.md
+node_modules
+.next
+output
+docs
+media
+tmp
+tsconfig.tsbuildinfo

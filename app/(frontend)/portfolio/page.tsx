@@ -10,10 +10,11 @@ export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPortfolioPage();
 
-  return metadataFromSeo(page.meta, {
+  const metadata = metadataFromSeo(page.meta, {
     title: `${page.title} | Move Social`,
     description: page.description,
   });
+  return { ...metadata, alternates: { canonical: "https://move.social/portfolio" } };
 }
 
 export default async function PortfolioPage({
