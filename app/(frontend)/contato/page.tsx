@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ContactForm } from "@/components/ContactForm";
 import { MediaFrame } from "@/components/MediaFrame";
 import { Reveal } from "@/components/Reveal";
 import { SectionLabel } from "@/components/SectionLabel";
@@ -142,7 +143,7 @@ export default async function ContactPage() {
           </Reveal>
 
           <Reveal delay={0.1} className="order-1 md:order-2">
-            <form className="rounded-soft bg-move-purple p-5 text-white md:p-8">
+            <ContactForm>
               <div className="grid gap-4 lg:grid-cols-2">
                 <label className="grid gap-2">
                   <span className="text-eyebrow font-bold uppercase text-move-yellow">
@@ -150,6 +151,10 @@ export default async function ContactPage() {
                   </span>
                   <input
                     className="rounded-soft border border-white/15 bg-white/10 px-4 py-3 text-base outline-none transition placeholder:text-white/35 focus:border-move-yellow"
+                    name="nome"
+                    autoComplete="name"
+                    required
+                    maxLength={120}
                     placeholder="Seu nome"
                   />
                 </label>
@@ -159,6 +164,10 @@ export default async function ContactPage() {
                   </span>
                   <input
                     type="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    maxLength={254}
                     className="rounded-soft border border-white/15 bg-white/10 px-4 py-3 text-base outline-none transition placeholder:text-white/35 focus:border-move-yellow"
                     placeholder="voce@organizacao.org"
                   />
@@ -169,6 +178,9 @@ export default async function ContactPage() {
                   </span>
                   <input
                     className="rounded-soft border border-white/15 bg-white/10 px-4 py-3 text-base outline-none transition placeholder:text-white/35 focus:border-move-yellow"
+                    name="organizacao"
+                    autoComplete="organization"
+                    maxLength={200}
                     placeholder="Nome da organização"
                   />
                 </label>
@@ -247,18 +259,15 @@ export default async function ContactPage() {
                   </span>
                   <textarea
                     rows={4}
+                    name="mensagem"
+                    required
+                    maxLength={5000}
                     className="resize-none rounded-soft border border-white/15 bg-white/10 px-4 py-3 text-base outline-none transition placeholder:text-white/35 focus:border-move-yellow"
                     placeholder="Como podemos ampliar seu impacto?"
                   />
                 </label>
               </div>
-              <button
-                type="submit"
-                className="mt-7 w-fit rounded-full bg-move-yellow px-7 py-3.5 font-bold text-move-purple transition hover:bg-white"
-              >
-                Enviar mensagem
-              </button>
-            </form>
+            </ContactForm>
           </Reveal>
         </div>
       </section>

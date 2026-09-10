@@ -6,6 +6,7 @@ import { HashScrollSync } from "@/components/HashScrollSync";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { getSiteSettings } from "@/lib/content";
+import { Analytics } from "@vercel/analytics/next"
 
 const raleway = Raleway({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default async function RootLayout({
         <Header navItems={navItems} social={social} />
         {children}
         <Footer navItems={navItems} contact={contact} />
+        <Analytics />
       </body>
     </html>
   );
