@@ -4,6 +4,7 @@ import type { GenerateDescription, GenerateTitle } from "@payloadcms/plugin-seo/
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { pt } from "@payloadcms/translations/languages/pt";
+import { attachDatabasePool } from "@vercel/functions";
 import path from "path";
 import { buildConfig } from "payload";
 import type { SharpDependency } from "payload";
@@ -55,6 +56,9 @@ const generateDescription: GenerateDescription = ({ doc }) => {
   return candidate?.slice(0, 160) ?? "";
 };
 
+// Registra cada MongoClient uma única vez na gestão de conexões da Vercel.
+const pooledClients = new WeakSet<object>();
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -74,6 +78,25 @@ export default buildConfig({
   },
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || "",
+    connectOptions: {
+      // Limite por pool: cada instância da Vercel mantém suas próprias conexões.
+      maxPoolSize: 5,
+      minPoolSize: 0,
+      maxIdleTimeMS: 30_000,
+    },
+    // `afterCreateConnection` roda sobre uma conexão ainda não aberta (o adapter
+    // cria o objeto sem URI em init), quando `getClient()` ainda é undefined e
+    // `attachDatabasePool` estoura. `afterOpenConnection` roda depois do
+    // `openUri`, com o MongoClient já existente.
+    afterOpenConnection: (adapter) => {
+      const client = adapter.connection?.getClient();
+      // Em dev o hot reload reconecta; sem a guarda acumularíamos listeners.
+      if (!client || pooledClients.has(client)) {
+        return;
+      }
+      pooledClients.add(client);
+      attachDatabasePool(client);
+    },
   }),
   // O .d.ts do Payload carrega uma cópia própria dos tipos do sharp, cujas
   // sobrecargas não batem com as do sharp 0.34 instalado. É divergência só de
