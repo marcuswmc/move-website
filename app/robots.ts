@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    rules: {
+    rules: [{
       userAgent: "*",
       allow: "/",
       disallow: [
@@ -14,6 +14,11 @@ export default function robots(): MetadataRoute.Robots {
         "/portfolio/?*_segmento=",
         "/portfolio/?*_servico=",
       ],
-    },
+    }, {
+      // Controles de treino separados dos agentes de pesquisa. Os crawlers de
+      // pesquisa continuam sujeitos às exclusões dos filtros antigos acima.
+      userAgent: ["GPTBot", "ClaudeBot", "Applebot-Extended"],
+      disallow: "/",
+    }],
   };
 }
