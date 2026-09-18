@@ -45,7 +45,11 @@ Publications come in three types (`article`, `download`, `external`), and the ty
 
 Tones and brand icons are closed `select` fields (`fields/toneField.ts`, `fields/iconField.ts`), never free text: each value maps to classes already written in a component, so an unlisted value would render an unstyled card. A portfolio card is a **flat block of palette color, never a photo background**: the color comes from the project's "Cor do card" field, which defaults to `auto` — the ecosystem's fixed color. The project image is optional and appears only at the top of `/portfolio/[slug]`.
 
-`next.config.ts` allows remote images from `images.unsplash.com` and from `*.public.blob.vercel-storage.com`, which is where CMS uploads now live.
+`next.config.ts` allows remote images from `images.unsplash.com` and from `*.public.blob.vercel-storage.com`, which is where CMS uploads now live. `localPatterns` is narrowed to `/brand/**` — the only local images that go through the optimizer.
+
+A Vercel Image Optimization transformation is billed per distinct (image, width, quality, format). With Next's default 8 `deviceSizes` + 8 `imageSizes`, the home page alone could request 704 of them, because each screen density picks a different width out of the srcset. Both lists are trimmed in `next.config.ts` to the widths the layout can actually use (`.editorial-container` caps at 1340px). Adding a width back multiplies the matrix across every image on the site, so don't widen them without a reason.
+
+For the same reason, **`sizes` on a `fill` image must be a real CSS length or media-query list**. An invalid value — Tailwind classes, say — makes the browser fall back to `100vw` and request the largest width in the srcset, which is how a 128px badge in the footer was asking for 2048px on every page.
 
 Legacy URLs from the WordPress site live in `lib/legacy-urls.ts`, recovered from the Wayback archive and split by whether the content survived the migration: `LEGACY_REDIRECTS` gets a 301 to the real new address, and `LEGACY_GONE` / `LEGACY_GONE_PREFIXES` get rewritten to `/conteudo-removido`, which answers 410. The split matters — a 301 to a listing reads as a soft 404 and keeps the address in the crawler's queue, which is how the old portfolio filters kept generating traffic. Both lists are wired in `next.config.ts`; `proxy.ts` only still handles the `_ecossistema`/`_segmento`/`_servico` query filters, which no path-based rule can catch. `app/sitemap.ts` publishes the real URL set.
 

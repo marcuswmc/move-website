@@ -32,15 +32,31 @@ const nextConfig: NextConfig = {
         hostname: "*.public.blob.vercel-storage.com",
       },
     ],
-    // Imagens servidas pela collection Media do Payload.
+    /**
+     * As únicas imagens locais que passam pelo otimizador são as da marca, em
+     * public/brand. O padrão anterior era `/**`, que autorizava qualquer caminho:
+     * cada variação pedida é uma transformação cobrada, e uma lista aberta permite a
+     * terceiros gerarem transformações à vontade a partir do site.
+     */
     localPatterns: [
       {
-        pathname: "/api/media/file/**",
-      },
-      {
-        pathname: "/**",
+        pathname: "/brand/**",
       },
     ],
+    /**
+     * Uma transformação é cobrada por combinação distinta de (imagem, largura,
+     * qualidade, formato). Com as listas padrão do Next — 8 `deviceSizes` e 8
+     * `imageSizes` — só a home podia pedir 704 combinações diferentes, porque cada
+     * densidade de tela escolhe uma largura diferente do srcset.
+     *
+     * Estas listas são dimensionadas pelo layout real: `.editorial-container` tem no
+     * máximo 1340px, e os slots menores (logos, retratos) estão entre 120 e 272px.
+     * 2048 cobre a tela grande em DPR 2; 3840 seria DPR 2,9 num slot de 1340px, que
+     * não existe. Menos larguras também significa mais acertos de cache, porque os
+     * visitantes convergem para as mesmas variações.
+     */
+    deviceSizes: [640, 828, 1080, 1440, 2048],
+    imageSizes: [64, 128, 256, 384],
     /**
      * O nome do arquivo no Blob é a chave do objeto: trocar a imagem de um documento
      * grava outro nome, e o nome antigo deixa de ser referenciado. Como nenhuma URL

@@ -35,7 +35,11 @@ export function Footer({ navItems, contact }: FooterProps) {
                 src="/brand/empresa-b.webp"
                 alt="Move Social"
                 fill
-                sizes="h-12 w-32"
+                // O slot tem 128px (w-32). Antes aqui havia classes do Tailwind, que o
+                // navegador não consegue ler como medida: cai no padrão de 100vw e pede
+                // a maior largura do srcset — 3840px para um selo de 128px, no rodapé
+                // de todas as páginas.
+                sizes="128px"
                 className="object-contain object-left"
               />
             </div>

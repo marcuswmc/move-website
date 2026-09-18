@@ -210,6 +210,26 @@ produção não dependerem de um id fixo no arquivo de configuração.
 arquivo é a chave do objeto no Blob, então trocar a imagem de um documento grava
 outro nome — nenhuma URL muda de conteúdo, e não há o que revalidar.
 
+### Transformações
+
+A Vercel cobra uma transformação por combinação distinta de **(imagem, largura,
+qualidade, formato)**. `formats` e `qualities` já estão no mínimo (um valor cada,
+que é o padrão do Next 16). O que multiplica são as larguras: com as listas padrão
+(8 `deviceSizes` + 8 `imageSizes`), só a home podia pedir **704** combinações, porque
+cada densidade de tela escolhe uma largura diferente do srcset.
+
+As listas foram dimensionadas pelo layout real — `.editorial-container` não passa de
+1340px, e os slots menores ficam entre 120 e 272px:
+
+```ts
+deviceSizes: [640, 828, 1080, 1440, 2048],
+imageSizes: [64, 128, 256, 384],
+```
+
+Acrescentar uma largura multiplica a conta em todas as imagens do site. E `sizes`
+numa imagem `fill` precisa ser medida CSS de verdade: um valor inválido faz o
+navegador assumir `100vw` e pedir a maior largura do srcset.
+
 O Unsplash está liberado porque os placeholders do redesign vêm de lá (ver
 `imageField` em [Campos](payload-campos.md)). **Uma imagem de domínio não listado
 não renderiza** — dá erro do `next/image`, não fallback. Ao introduzir uma fonte
