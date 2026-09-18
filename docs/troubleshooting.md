@@ -14,7 +14,12 @@ Três causas, nesta ordem de frequência:
 
 1. **O documento está como rascunho.** Collections com `versions.drafts: true`
    nascem em `draft` e só entram no site depois de **Publicar**.
-2. **Passaram-se menos de 60 segundos.** `revalidate = 60`. Recarregue.
+2. **A invalidação por tag não chegou.** O normal é a edição aparecer na
+   requisição seguinte, porque a collection purga suas tags ao salvar (ver
+   `lib/revalidate.ts`). Se não apareceu, confira se a collection tem
+   `revalidatesCollection(...)` em `hooks` e se a leitura correspondente em
+   `lib/content.ts` declara a mesma tag. No pior caso o conteúdo sai sozinho em
+   10 minutos, pelo `FALLBACK_TTL`.
 3. **A função de leitura não filtra o que você espera.** Confira `where`, `sort`
    e principalmente `limit` em `lib/content.ts`.
 
@@ -85,11 +90,25 @@ Verifique:
    `VERCEL_OIDC_TOKEN` **não servem**.
 3. Para os arquivos que já ficaram para trás: `pnpm migrate:media`.
 
-### `/api/media/file/*` responde 500
+### Imagem do CMS responde 404 no store
 
 O documento existe no Mongo, o arquivo não existe no Blob. Mesmo diagnóstico
 acima. `pnpm migrate:media` sobe o que estiver em `./media` (idempotente, nunca
 sobrescreve).
+
+Desde `disablePayloadAccessControl` o endereço público é o do store
+(`https://<store>.public.blob.vercel-storage.com/<arquivo>`), não mais
+`/api/media/file/*` — teste direto no store para separar "arquivo não está lá" de
+"a aplicação não está a servir".
+
+### `/_next/image` responde `400 INVALID_IMAGE_OPTIMIZE_REQUEST`
+
+O otimizador não conseguiu buscar a origem. Foi o sintoma de quando as mídias
+ainda passavam por `/api/media/file/*`: a rota subia o Payload e abria conexão com
+o Mongo a cada arquivo, levava 4 s em cache MISS, e um lote de imagens pedidas de
+uma vez estourava. Se voltar a acontecer, confira que `payload.config.ts` mantém
+`disablePayloadAccessControl: true` e que o host do store está em
+`images.remotePatterns`.
 
 ### `Invalid src prop … hostname is not configured`
 

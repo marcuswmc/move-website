@@ -40,7 +40,6 @@ export const Projects: CollectionConfig = {
     ...revalidatesCollection(TAG.projects, TAG.partners),
   },
   fields: [
-    { name: "migrationNotes", type: "textarea", label: "Observações da migração", admin: { position: "sidebar" } },
     {
       type: "tabs",
       tabs: [
