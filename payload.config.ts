@@ -126,7 +126,25 @@ export default buildConfig({
     // dev e produção compartilham o mesmo banco, isso recria exatamente o bug: o
     // registro existe, o arquivo não. Mantenha BLOB_READ_WRITE_TOKEN nos dois lados.
     vercelBlobStorage({
-      collections: { media: true },
+      collections: {
+        media: {
+          // Sem isto, `doc.url` aponta para /api/media/file/<arquivo>: cada imagem
+          // vira uma invocação que sobe o Payload e abre conexão com o Mongo só
+          // para devolver bytes que já estão no Blob. Em produção isso custava
+          // ~4,3 s por arquivo em cache MISS, e o otimizador do Next desistia de
+          // parte delas com 400 INVALID_IMAGE_OPTIMIZE_REQUEST — as imagens que
+          // "pipocavam" e as que só apareciam ao recarregar.
+          //
+          // Com o controlo de acesso desligado, `url` passa a ser o endereço
+          // público do Blob, servido pelo CDN sem função e sem banco. O hook
+          // afterRead do plugin recalcula `url` a cada leitura a partir do
+          // filename, então os documentos já gravados não precisam de migração.
+          //
+          // O acesso de leitura da collection já era `anyone` (collections/Media.ts):
+          // não há regra de autorização a perder aqui.
+          disablePayloadAccessControl: true,
+        },
+      },
       token: process.env.BLOB_READ_WRITE_TOKEN,
     }),
   ],

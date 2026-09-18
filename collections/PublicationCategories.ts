@@ -1,4 +1,6 @@
 import type { CollectionConfig } from "payload";
+import { revalidatesCollection } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 import { slugField } from "payload";
 
 import { anyone, authenticated } from "@/access";
@@ -27,6 +29,7 @@ export const PublicationCategories: CollectionConfig = {
     delete: authenticated,
   },
   defaultSort: "order",
+  hooks: revalidatesCollection(TAG.publicationCategories),
   fields: [
     {
       name: "name",

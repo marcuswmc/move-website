@@ -1,4 +1,6 @@
 import type { CollectionConfig } from "payload";
+import { revalidatesCollection } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 import { slugField } from "payload";
 
 import { authenticated, publishedOrAuthenticated } from "@/access";
@@ -34,6 +36,7 @@ export const Publications: CollectionConfig = {
   },
   versions: { drafts: true, maxPerDoc: 20 },
   defaultSort: "-publishedAt",
+  hooks: revalidatesCollection(TAG.publications),
   fields: [
     {
       type: "tabs",

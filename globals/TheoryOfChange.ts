@@ -1,6 +1,8 @@
 import type { Field, GlobalConfig } from "payload";
 
 import { anyone, authenticated } from "@/access";
+import { revalidatesGlobal } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 
 /**
  * A página espelha a Teoria de Mudança oficial da Move (TdM_MoveSocial_2025.pdf).
@@ -38,6 +40,7 @@ export const TheoryOfChange: GlobalConfig = {
   },
   access: { read: anyone, update: authenticated },
   versions: { max: 20 },
+  hooks: revalidatesGlobal(TAG.theory),
   fields: [
     {
       name: "hero",

@@ -155,7 +155,6 @@ export interface UserAuthOperations {
  */
 export interface Project {
   id: string;
-  migrationNotes?: string | null;
   client: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
@@ -260,14 +259,6 @@ export interface Project {
         | 'Outros'
       )
     | null;
-  /**
-   * Fundo do card em /portfolio. Em automático, segue a cor do ecossistema.
-   */
-  cardColor: 'auto' | 'purple' | 'yellow' | 'periwinkle' | 'coral' | 'sand' | 'mint' | 'green';
-  /**
-   * Menor número aparece primeiro.
-   */
-  order: number;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -276,6 +267,14 @@ export interface Project {
      */
     image?: (string | null) | Media;
   };
+  /**
+   * Fundo do card em /portfolio. Em automático, segue a cor do ecossistema.
+   */
+  cardColor: 'auto' | 'purple' | 'yellow' | 'periwinkle' | 'coral' | 'sand' | 'mint' | 'green';
+  /**
+   * Menor número aparece primeiro.
+   */
+  order: number;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -685,7 +684,6 @@ export interface PayloadMigration {
  * via the `definition` "projects_select".
  */
 export interface ProjectsSelect<T extends boolean = true> {
-  migrationNotes?: T;
   client?: T;
   generateSlug?: T;
   slug?: T;
@@ -708,8 +706,6 @@ export interface ProjectsSelect<T extends boolean = true> {
   service?: T;
   segments?: T;
   segment?: T;
-  cardColor?: T;
-  order?: T;
   meta?:
     | T
     | {
@@ -717,6 +713,8 @@ export interface ProjectsSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  cardColor?: T;
+  order?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

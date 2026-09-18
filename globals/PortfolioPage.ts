@@ -1,6 +1,8 @@
 import type { GlobalConfig } from "payload";
 
 import { anyone, authenticated } from "@/access";
+import { revalidatesGlobal } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 
 /**
  * A copy da abertura de /portfolio. Existe para que o cabeçalho da listagem — e o
@@ -16,6 +18,7 @@ export const PortfolioPage: GlobalConfig = {
   },
   access: { read: anyone, update: authenticated },
   versions: { max: 20 },
+  hooks: revalidatesGlobal(TAG.portfolioPage),
   fields: [
     { name: "eyebrow", type: "text", label: "Chapéu", required: true, defaultValue: "Portfólio" },
     { name: "title", type: "textarea", label: "Título", required: true },

@@ -12,7 +12,7 @@ import { getProject, getProjectSlugs, getRelatedProjects } from "@/lib/content";
 import { surfaceForProject } from "@/lib/palette";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 export async function generateStaticParams() {
   const slugs = await getProjectSlugs();

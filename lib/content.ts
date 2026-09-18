@@ -1,7 +1,7 @@
 import { convertLexicalToPlaintext } from "@payloadcms/richtext-lexical/plaintext";
 import { cache } from "react";
-import { unstable_cache } from "next/cache";
 
+import { TAG, cachedRead } from "@/lib/cache";
 import { ensureLexical } from "@/lib/lexical";
 import { SURFACE_AUTO } from "@/lib/palette";
 import { getPayloadClient } from "@/lib/payload";
@@ -15,8 +15,11 @@ import type { Project, Publication, PublicationCategory } from "@/payload-types"
  * consumiam quando o conteúdo vivia em data/site.ts, para que os componentes
  * sigam presentacionais (ver CLAUDE.md) e nada de Payload vaze para dentro deles.
  *
- * `cache()` deduplica as chamadas dentro de um mesmo request — o header e o
- * rodapé, por exemplo, leem o mesmo global sem ir duas vezes ao banco.
+ * Toda leitura passa por `cachedRead` (lib/cache.ts): `cache()` do React deduplica
+ * dentro de um request — o header e o rodapé leem o mesmo global sem ir duas vezes
+ * ao banco — e `unstable_cache` guarda o resultado entre requests, com uma tag por
+ * collection/global. O CMS invalida a tag ao salvar, então o cache pode durar sem
+ * atrasar a publicação.
  */
 
 /** Nas leituras públicas só entra o que foi publicado; rascunhos ficam no admin. */
@@ -41,7 +44,7 @@ const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("pt-BR", {
 
 const formatDate = (value: string) => DATE_FORMAT.format(new Date(value));
 
-export const getSiteSettings = cache(unstable_cache(async () => {
+export const getSiteSettings = cachedRead(async () => {
   const payload = await getPayloadClient();
   const settings = await payload.findGlobal({ slug: "site-settings" });
 
@@ -59,9 +62,12 @@ export const getSiteSettings = cache(unstable_cache(async () => {
     ].filter((item): item is { name: "Instagram" | "LinkedIn"; href: string } => Boolean(item.href?.trim())),
     metrics: (settings.metrics ?? []).map((metric) => ({ value: metric.value, label: metric.label })),
   };
-}, ["public-site-settings"], { revalidate: 60 }));
+},
+  "site-settings",
+  [TAG.siteSettings],
+);
 
-export const getHomeContent = cache(async () => {
+export const getHomeContent = cachedRead(async () => {
   const payload = await getPayloadClient();
   const home = await payload.findGlobal({ slug: "home" });
 
@@ -92,9 +98,12 @@ export const getHomeContent = cache(async () => {
       };
     }),
   };
-});
+},
+  "home",
+  [TAG.home, TAG.media],
+);
 
-export const getServices = cache(async () => {
+export const getServices = cachedRead(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "services",
@@ -110,7 +119,10 @@ export const getServices = cache(async () => {
     body: service.body,
     icon: service.icon,
   }));
-});
+},
+  "services",
+  [TAG.services],
+);
 
 export type PublicationCard = {
   slug: string;
@@ -186,20 +198,32 @@ const toPublicationCard = (publication: PublicationSummary): PublicationCard => 
   };
 };
 
-export const getPublications = cache(async () => {
+/** Os campos que o card consome. Fora daqui, o Payload traria o corpo em rich text
+ * de 52 publicações para desenhar uma grade de capas. */
+const PUBLICATION_CARD_SELECT = {
+  slug: true, title: true, synopsis: true, cover: true, type: true,
+  publishedAt: true, author: true, categories: true, featured: true,
+} as const;
+
+export const getPublications = cachedRead(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "publications",
     where: PUBLISHED,
     sort: "-publishedAt",
     limit: 0,
+    depth: 1,
+    select: PUBLICATION_CARD_SELECT,
   });
 
   return docs.map(toPublicationCard);
-});
+},
+  "publications",
+  [TAG.publications, TAG.publicationCategories, TAG.media],
+);
 
 /** As 3 destacadas mais recentes; sem destaques, as 3 mais recentes. */
-export const getHomePublications = cache(async () => {
+export const getHomePublications = cachedRead(async () => {
   const payload = await getPayloadClient();
   const query = {
     collection: "publications" as const,
@@ -207,10 +231,7 @@ export const getHomePublications = cache(async () => {
     limit: 3,
     depth: 1,
     pagination: false,
-    select: {
-      slug: true, title: true, synopsis: true, cover: true, type: true,
-      publishedAt: true, author: true, categories: true, featured: true,
-    },
+    select: PUBLICATION_CARD_SELECT,
   } as const;
   const featured = await payload.find({
     ...query,
@@ -218,9 +239,37 @@ export const getHomePublications = cache(async () => {
   });
   const { docs } = featured.docs.length ? featured : await payload.find({ ...query, where: PUBLISHED });
   return docs.map(toPublicationCard);
-});
+},
+  "home-publications",
+  [TAG.publications, TAG.publicationCategories, TAG.media],
+);
 
-export const getPublicationsPage = cache(async () => {
+/**
+ * As publicações que fecham a página de uma publicação. Existe separado de
+ * `getPublications` porque a página precisa de três cards e não do acervo inteiro:
+ * carregar 52 documentos para descartar 49 é trabalho que o banco faz à toa em cada
+ * revalidação.
+ */
+export const getRelatedPublications = cachedRead(
+  async (slug: string, limit = 3) => {
+    const payload = await getPayloadClient();
+    const { docs } = await payload.find({
+      collection: "publications",
+      where: { ...PUBLISHED, slug: { not_equals: slug } },
+      sort: "-publishedAt",
+      limit,
+      depth: 1,
+      pagination: false,
+      select: PUBLICATION_CARD_SELECT,
+    });
+
+    return docs.map(toPublicationCard);
+  },
+  "related-publications",
+  [TAG.publications, TAG.publicationCategories, TAG.media],
+);
+
+export const getPublicationsPage = cachedRead(async () => {
   const payload = await getPayloadClient();
   const page = await payload.findGlobal({ slug: "publications-page" });
 
@@ -230,9 +279,12 @@ export const getPublicationsPage = cache(async () => {
     title: page.title,
     description: page.description ?? null,
   };
-});
+},
+  "publications-page",
+  [TAG.publicationsPage],
+);
 
-export const getPortfolioPage = cache(unstable_cache(async () => {
+export const getPortfolioPage = cachedRead(async () => {
   const payload = await getPayloadClient();
   const page = await payload.findGlobal({ slug: "portfolio-page" });
 
@@ -242,9 +294,12 @@ export const getPortfolioPage = cache(unstable_cache(async () => {
     title: page.title,
     description: page.description ?? null,
   };
-}, ["public-portfolio-page"], { revalidate: 60 }));
+},
+  "portfolio-page",
+  [TAG.portfolioPage],
+);
 
-export const getPublicationCategories = cache(async () => {
+export const getPublicationCategories = cachedRead(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "publication-categories",
@@ -258,9 +313,12 @@ export const getPublicationCategories = cache(async () => {
     name: category.name,
     color: category.color,
   }));
-});
+},
+  "publication-categories",
+  [TAG.publicationCategories],
+);
 
-export const getPublicationSlugs = cache(async () => {
+export const getPublicationSlugs = cachedRead(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "publications",
@@ -271,9 +329,12 @@ export const getPublicationSlugs = cache(async () => {
   });
 
   return docs.map((doc) => doc.slug);
-});
+},
+  "publication-slugs",
+  [TAG.publications],
+);
 
-export const getPublication = cache(async (slug: string) => {
+export const getPublication = cachedRead(async (slug: string) => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "publications",
@@ -309,9 +370,12 @@ export const getPublication = cache(async (slug: string) => {
         }
       : null,
   };
-});
+},
+  "publication",
+  [TAG.publications, TAG.publicationCategories, TAG.media],
+);
 
-export const getTeam = cache(async () => {
+export const getTeam = cachedRead(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "team-members",
@@ -336,9 +400,12 @@ export const getTeam = cache(async () => {
     teamMembers: docs.filter((member) => member.group === "team").map(toMember),
     boardMembers: docs.filter((member) => member.group === "board").map(toMember),
   };
-});
+},
+  "team",
+  [TAG.team, TAG.media],
+);
 
-export const getPartners = cache(async () => {
+export const getPartners = cachedRead(async () => {
   const payload = await getPayloadClient();
 
   const [{ docs }, { docs: projects }] = await Promise.all([
@@ -377,7 +444,10 @@ export const getPartners = cache(async () => {
     // proporção do arquivo — ver components/LogoLoop.tsx.
     return { name: partner.name, src: logo.src, href, width: logo.width, height: logo.height };
   });
-});
+},
+  "partners",
+  [TAG.partners, TAG.projects, TAG.media],
+);
 
 /**
  * Identificador do cliente na URL de /portfolio?cliente=…
@@ -453,7 +523,7 @@ const toProjectCard = (project: Project): ProjectCard => {
   };
 };
 
-export const getProjects = cache(unstable_cache(async () => {
+export const getProjects = cachedRead(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "projects",
@@ -463,9 +533,12 @@ export const getProjects = cache(unstable_cache(async () => {
   });
 
   return docs.map(toProjectCard);
-}, ["public-projects"], { revalidate: 60 }));
+},
+  "projects",
+  [TAG.projects, TAG.partners, TAG.media],
+);
 
-export const getProjectSlugs = cache(async () => {
+export const getProjectSlugs = cachedRead(async () => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "projects",
@@ -476,9 +549,12 @@ export const getProjectSlugs = cache(async () => {
   });
 
   return docs.map((doc) => doc.slug);
-});
+},
+  "project-slugs",
+  [TAG.projects],
+);
 
-export const getProject = cache(async (slug: string) => {
+export const getProject = cachedRead(async (slug: string) => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "projects",
@@ -502,10 +578,13 @@ export const getProject = cache(async (slug: string) => {
     results: project.results,
     description: project.description ?? null,
   };
-});
+},
+  "project",
+  [TAG.projects, TAG.partners, TAG.media],
+);
 
 /** Outros projetos do mesmo ecossistema, para o rodapé da página do projeto. */
-export const getRelatedProjects = cache(async (slug: string, ecosystems: string[], limit = 3) => {
+export const getRelatedProjects = cachedRead(async (slug: string, ecosystems: string[], limit = 3) => {
   const payload = await getPayloadClient();
   const { docs } = await payload.find({
     collection: "projects",
@@ -522,9 +601,12 @@ export const getRelatedProjects = cache(async (slug: string, ecosystems: string[
   });
 
   return docs.map(toProjectCard);
-});
+},
+  "related-projects",
+  [TAG.projects, TAG.partners, TAG.media],
+);
 
-export const getTheoryOfChange = cache(async () => {
+export const getTheoryOfChange = cachedRead(async () => {
   const payload = await getPayloadClient();
   const theory = await payload.findGlobal({ slug: "theory-of-change" });
   const file = typeof theory.pdf?.file === "object" ? theory.pdf.file : null;
@@ -568,9 +650,12 @@ export const getTheoryOfChange = cache(async () => {
       href: file?.url ?? theory.pdf?.href ?? "",
     },
   };
-});
+},
+  "theory-of-change",
+  [TAG.theory, TAG.media],
+);
 
-export const getContactPage = cache(async () => {
+export const getContactPage = cachedRead(async () => {
   const payload = await getPayloadClient();
   const page = await payload.findGlobal({ slug: "contact-page" });
 
@@ -592,4 +677,7 @@ export const getContactPage = cache(async () => {
     contracted: (page.contracted ?? []).map((item) => item.label),
     received: (page.received ?? []).map((item) => item.label),
   };
-});
+},
+  "contact-page",
+  [TAG.contactPage, TAG.media],
+);

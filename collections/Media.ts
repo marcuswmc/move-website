@@ -3,6 +3,7 @@ import type { CollectionConfig } from "payload";
 import { anyone, authenticated } from "@/access";
 import { addImagePlaceholder } from "@/lib/image-placeholder";
 import { compactMediaETag } from "@/lib/media-response-headers";
+import { MEDIA_DEPENDENTS, revalidatesCollection } from "@/lib/revalidate";
 
 export const Media: CollectionConfig = {
   slug: "media",
@@ -18,7 +19,7 @@ export const Media: CollectionConfig = {
     update: authenticated,
     delete: authenticated,
   },
-  hooks: { beforeChange: [addImagePlaceholder] },
+  hooks: { beforeChange: [addImagePlaceholder], ...revalidatesCollection(...MEDIA_DEPENDENTS) },
   upload: {
     staticDir: "media",
     modifyResponseHeaders: compactMediaETag,

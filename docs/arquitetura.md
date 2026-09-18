@@ -68,7 +68,7 @@ lib/content.ts ──── resolveImage() ──── lib/resolveImage.ts
      │  filtro _status: 'published'
      │  devolve objetos planos: { title, image: {src, alt}, ... }
      ▼
-app/(frontend)/**/page.tsx        (Server Component, revalidate = 60)
+app/(frontend)/**/page.tsx        (Server Component, revalidate = 600)
      │
      │  props simples
      ▼
@@ -182,7 +182,7 @@ marcados `"use client"` recebem os dados já prontos.
 O caso mais instrutivo é `/portfolio`: a página é servidor, busca **todos** os
 projetos e entrega um array simples ao `PortfolioBrowser`, que filtra em memória.
 A página resolve `?cliente=` no servidor para entregar os cards corretos no HTML
-inicial. Os dados públicos usam cache persistente de 60 segundos. Os demais filtros
+inicial. Os dados públicos vêm do cache por tag, purgado pelo CMS ao salvar. Os demais filtros
 continuam em memória e respondem sem ida ao servidor.
 Reavaliar se o acervo passar de alguns milhares.
 

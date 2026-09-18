@@ -17,7 +17,7 @@ import {
 } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { meta, hero } = await getHomeContent();

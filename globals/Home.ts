@@ -7,6 +7,8 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import type { GlobalConfig } from "payload";
+import { revalidatesGlobal } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 
 import { anyone, authenticated } from "@/access";
 import { imageField } from "@/fields/imageField";
@@ -22,6 +24,7 @@ export const Home: GlobalConfig = {
   },
   access: { read: anyone, update: authenticated },
   versions: { max: 20 },
+  hooks: revalidatesGlobal(TAG.home),
   fields: [
     {
       type: "tabs",

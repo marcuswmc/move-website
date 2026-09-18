@@ -1,5 +1,7 @@
 import type { CollectionConfig } from "payload";
 import { slugField } from "payload";
+import { revalidatesCollection } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 
 import { authenticated, publishedOrAuthenticated } from "@/access";
 import { imageField } from "@/fields/imageField";
@@ -35,9 +37,9 @@ export const Projects: CollectionConfig = {
       if (Array.isArray(data.segments)) data.segment = data.segments[0] ?? null;
       return data;
     }],
+    ...revalidatesCollection(TAG.projects, TAG.partners),
   },
   fields: [
-    { name: "migrationNotes", type: "textarea", label: "Observações da migração", admin: { position: "sidebar" } },
     {
       type: "tabs",
       tabs: [

@@ -1,6 +1,8 @@
 import type { GlobalConfig } from "payload";
 
 import { anyone, authenticated } from "@/access";
+import { revalidatesGlobal } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
@@ -11,6 +13,7 @@ export const SiteSettings: GlobalConfig = {
   },
   access: { read: anyone, update: authenticated },
   versions: { max: 20 },
+  hooks: revalidatesGlobal(TAG.siteSettings),
   fields: [
     {
       name: "nav",

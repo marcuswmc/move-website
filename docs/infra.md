@@ -110,9 +110,31 @@ Isso **só funciona em dev**: o filesystem das functions da Vercel é efêmero e
 somente-leitura. Em produção o documento existia no Mongo, o arquivo não existia
 em lugar nenhum, e `/api/media/file/*` respondia 500.
 
-As URLs não mudaram com a migração: o adaptador continua servindo por
-`/api/media/file/**` e faz o streaming a partir do store. Nem os componentes nem
-os documentos gravados precisam saber de onde o arquivo vem.
+### `disablePayloadAccessControl`
+
+```ts
+vercelBlobStorage({
+  collections: { media: { disablePayloadAccessControl: true } },
+  token: process.env.BLOB_READ_WRITE_TOKEN,
+})
+```
+
+Sem esta opção, `doc.url` aponta para `/api/media/file/<arquivo>` — uma rota do
+Payload. Cada imagem virava uma invocação que subia o Payload e abria conexão com
+o Mongo para devolver bytes que já estavam no Blob. Medido em produção, um cache
+MISS levava 4,3–4,5 s por arquivo; com ~30 logos pedidos de uma vez, o otimizador
+do `next/image` desistia de parte deles com `400 INVALID_IMAGE_OPTIMIZE_REQUEST`.
+Eram as imagens que apareciam aos poucos e as que só vinham ao recarregar.
+
+Com o controlo de acesso desligado, `url` passa a ser o endereço público do store
+(`https://<store>.public.blob.vercel-storage.com/<arquivo>`), servido pelo CDN sem
+função e sem banco. O hook `afterRead` do plugin recalcula `url` a cada leitura a
+partir do `filename`, então documentos já gravados não precisam de migração.
+
+A rota antiga não some para quem já a tinha: `next.config.ts` mantém um 301 de
+`/api/media/file/:path*` para o store, o que preserva as imagens de OG já
+rastreadas. O acesso de leitura da collection já era `anyone`, então não há regra
+de autorização a perder.
 
 ### ⚠️ O token é obrigatório em dev
 
@@ -154,11 +176,16 @@ Documentos (PDF etc.) são servidos como estão; o `sharp` só processa imagens.
 
 ### Cache e revalidação
 
-Todas as páginas declaram `export const revalidate = 60`: o HTML é regenerado no
-máximo a cada 60 segundos. Uma edição no admin aparece no site em até um minuto,
-**sem deploy**. Não há revalidação sob demanda configurada — se um dia for
-preciso publicação instantânea, o caminho é um hook `afterChange` chamando
-`revalidatePath`.
+A invalidação é por tag, não por prazo. Cada leitura de `lib/content.ts` passa
+por `cachedRead()` e declara de que collections e globals depende; cada collection
+e global chama `revalidatesCollection` / `revalidatesGlobal` (ver
+[`lib/revalidate.ts`](../lib/revalidate.ts)), que purga essas tags ao salvar. Uma
+edição no admin aparece na requisição seguinte, **sem deploy e sem espera**.
+
+`revalidate = 600` nas páginas e os 10 minutos de `FALLBACK_TTL` em
+[`lib/cache.ts`](../lib/cache.ts) são rede de segurança, para o caso de uma
+invalidação se perder — uma edição feita direto no banco, um hook que falhou. Não
+são o mecanismo de publicação.
 
 ### Imagens
 
@@ -166,10 +193,22 @@ Em [`next.config.ts`](../next.config.ts):
 
 ```ts
 images: {
-  remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
+  remotePatterns: [
+    { protocol: "https", hostname: "images.unsplash.com" },
+    { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
+  ],
   localPatterns: [{ pathname: "/api/media/file/**" }, { pathname: "/**" }],
+  minimumCacheTTL: 31_536_000,
 }
 ```
+
+O host do Blob é de onde vêm as mídias da collection Media desde
+`disablePayloadAccessControl`. O curinga cobre qualquer store, para preview e
+produção não dependerem de um id fixo no arquivo de configuração.
+
+`minimumCacheTTL` sobe do padrão de 4 horas do Next 16 para um ano: o nome do
+arquivo é a chave do objeto no Blob, então trocar a imagem de um documento grava
+outro nome — nenhuma URL muda de conteúdo, e não há o que revalidar.
 
 O Unsplash está liberado porque os placeholders do redesign vêm de lá (ver
 `imageField` em [Campos](payload-campos.md)). **Uma imagem de domínio não listado

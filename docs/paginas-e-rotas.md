@@ -56,7 +56,7 @@ return (
 
 As páginas públicas seguem esta estrutura geral. `/portfolio` também aguarda
 `searchParams` para aplicar o cliente antes de gerar o HTML; por isso é dinâmica,
-com dados públicos em cache por 60 segundos:
+servida a partir das mesmas leituras em cache:
 
 ```tsx
 import type { Metadata } from "next";
@@ -65,7 +65,7 @@ import { PageHero } from "@/components/PageHero";
 import { getPortfolioPage, getProjects } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 60;                          // ①
+export const revalidate = 600;                         // ①
 
 export async function generateMetadata(): Promise<Metadata> {   // ②
   const page = await getPortfolioPage();
@@ -90,8 +90,11 @@ export default async function PortfolioPage() {        // ③
 }
 ```
 
-① **`revalidate = 60`** em todas as páginas: o HTML é regenerado no máximo a cada
-60 segundos. Uma edição no admin aparece no site em até um minuto, sem deploy.
+① **`revalidate = 600`** em todas as páginas. Não é por aqui que uma edição
+chega ao site: as leituras de `lib/content.ts` carregam tags que o CMS purga ao
+salvar (ver [Camada de conteúdo](camada-de-conteudo.md)), e a publicação acontece
+na requisição seguinte. Os 10 minutos são rede de segurança para uma invalidação
+que se perca.
 
 ② **`generateMetadata`** sempre via `metadataFromSeo` — ver [SEO](#seo).
 
@@ -106,7 +109,7 @@ importa.
 `app/(frontend)/portfolio/[slug]/page.tsx`:
 
 ```tsx
-export const revalidate = 60;
+export const revalidate = 600;
 
 export async function generateStaticParams() {
   const slugs = await getProjectSlugs();
@@ -211,7 +214,7 @@ sai com a mesma medida de leitura e a mesma escala do resto do site.
 2. Função de leitura em [`lib/content.ts`](camada-de-conteudo.md).
 3. Se a página tem SEO próprio, registre o slug no `seoPlugin` do
    `payload.config.ts`.
-4. `app/(frontend)/minha-rota/page.tsx` com `revalidate = 60`,
+4. `app/(frontend)/minha-rota/page.tsx` com `revalidate = 600`,
    `generateMetadata` via `metadataFromSeo` e o componente assíncrono.
 5. Acrescente a rota ao menu em **/admin → Configurações do site → Menu de
    navegação** (não é código — o menu é conteúdo).
@@ -219,7 +222,7 @@ sai com a mesma medida de leitura e a mesma escala do resto do site.
 
 ## Checklist
 
-- [ ] `export const revalidate = 60`
+- [ ] `export const revalidate = 600`
 - [ ] `generateMetadata` usando `metadataFromSeo`
 - [ ] Consultas independentes em `Promise.all`
 - [ ] `await params` nas rotas dinâmicas

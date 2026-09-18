@@ -74,10 +74,27 @@ Todas as funções são embrulhadas em `cache()` do React. Isso deduplica chamad
 **dentro do mesmo request**: `getSiteSettings()` é chamado pelo layout, pelo
 header e pelo rodapé, e vai ao banco uma vez só.
 
-React `cache()` não é cache entre requests. As páginas estáticas usam ISR de
-60 segundos. `getProjects`, `getPortfolioPage` e `getSiteSettings` também usam
-`unstable_cache` por 60 segundos, pois `/portfolio` resolve parâmetros no servidor
-sem precisar consultar o banco a cada visitante.
+React `cache()` não é cache entre requests — quem faz isso é `unstable_cache`. As
+duas camadas estão empilhadas em `cachedRead()`
+([`lib/cache.ts`](../lib/cache.ts)), por onde passa toda leitura:
+
+```ts
+export const getProjects = cachedRead(
+  async () => { /* … */ },
+  "projects",                                    // chave do cache
+  [TAG.projects, TAG.partners, TAG.media],       // de que documentos depende
+);
+```
+
+As tags são o que liga a leitura ao CMS: cada collection e global chama
+`revalidatesCollection` / `revalidatesGlobal`
+([`lib/revalidate.ts`](../lib/revalidate.ts)) e purga suas tags ao salvar, então
+a edição aparece na requisição seguinte. O prazo de 10 minutos em `FALLBACK_TTL` é
+só rede de segurança para uma invalidação perdida, não o mecanismo de publicação.
+
+`TAG.media` entra em quase toda leitura porque uma imagem trocada muda o `src`
+resolvido em qualquer página que a exiba, sem que o documento que a referencia
+seja salvo.
 
 `getHomePublications` consulta apenas três destaques, com `select` e `depth: 1`.
 Somente se não houver destaques faz a segunda consulta às três mais recentes.

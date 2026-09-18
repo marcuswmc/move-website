@@ -5,7 +5,7 @@ import { PortfolioBrowser } from "@/components/PortfolioBrowser";
 import { getPortfolioPage, getProjects } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPortfolioPage();
