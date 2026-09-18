@@ -13,7 +13,7 @@ import { getServices, getTheoryOfChange } from "@/lib/content";
 import { SURFACES, type SurfaceName } from "@/lib/palette";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 /**
  * A página é a Teoria de Mudança oficial da Move desenhada como uma cadeia percorrível:

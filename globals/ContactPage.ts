@@ -1,6 +1,8 @@
 import type { GlobalConfig } from "payload";
 
 import { anyone, authenticated } from "@/access";
+import { revalidatesGlobal } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 import { imageField } from "@/fields/imageField";
 
 export const ContactPage: GlobalConfig = {
@@ -12,6 +14,7 @@ export const ContactPage: GlobalConfig = {
   },
   access: { read: anyone, update: authenticated },
   versions: { max: 20 },
+  hooks: revalidatesGlobal(TAG.contactPage),
   fields: [
     {
       type: "tabs",

@@ -1,4 +1,6 @@
 import type { CollectionConfig } from "payload";
+import { revalidatesCollection } from "@/lib/revalidate";
+import { TAG } from "@/lib/cache";
 
 import { authenticated, publishedOrAuthenticated } from "@/access";
 import { imageField } from "@/fields/imageField";
@@ -20,6 +22,7 @@ export const TeamMembers: CollectionConfig = {
   },
   versions: { drafts: true, maxPerDoc: 20 },
   defaultSort: "order",
+  hooks: revalidatesCollection(TAG.team),
   fields: [
     {
       name: "name",

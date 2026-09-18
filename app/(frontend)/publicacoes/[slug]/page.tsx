@@ -7,11 +7,11 @@ import { PublicationCard } from "@/components/PublicationCard";
 import { Reveal } from "@/components/Reveal";
 import { RichText } from "@/components/RichText";
 import { SectionLabel } from "@/components/SectionLabel";
-import { getPublication, getPublicationSlugs, getPublications } from "@/lib/content";
+import { getPublication, getPublicationSlugs, getRelatedPublications } from "@/lib/content";
 import { surfaceByName } from "@/lib/palette";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 60;
+export const revalidate = 600;
 
 export async function generateStaticParams() {
   const slugs = await getPublicationSlugs();
@@ -62,8 +62,7 @@ export default async function PublicationPage({ params }: Props) {
 
   if (!publication) notFound();
 
-  const all = await getPublications();
-  const related = all.filter((item) => item.slug !== publication.slug).slice(0, 3);
+  const related = await getRelatedPublications(publication.slug);
 
   return (
     <main className="bg-move-offwhite">
