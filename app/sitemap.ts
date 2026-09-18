@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 
-import { getProjectSlugs, getPublicationSlugs } from "@/lib/content";
+import { getClientSlugs, getProjectSlugs, getPublicationSlugs } from "@/lib/content";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 const SITE_URL = "https://move.social";
 
@@ -13,7 +13,11 @@ const SITE_URL = "https://move.social";
  * de next.config.ts e os 410 do proxy.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [projectSlugs, publicationSlugs] = await Promise.all([getProjectSlugs(), getPublicationSlugs()]);
+  const [projectSlugs, publicationSlugs, clientSlugs] = await Promise.all([
+    getProjectSlugs(),
+    getPublicationSlugs(),
+    getClientSlugs(),
+  ]);
 
   const pages: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "monthly", priority: 1 },
@@ -34,6 +38,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${SITE_URL}/publicacoes/${slug}`,
       changeFrequency: "yearly" as const,
       priority: 0.6,
+    })),
+    // O portfólio filtrado por cliente virou endereço próprio; sem isto ele existiria
+    // sem nunca ser anunciado.
+    ...clientSlugs.map((slug) => ({
+      url: `${SITE_URL}/portfolio/cliente/${slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
     })),
   ];
 }

@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import { getContactPage, getSiteSettings } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 600;
+export const revalidate = 86400;
 
 /* O checkbox real fica em sr-only — segue focável pelo teclado — e o estado marcado é
    pintado no chip visível através das variantes `peer-*`. Por isso o input precisa vir

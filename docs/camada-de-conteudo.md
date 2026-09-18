@@ -89,8 +89,10 @@ export const getProjects = cachedRead(
 As tags são o que liga a leitura ao CMS: cada collection e global chama
 `revalidatesCollection` / `revalidatesGlobal`
 ([`lib/revalidate.ts`](../lib/revalidate.ts)) e purga suas tags ao salvar, então
-a edição aparece na requisição seguinte. O prazo de 10 minutos em `FALLBACK_TTL` é
-só rede de segurança para uma invalidação perdida, não o mecanismo de publicação.
+a edição aparece na requisição seguinte. O prazo de um dia em `FALLBACK_TTL` é só
+rede de segurança para uma invalidação perdida, não o mecanismo de publicação — com
+dez minutos, uma página com visita constante era recalculada 144 vezes por dia para
+produzir o mesmo HTML, e cada recálculo sobe o Payload e abre conexão com o Mongo.
 
 `TAG.media` entra em quase toda leitura porque uma imagem trocada muda o `src`
 resolvido em qualquer página que a exiba, sem que o documento que a referencia

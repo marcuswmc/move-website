@@ -11,6 +11,16 @@
  * O corpo é texto curto de propósito: sem HTML e sem link, para não oferecer ao
  * rastreador um próximo endereço a pedir. Nada aqui toca no CMS.
  */
+/**
+ * Esta rota custa uma invocação por pedido: o Next não pré-renderiza um route handler
+ * que responde fora da faixa 2xx, então `force-static` aqui não tem efeito — foi
+ * testado. O gasto é pequeno (não sobe o Payload nem toca no banco) e, na amostra de
+ * logs consultada, os endereços herdados não receberam tráfego orgânico: o que os
+ * rastreadores ainda pedem são os filtros do portfólio, negados no firewall antes de
+ * chegarem aqui. Se isso mudar, o caminho barato é acrescentar estes prefixos à regra
+ * do firewall, em vez de trocar o 410 por um 404 estático.
+ */
+
 const BODY = "Esta página não existe mais. O site da Move está em https://move.social.";
 
 const HEADERS = {

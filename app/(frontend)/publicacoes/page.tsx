@@ -5,7 +5,7 @@ import { PublicationsBrowser } from "@/components/PublicationsBrowser";
 import { getPublicationCategories, getPublications, getPublicationsPage } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 600;
+export const revalidate = 86400;
 
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPublicationsPage();

@@ -437,7 +437,7 @@ export const getPartners = cachedRead(async () => {
      * ligado, sobra o portfólio inteiro — melhor do que um link que não leva a nada.
      */
     const href = partnersWithProjects.has(partner.id)
-      ? `/portfolio?cliente=${encodeURIComponent(clientKey(partner))}`
+      ? `/portfolio/cliente/${encodeURIComponent(clientKey(partner))}`
       : "/portfolio";
 
     // As dimensões seguem junto porque o carrossel dimensiona cada logo pela
@@ -450,7 +450,7 @@ export const getPartners = cachedRead(async () => {
 );
 
 /**
- * Identificador do cliente na URL de /portfolio?cliente=…
+ * Identificador do cliente na URL de /portfolio/cliente/…
  *
  * Prefere o slug do documento, mas cai para o nome normalizado quando ele não existe:
  * os parceiros carregados pelo seed antigo são anteriores ao campo `slug` e só o ganham
@@ -467,12 +467,39 @@ const clientKey = (partner: { slug?: string | null; name: string }): string =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
 
+/**
+ * Os clientes que têm ao menos um projeto publicado — os únicos para os quais existe
+ * uma página de portfólio filtrada. Serve ao `generateStaticParams` de
+ * /portfolio/cliente/[slug], que é o que permite a essa rota ser pré-renderizada em
+ * vez de renderizar por requisição.
+ */
+export const getClientSlugs = cachedRead(
+  async () => {
+    const payload = await getPayloadClient();
+    const { docs } = await payload.find({
+      collection: "projects",
+      where: PUBLISHED,
+      limit: 0,
+      depth: 1,
+      select: { partner: true },
+    });
+
+    const slugs = docs
+      .map((project) => (typeof project.partner === "object" && project.partner ? clientKey(project.partner) : null))
+      .filter((slug): slug is string => Boolean(slug));
+
+    return [...new Set(slugs)];
+  },
+  "client-slugs",
+  [TAG.projects, TAG.partners],
+);
+
 export type ProjectCard = {
   slug: string;
   client: string;
   /** Logo do cliente — só existe quando o projeto tem um parceiro ligado. */
   logo: ResolvedImage | null;
-  /** Slug do parceiro, que identifica o cliente em /portfolio?cliente=… */
+  /** Slug do parceiro, que identifica o cliente em /portfolio/cliente/… */
   clientSlug: string | null;
   ecosystem: string;
   ecosystems: string[];

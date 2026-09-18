@@ -69,6 +69,18 @@ const nextConfig: NextConfig = {
         statusCode: 301,
       })),
       /**
+       * O filtro por cliente saiu de `?cliente=` para /portfolio/cliente/<slug>, para
+       * /portfolio poder voltar a ser estática. O parâmetro antigo continua a funcionar
+       * — está em links do próprio site já indexados — e é resolvido aqui, na camada de
+       * roteamento, sem invocar função.
+       */
+      {
+        source: "/portfolio",
+        has: [{ type: "query", key: "cliente", value: "(?<cliente>.*)" }],
+        destination: "/portfolio/cliente/:cliente",
+        statusCode: 301,
+      },
+      /**
        * Antes de `disablePayloadAccessControl`, toda mídia era publicada sob
        * /api/media/file/<arquivo> — inclusive as imagens de OG já rastreadas pelos
        * buscadores. O endereço agora é o do Blob, e sem esta regra o caminho antigo

@@ -19,7 +19,7 @@ Três causas, nesta ordem de frequência:
    `lib/revalidate.ts`). Se não apareceu, confira se a collection tem
    `revalidatesCollection(...)` em `hooks` e se a leitura correspondente em
    `lib/content.ts` declara a mesma tag. No pior caso o conteúdo sai sozinho em
-   10 minutos, pelo `FALLBACK_TTL`.
+   um dia, pelo `FALLBACK_TTL`.
 3. **A função de leitura não filtra o que você espera.** Confira `where`, `sort`
    e principalmente `limit` em `lib/content.ts`.
 

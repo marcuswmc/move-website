@@ -31,10 +31,12 @@ export type ContentTag = (typeof TAG)[keyof typeof TAG];
  * Rede de segurança para o caso de uma invalidação se perder — uma edição feita
  * direto no banco, um hook que falhou. Com as tags ligadas, este prazo quase nunca
  * é o que devolve o conteúdo novo: ele só existe para o desvio não ser permanente.
- * Dez minutos em vez dos sessenta segundos anteriores reduz o trabalho repetido sem
- * transformar uma invalidação perdida num problema de uma hora.
+ * Um dia, e não dez minutos: com `revalidate = 600`, uma página com visita constante
+ * era recalculada até 144 vezes por dia, e cada recálculo sobe o Payload e abre
+ * conexão com o Mongo. É trabalho repetido para produzir exatamente o mesmo HTML,
+ * e foi o que consumia o CPU da conta. A frescura vem das tags, não do prazo.
  */
-const FALLBACK_TTL = 600;
+const FALLBACK_TTL = 86_400;
 
 /**
  * `unstable_cache` guarda o resultado entre requests e entre instâncias; `cache()`

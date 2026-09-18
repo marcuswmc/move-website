@@ -68,7 +68,7 @@ lib/content.ts ──── resolveImage() ──── lib/resolveImage.ts
      │  filtro _status: 'published'
      │  devolve objetos planos: { title, image: {src, alt}, ... }
      ▼
-app/(frontend)/**/page.tsx        (Server Component, revalidate = 600)
+app/(frontend)/**/page.tsx        (Server Component, revalidate = 86400 + tags)
      │
      │  props simples
      ▼

@@ -55,8 +55,7 @@ return (
 ## Anatomia de uma página
 
 As páginas públicas seguem esta estrutura geral. `/portfolio` também aguarda
-`searchParams` para aplicar o cliente antes de gerar o HTML; por isso é dinâmica,
-servida a partir das mesmas leituras em cache:
+**Nenhuma delas lê `searchParams`** — ver o aviso no fim desta seção:
 
 ```tsx
 import type { Metadata } from "next";
@@ -65,7 +64,7 @@ import { PageHero } from "@/components/PageHero";
 import { getPortfolioPage, getProjects } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
-export const revalidate = 600;                         // ①
+export const revalidate = 86400;                       // ①
 
 export async function generateMetadata(): Promise<Metadata> {   // ②
   const page = await getPortfolioPage();
@@ -90,11 +89,21 @@ export default async function PortfolioPage() {        // ③
 }
 ```
 
-① **`revalidate = 600`** em todas as páginas. Não é por aqui que uma edição
+① **`revalidate = 86400`** em todas as páginas. Não é por aqui que uma edição
 chega ao site: as leituras de `lib/content.ts` carregam tags que o CMS purga ao
 salvar (ver [Camada de conteúdo](camada-de-conteudo.md)), e a publicação acontece
-na requisição seguinte. Os 10 minutos são rede de segurança para uma invalidação
-que se perca.
+na requisição seguinte. O dia é rede de segurança para uma invalidação que se perca.
+
+> ⚠️ **Não leia `searchParams` numa página pública.** Basta lê-los para o Next
+> marcar a rota como dinâmica: ela deixa de ser servida do CDN e passa a subir o
+> Payload e abrir conexão com o Mongo **em toda visita**. `/portfolio` fazia isso
+> por causa de `?cliente=`, e era a única rota do site a fazê-lo — consumia mais
+> CPU sozinha do que todo o resto somado. O filtro por cliente virou
+> `/portfolio/cliente/[slug]`, pré-renderizado por `generateStaticParams` a partir
+> de `getClientSlugs()`, com um 301 do parâmetro antigo em `next.config.ts`.
+>
+> Para um filtro novo, o caminho é o mesmo: se o conjunto de valores é conhecido no
+> build, vire rota; se não é, filtre no cliente.
 
 ② **`generateMetadata`** sempre via `metadataFromSeo` — ver [SEO](#seo).
 
@@ -109,7 +118,7 @@ importa.
 `app/(frontend)/portfolio/[slug]/page.tsx`:
 
 ```tsx
-export const revalidate = 600;
+export const revalidate = 86400;
 
 export async function generateStaticParams() {
   const slugs = await getProjectSlugs();
@@ -143,8 +152,7 @@ export default async function ProjectPage({ params }: Props) {
 
 Três pontos:
 
-- **`params` é uma `Promise`** neste Next e precisa de `await`. Vale para
-  `searchParams` também.
+- **`params` é uma `Promise`** neste Next e precisa de `await`.
 - **`generateStaticParams`** pré-renderiza as páginas existentes no build. Um
   projeto publicado depois entra pela revalidação, sem deploy.
 - **`generateMetadata` trata o caso "não existe"** antes de `notFound()`, senão o
@@ -214,7 +222,7 @@ sai com a mesma medida de leitura e a mesma escala do resto do site.
 2. Função de leitura em [`lib/content.ts`](camada-de-conteudo.md).
 3. Se a página tem SEO próprio, registre o slug no `seoPlugin` do
    `payload.config.ts`.
-4. `app/(frontend)/minha-rota/page.tsx` com `revalidate = 600`,
+4. `app/(frontend)/minha-rota/page.tsx` com `revalidate = 86400`,
    `generateMetadata` via `metadataFromSeo` e o componente assíncrono.
 5. Acrescente a rota ao menu em **/admin → Configurações do site → Menu de
    navegação** (não é código — o menu é conteúdo).
@@ -222,7 +230,8 @@ sai com a mesma medida de leitura e a mesma escala do resto do site.
 
 ## Checklist
 
-- [ ] `export const revalidate = 600`
+- [ ] `export const revalidate = 86400`
+- [ ] nenhuma leitura de `searchParams` (torna a rota dinâmica)
 - [ ] `generateMetadata` usando `metadataFromSeo`
 - [ ] Consultas independentes em `Promise.all`
 - [ ] `await params` nas rotas dinâmicas

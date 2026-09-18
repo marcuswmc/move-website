@@ -182,7 +182,7 @@ e global chama `revalidatesCollection` / `revalidatesGlobal` (ver
 [`lib/revalidate.ts`](../lib/revalidate.ts)), que purga essas tags ao salvar. Uma
 edição no admin aparece na requisição seguinte, **sem deploy e sem espera**.
 
-`revalidate = 600` nas páginas e os 10 minutos de `FALLBACK_TTL` em
+`revalidate = 86400` nas páginas e o dia de `FALLBACK_TTL` em
 [`lib/cache.ts`](../lib/cache.ts) são rede de segurança, para o caso de uma
 invalidação se perder — uma edição feita direto no banco, um hook que falhou. Não
 são o mecanismo de publicação.
