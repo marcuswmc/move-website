@@ -319,6 +319,10 @@ export interface Partner {
     totalDocs?: number;
   };
   /**
+   * Desmarque para tirar este logo da faixa "Com quem trabalhamos" sem apagar o cliente.
+   */
+  showOnHome?: boolean | null;
+  /**
    * Menor número aparece primeiro.
    */
   order: number;
@@ -818,6 +822,7 @@ export interface PartnersSelect<T extends boolean = true> {
         alt?: T;
       };
   projects?: T;
+  showOnHome?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;
