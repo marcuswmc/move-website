@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { PageHero } from "@/components/PageHero";
 import { PortfolioBrowser } from "@/components/PortfolioBrowser";
-import { getPortfolioPage, getProjects } from "@/lib/content";
+import { getPortfolioPage, getProjects, getSegments } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
 export const revalidate = 86400;
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
  * camada de roteamento, sem invocar função.
  */
 export default async function PortfolioPage() {
-  const [page, projects] = await Promise.all([getPortfolioPage(), getProjects()]);
+  const [page, projects, segments] = await Promise.all([getPortfolioPage(), getProjects(), getSegments()]);
 
   return (
     <main className="bg-move-offwhite">
@@ -38,7 +38,7 @@ export default async function PortfolioPage() {
         breadcrumbs={[{ label: "Início", href: "/" }]}
       />
 
-      <PortfolioBrowser projects={projects} />
+      <PortfolioBrowser projects={projects} segments={segments} />
     </main>
   );
 }

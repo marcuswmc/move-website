@@ -1,11 +1,15 @@
 /**
- * Taxonomias fechadas do portfólio.
+ * Taxonomia fechada do portfólio.
  *
- * Vivem aqui, e não dentro de collections/Projects.ts, porque as duas pontas precisam
- * delas: o CMS monta os selects, e o filtro de /portfolio lista todas as opções mesmo
- * as que ainda não têm projeto — é o que faz a página comunicar a extensão do trabalho
- * da Move em vez de só o que já foi cadastrado. Um componente cliente não pode importar
- * o arquivo da collection sem arrastar o Payload para o bundle do navegador.
+ * Vive aqui, e não dentro de collections/Projects.ts, porque as duas pontas precisam
+ * dela: o CMS monta o select, e o filtro de /portfolio lista todas as opções mesmo as
+ * que ainda não têm projeto — é o que faz a página comunicar a extensão do trabalho da
+ * Move em vez de só o que já foi cadastrado. Um componente cliente não pode importar o
+ * arquivo da collection sem arrastar o Payload para o bundle do navegador.
+ *
+ * Segmento saiu daqui e virou collection (collections/ProjectSegments.ts), porque a
+ * Move precisa criar valor novo sem deploy. Ecossistema fica: cada valor tem cor e
+ * grafismo presos a ele, e um valor fora dos mapas cairia num fallback silencioso.
  */
 
 /**
@@ -21,17 +25,4 @@ export const ECOSYSTEMS = [
   "Finanças",
   "Saúde",
   "Empreendedorismo",
-] as const;
-
-/** Natureza da organização atendida — mesma taxonomia do site antigo. */
-export const SEGMENTS = [
-  "Agência de Cooperação Internacional",
-  "Empresa",
-  "Fundação ou Instituto Empresarial",
-  "Fundação ou Instituto Familiar",
-  "Governo",
-  "Negócio de Impacto",
-  "Organização de Sociedade Civil",
-  "Organismo Internacional",
-  "Outros",
 ] as const;

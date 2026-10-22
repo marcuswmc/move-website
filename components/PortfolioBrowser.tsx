@@ -9,7 +9,7 @@ import { getLenis } from "@/components/SmoothScroll";
 import { SearchField } from "@/components/SearchField";
 import type { ProjectCard as ProjectCardData } from "@/lib/content";
 import { iconForEcosystem, iconForService } from "@/lib/filterIcons";
-import { ECOSYSTEMS, SEGMENTS } from "@/lib/taxonomy";
+import { ECOSYSTEMS } from "@/lib/taxonomy";
 
 /** Normaliza para busca: minúsculas e sem acento, para "arapyau" achar "Arapyaú". */
 const normalize = (value: string) =>
@@ -57,16 +57,26 @@ const byName = (a: string, b: string) => a.localeCompare(b, "pt-BR");
  * esconderia metade dessa mensagem. Serviços mostram somente as opções utilizadas
  * pelos projetos cadastrados, incluindo os valores dos registros anteriores à migração.
  */
-const optionsFor = (projects: ProjectCardData[], dimension: Dimension): string[] => {
+const optionsFor = (projects: ProjectCardData[], dimension: Dimension, segments: string[]): string[] => {
   if (dimension === "ecosystem") return [...ECOSYSTEMS].sort(byName);
-  if (dimension === "segment") return [...SEGMENTS].sort(byName);
+  // Segmento vem da collection, por prop: é lista editável no CMS, não constante.
+  if (dimension === "segment") return [...segments].sort(byName);
 
   return Array.from(
     new Set(projects.flatMap(PICK[dimension]).filter((value): value is string => Boolean(value))),
   ).sort(byName);
 };
 
-export function PortfolioBrowser({ projects, initialClient = null }: { projects: ProjectCardData[]; initialClient?: string | null }) {
+export function PortfolioBrowser({
+  projects,
+  segments,
+  initialClient = null,
+}: {
+  projects: ProjectCardData[];
+  /** Todos os segmentos cadastrados, inclusive os sem projeto — ver getSegments(). */
+  segments: string[];
+  initialClient?: string | null;
+}) {
   const [query, setQuery] = useState("");
   const [selection, setSelection] = useState<Selection>(NOTHING_SELECTED);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -122,7 +132,7 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
 
   const filtered = useMemo(
     () => projects.filter((project) => matches(project, selection)),
-    [projects, matches, selection],
+    [projects, segments, matches, selection],
   );
 
   /**
@@ -135,7 +145,7 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
         const pool = projects.filter((project) => matches(project, selection, dimension));
         const icon = ICON[dimension];
 
-        const options: FilterOption[] = optionsFor(projects, dimension).map((value) => ({
+        const options: FilterOption[] = optionsFor(projects, dimension, segments).map((value) => ({
           value,
           count: pool.filter((project) => PICK[dimension](project).includes(value)).length,
           icon: icon?.(value),

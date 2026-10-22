@@ -560,6 +560,18 @@ const excerpt = (text: string, max = 200) => {
   return `${cut.slice(0, lastSpace > 0 ? lastSpace : max).replace(/[,;:.\s]+$/, "")}…`;
 };
 
+/**
+ * Segmento virou relação (collections/ProjectSegments.ts). Com `depth >= 1` chega
+ * populado; aceitar string também cobre os documentos que ainda não passaram pela
+ * migração e qualquer leitura feita com profundidade zero.
+ */
+const segmentNames = (segments: Project["segments"]): string[] => {
+  if (!Array.isArray(segments)) return [];
+  return segments
+    .map((segment) => (typeof segment === "object" && segment ? segment.name : typeof segment === "string" ? segment : null))
+    .filter((name): name is string => Boolean(name));
+};
+
 const toProjectCard = (project: Project): ProjectCard => {
   // `partner` só vem populado com depth ≥ 1; com depth 0 chega como id, e aí o card
   // simplesmente não mostra logo — que é o mesmo comportamento de quem não tem cliente.
@@ -574,8 +586,8 @@ const toProjectCard = (project: Project): ProjectCard => {
     ecosystems: taxonomyValues(project.ecosystems, project.ecosystem),
     service: taxonomyValues(project.services, project.service).join("; "),
     services: taxonomyValues(project.services, project.service),
-    segment: taxonomyValues(project.segments, project.segment).join("; ") || null,
-    segments: taxonomyValues(project.segments, project.segment),
+    segment: segmentNames(project.segments).join("; ") || null,
+    segments: segmentNames(project.segments),
     year: project.year,
     // O card precisa de algum texto; sem resumo próprio, o desafio é o melhor
     // substituto. A página do projeto não usa esse fallback — ver `intro` abaixo.
@@ -584,6 +596,31 @@ const toProjectCard = (project: Project): ProjectCard => {
     cardColor: project.cardColor ?? SURFACE_AUTO,
   };
 };
+
+/**
+ * Todos os segmentos cadastrados, inclusive os que ainda não têm projeto.
+ *
+ * O filtro de /portfolio mostra a lista inteira de propósito: os rótulos são parte do
+ * que a página comunica sobre o alcance do trabalho da Move, e uma lista que encolhe a
+ * cada clique faria o filtro parecer instável (ver components/FilterGroup.tsx). Por
+ * isso a lista vem da collection, e não dos projetos existentes.
+ */
+export const getSegments = cachedRead(
+  async () => {
+    const payload = await getPayloadClient();
+    const { docs } = await payload.find({
+      collection: "project-segments",
+      sort: "order",
+      limit: 0,
+      depth: 0,
+      select: { name: true },
+    });
+
+    return docs.map((segment) => segment.name);
+  },
+  "segments",
+  [TAG.projectSegments],
+);
 
 export const getProjects = cachedRead(async () => {
   const payload = await getPayloadClient();
@@ -597,7 +634,7 @@ export const getProjects = cachedRead(async () => {
   return docs.map(toProjectCard);
 },
   "projects",
-  [TAG.projects, TAG.partners, TAG.media],
+  [TAG.projects, TAG.projectSegments, TAG.partners, TAG.media],
 );
 
 export const getProjectSlugs = cachedRead(async () => {
@@ -642,7 +679,7 @@ export const getProject = cachedRead(async (slug: string) => {
   };
 },
   "project",
-  [TAG.projects, TAG.partners, TAG.media],
+  [TAG.projects, TAG.projectSegments, TAG.partners, TAG.media],
 );
 
 /** Outros projetos do mesmo ecossistema, para o rodapé da página do projeto. */
@@ -665,7 +702,7 @@ export const getRelatedProjects = cachedRead(async (slug: string, ecosystems: st
   return docs.map(toProjectCard);
 },
   "related-projects",
-  [TAG.projects, TAG.partners, TAG.media],
+  [TAG.projects, TAG.projectSegments, TAG.partners, TAG.media],
 );
 
 export const getTheoryOfChange = cachedRead(async () => {

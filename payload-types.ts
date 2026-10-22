@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     projects: Project;
+    'project-segments': ProjectSegment;
     services: Service;
     publications: Publication;
     'publication-categories': PublicationCategory;
@@ -87,6 +88,7 @@ export interface Config {
   };
   collectionsSelect: {
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'project-segments': ProjectSegmentsSelect<false> | ProjectSegmentsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     publications: PublicationsSelect<false> | PublicationsSelect<true>;
     'publication-categories': PublicationCategoriesSelect<false> | PublicationCategoriesSelect<true>;
@@ -233,32 +235,10 @@ export interface Project {
    * Alimenta o filtro por serviço. Reaproveite exatamente o mesmo texto entre projetos do mesmo tipo, senão viram duas opções distintas no filtro.
    */
   service?: string | null;
-  segments?:
-    | (
-        | 'Agência de Cooperação Internacional'
-        | 'Empresa'
-        | 'Fundação ou Instituto Empresarial'
-        | 'Fundação ou Instituto Familiar'
-        | 'Governo'
-        | 'Negócio de Impacto'
-        | 'Organização de Sociedade Civil'
-        | 'Organismo Internacional'
-        | 'Outros'
-      )[]
-    | null;
-  segment?:
-    | (
-        | 'Agência de Cooperação Internacional'
-        | 'Empresa'
-        | 'Fundação ou Instituto Empresarial'
-        | 'Fundação ou Instituto Familiar'
-        | 'Governo'
-        | 'Negócio de Impacto'
-        | 'Organização de Sociedade Civil'
-        | 'Organismo Internacional'
-        | 'Outros'
-      )
-    | null;
+  /**
+   * Cadastre segmentos novos em Conteúdo → Segmentos de projeto.
+   */
+  segments?: (string | ProjectSegment)[] | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -378,6 +358,30 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * Rótulos de segmento usados na classificação dos projetos e no filtro de /portfolio.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-segments".
+ */
+export interface ProjectSegment {
+  id: string;
+  /**
+   * Aparece no filtro de /portfolio exatamente como escrito aqui.
+   */
+  name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Menor número aparece primeiro.
+   */
+  order: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Cards do bloco "O que entregamos", na home e na Teoria da Mudança.
@@ -614,6 +618,10 @@ export interface PayloadLockedDocument {
         value: string | Project;
       } | null)
     | ({
+        relationTo: 'project-segments';
+        value: string | ProjectSegment;
+      } | null)
+    | ({
         relationTo: 'services';
         value: string | Service;
       } | null)
@@ -709,7 +717,6 @@ export interface ProjectsSelect<T extends boolean = true> {
   services?: T;
   service?: T;
   segments?: T;
-  segment?: T;
   meta?:
     | T
     | {
@@ -722,6 +729,18 @@ export interface ProjectsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-segments_select".
+ */
+export interface ProjectSegmentsSelect<T extends boolean = true> {
+  name?: T;
+  generateSlug?: T;
+  slug?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
