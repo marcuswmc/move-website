@@ -5,10 +5,14 @@ tags: [claude/index]
 
 # Index
 
-_Generated automatically on 22-10-2026 11:06. Do not edit by hand._
+_Generated automatically on 22-10-2026 11:16. Do not edit by hand._
 
 - [[CLAUDE]] — project context
 - [[00-inbox]] — inbox
+
+## daily
+
+- **18-09-2026** — [[daily/18-09-2026/transcript-12h40-ff083fe4|transcript-12h40-ff083fe4]]
 
 ## decisions
 
