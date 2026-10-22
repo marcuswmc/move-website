@@ -13,6 +13,7 @@ import sharp from "sharp";
 
 import { Media } from "@/collections/Media";
 import { Partners } from "@/collections/Partners";
+import { ProjectSegments } from "@/collections/ProjectSegments";
 import { Projects } from "@/collections/Projects";
 import { PublicationCategories } from "@/collections/PublicationCategories";
 import { Publications } from "@/collections/Publications";
@@ -69,7 +70,7 @@ export default buildConfig({
       titleSuffix: " · Move Social",
     },
   },
-  collections: [Projects, Services, Publications, PublicationCategories, TeamMembers, Partners, Media, Users],
+  collections: [Projects, ProjectSegments, Services, Publications, PublicationCategories, TeamMembers, Partners, Media, Users],
   globals: [Home, TheoryOfChange, PublicationsPage, PortfolioPage, ContactPage, SiteSettings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",

@@ -61,6 +61,23 @@ export const Partners: CollectionConfig = {
           "A ligação é feita no projeto, em Portfólio → Cliente (logo). Um cliente pode ter vários projetos: o logo do carrossel leva ao projeto quando há só um, e à listagem filtrada quando há mais.",
       },
     },
+    /**
+     * O carrossel da home e o card do projeto são caminhos separados: este campo só
+     * controla o carrossel. Desmarcado, o cliente continua a aparecer no card dos
+     * projetos dele e na listagem filtrada — é só o mural da home que fica curado.
+     *
+     * `defaultValue: true` mantém os parceiros já cadastrados exatamente como estão.
+     */
+    {
+      name: "showOnHome",
+      type: "checkbox",
+      label: "Exibir no carrossel da home",
+      defaultValue: true,
+      admin: {
+        position: "sidebar",
+        description: 'Desmarque para tirar este logo da faixa "Com quem trabalhamos" sem apagar o cliente.',
+      },
+    },
     {
       name: "order",
       type: "number",

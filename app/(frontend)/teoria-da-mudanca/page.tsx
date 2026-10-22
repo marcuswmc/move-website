@@ -129,8 +129,6 @@ export default async function TheoryPage() {
         />
         <div className="editorial-container relative">
           <TheoryStep
-            step={1}
-            total={CHAIN.length}
             eyebrow={frontsIntro?.eyebrow ?? "Como atuamos"}
             title={frontsIntro?.title ?? ""}
             description={frontsIntro?.description}
@@ -145,8 +143,6 @@ export default async function TheoryPage() {
       <section id="o-que-fazemos" className="bg-white px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container">
           <TheoryStep
-            step={2}
-            total={CHAIN.length}
             eyebrow={activitiesIntro?.eyebrow ?? "O que fazemos"}
             title={activitiesIntro?.title ?? ""}
             description={activitiesIntro?.description}
@@ -172,8 +168,6 @@ export default async function TheoryPage() {
       >
         <div className="editorial-container relative z-10">
           <TheoryStep
-            step={3}
-            total={CHAIN.length}
             eyebrow={audiencesIntro?.eyebrow ?? "Para quem fazemos"}
             title={audiencesIntro?.title ?? ""}
             description={audiencesIntro?.description}
@@ -189,8 +183,6 @@ export default async function TheoryPage() {
       <section id="o-que-entregamos" className="bg-move-offwhite px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container">
           <TheoryStep
-            step={4}
-            total={CHAIN.length}
             eyebrow={deliverablesIntro?.eyebrow ?? "O que entregamos"}
             title={deliverablesIntro?.title ?? ""}
             description={deliverablesIntro?.description}
@@ -203,8 +195,6 @@ export default async function TheoryPage() {
       <section id="o-que-queremos" className="bg-white px-4 py-24 md:px-14 md:py-32">
         <div className="editorial-container">
           <TheoryStep
-            step={5}
-            total={CHAIN.length}
             eyebrow={outcomesIntro?.eyebrow ?? "O que queremos"}
             title={outcomesIntro?.title ?? ""}
             description={outcomesIntro?.description}
@@ -245,8 +235,6 @@ export default async function TheoryPage() {
 
         <div className="editorial-container relative z-10">
           <TheoryStep
-            step={6}
-            total={CHAIN.length}
             eyebrow={impact?.eyebrow ?? "Impacto"}
             title={impact?.title ?? ""}
             light

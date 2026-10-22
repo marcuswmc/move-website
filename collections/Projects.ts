@@ -8,7 +8,7 @@ import { imageField } from "@/fields/imageField";
 import { projectCardColorField } from "@/fields/toneField";
 // As duas taxonomias fechadas moram em lib/ porque o filtro de /portfolio também as
 // consome, e um componente cliente não pode importar este arquivo.
-import { ECOSYSTEMS, SEGMENTS } from "@/lib/taxonomy";
+import { ECOSYSTEMS } from "@/lib/taxonomy";
 
 export const Projects: CollectionConfig = {
   slug: "projects",
@@ -34,7 +34,6 @@ export const Projects: CollectionConfig = {
       // Keep scalar fields readable by the deployed site during rollout.
       if (Array.isArray(data.ecosystems)) data.ecosystem = data.ecosystems[0] ?? "";
       if (Array.isArray(data.services)) data.service = data.services.join("; ");
-      if (Array.isArray(data.segments)) data.segment = data.segments[0] ?? null;
       return data;
     }],
     ...revalidatesCollection(TAG.projects, TAG.partners),
@@ -164,20 +163,20 @@ export const Projects: CollectionConfig = {
                   "Alimenta o filtro por serviço. Reaproveite exatamente o mesmo texto entre projetos do mesmo tipo, senão viram duas opções distintas no filtro.",
               },
             },
+            /**
+             * Relação, e não lista fechada: a Move cria e renomeia segmento no admin
+             * sem esperar deploy (ver collections/ProjectSegments.ts). Como o projeto
+             * guarda a referência e não o texto, renomear vale para todos de uma vez.
+             */
             {
               name: "segments",
-              type: "select",
+              type: "relationship",
+              relationTo: "project-segments",
               hasMany: true,
               label: "Segmentos",
-              options: SEGMENTS.map((value) => ({ label: value, value })),
-            },
-            {
-              name: "segment",
-              type: "select",
-              label: "Segmento",
-              index: true,
-              options: SEGMENTS.map((value) => ({ label: value, value })),
-              admin: { hidden: true },
+              admin: {
+                description: "Cadastre segmentos novos em Conteúdo → Segmentos de projeto.",
+              },
             },
           ],
         },

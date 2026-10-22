@@ -2,9 +2,6 @@ import { Reveal } from "@/components/Reveal";
 import { SectionLabel } from "@/components/SectionLabel";
 
 type TheoryStepProps = {
-  /** Posição do elo na cadeia, 1-based. Aparece como "elo 03 / 06". */
-  step: number;
-  total: number;
   eyebrow: string;
   title: string;
   description?: string | null;
@@ -13,30 +10,13 @@ type TheoryStepProps = {
   children?: React.ReactNode;
 };
 
-/**
- * Cabeçalho de um elo da cadeia da Teoria de Mudança.
- *
- * O contador "elo 03 / 06" é o que mantém a leitura orientada quando a barra lateral
- * não cabe na tela: sem ele, cada seção pareceria uma seção solta em vez de um passo
- * de uma sequência causal — que é justamente o que o documento oficial descreve.
- */
-export function TheoryStep({ step, total, eyebrow, title, description, light = false, children }: TheoryStepProps) {
-  const pad = (value: number) => String(value).padStart(2, "0");
-
+/** Cabeçalho de um elo da cadeia da Teoria de Mudança. */
+export function TheoryStep({ eyebrow, title, description, light = false, children }: TheoryStepProps) {
   return (
     <Reveal>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <SectionLabel dot={light ? "yellow" : "purple"} light={light}>
-          {eyebrow}
-        </SectionLabel>
-        <p
-          className={`mb-6 text-eyebrow font-bold uppercase tabular-nums ${
-            light ? "text-white/45" : "text-move-purple/40"
-          }`}
-        >
-          elo {pad(step)} <span aria-hidden="true">/</span> {pad(total)}
-        </p>
-      </div>
+      <SectionLabel dot={light ? "yellow" : "purple"} light={light}>
+        {eyebrow}
+      </SectionLabel>
 
       {/* `max-w-4xl`, e não 3xl: no corpo do display-2 a medida menor empurrava títulos
           de ~45 caracteres para três linhas. Aqui eles fecham em duas. */}

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { PageHero } from "@/components/PageHero";
 import { PortfolioBrowser } from "@/components/PortfolioBrowser";
-import { getClientSlugs, getPortfolioPage, getProjects } from "@/lib/content";
+import { getClientSlugs, getPortfolioPage, getProjects, getSegments } from "@/lib/content";
 import { metadataFromSeo } from "@/lib/seo";
 
 export const revalidate = 86400;
@@ -44,7 +44,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PortfolioByClientPage({ params }: Props) {
-  const [{ slug }, page, projects] = await Promise.all([params, getPortfolioPage(), getProjects()]);
+  const [{ slug }, page, projects, segments] = await Promise.all([
+    params,
+    getPortfolioPage(),
+    getProjects(),
+    getSegments(),
+  ]);
 
   // Um slug sem projeto nenhum renderizaria uma listagem vazia sob um título de
   // cliente — melhor dizer que a página não existe.
@@ -62,7 +67,7 @@ export default async function PortfolioByClientPage({ params }: Props) {
         ]}
       />
 
-      <PortfolioBrowser projects={projects} initialClient={slug} />
+      <PortfolioBrowser projects={projects} segments={segments} initialClient={slug} />
     </main>
   );
 }

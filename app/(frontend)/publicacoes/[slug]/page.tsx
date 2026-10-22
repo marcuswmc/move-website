@@ -117,10 +117,15 @@ export default async function PublicationPage({ params }: Props) {
       </section>
 
       <article className="bg-white px-4 py-16 md:px-14 md:py-24">
-        <div className="editorial-container">
+        {/* Duas colunas no desktop: a capa à esquerda, estreita, e o texto com a ação
+            à direita. A capa rola junto com o texto. Abaixo de lg empilha, capa
+            primeiro. A largura do texto vem da coluna, por isso não há `max-w` aqui. */}
+        <div className="editorial-container grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-start lg:gap-12">
           {publication.cover.src && (
             <Reveal>
-              <div className="relative aspect-[21/9] w-full overflow-hidden rounded-[1.5rem] bg-move-offwhite">
+              {/* 3:4 é a mediana real do acervo — a maioria das capas é retrato. O
+                  quadro panorâmico anterior descartava quase toda a imagem. */}
+              <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[1.5rem] bg-move-offwhite">
                 <Image
                   src={publication.cover.src}
                   alt={publication.cover.alt}
@@ -128,56 +133,58 @@ export default async function PublicationPage({ params }: Props) {
                   blurDataURL={publication.cover.blurDataURL}
                   fill
                   priority
-                  sizes="(min-width: 1340px) 1340px, 100vw"
+                  sizes="(min-width: 1024px) 20rem, 100vw"
                   className="object-cover"
                 />
               </div>
             </Reveal>
           )}
 
-          {publication.synopsis && (
-            <Reveal delay={0.06}>
-              <p className="mt-12 max-w-[68ch] border-l-2 border-move-yellow pl-5 text-body-lg font-medium leading-relaxed text-move-purple">
-                {publication.synopsis}
-              </p>
-            </Reveal>
-          )}
+          <div className={publication.cover.src ? "" : "lg:col-span-2"}>
+            {publication.synopsis && (
+              <Reveal delay={0.06}>
+                <p className="border-l-2 border-move-yellow pl-5 text-body-lg font-medium leading-relaxed text-move-purple">
+                  {publication.synopsis}
+                </p>
+              </Reveal>
+            )}
 
-          {publication.content && (
-            <Reveal delay={0.1}>
-              <RichText data={publication.content} className="mt-12" />
-            </Reveal>
-          )}
+            {publication.content && (
+              <Reveal delay={0.1}>
+                <RichText data={publication.content} className="mt-10" />
+              </Reveal>
+            )}
 
-          {/* A ação fecha a página, depois do texto que apresenta a publicação —
-              a pessoa decide baixar ou sair já sabendo o que vai encontrar. */}
-          {publication.action && (
-            <Reveal delay={0.14}>
-              <div className="flex items-center gap-4 mt-12 max-w-[68ch] border-move-purple/12 p-7">
-                <a
-                  href={publication.action.href}
-                  {...(publication.action.isDownload
-                    ? { download: true }
-                    : { target: "_blank", rel: "noopener noreferrer" })}
-                  className="inline-flex items-center gap-3 rounded-full bg-move-purple px-7 py-4 text-sm font-bold text-white transition hover:bg-move-purple/90"
-                >
-                  {publication.action.label}
-                  <span aria-hidden="true">{publication.action.isDownload ? "↓" : "↗"}</span>
-                </a>
+            {/* A ação fecha a coluna, depois do texto que apresenta a publicação —
+                a pessoa decide baixar ou sair já sabendo o que vai encontrar. */}
+            {publication.action && (
+              <Reveal delay={0.14}>
+                <div className="mt-10 flex flex-col items-start gap-2">
+                  <a
+                    href={publication.action.href}
+                    {...(publication.action.isDownload
+                      ? { download: true }
+                      : { target: "_blank", rel: "noopener noreferrer" })}
+                    className="inline-flex items-center gap-3 rounded-full bg-move-purple px-7 py-4 text-sm font-bold text-white transition hover:bg-move-purple/90"
+                  >
+                    {publication.action.label}
+                    <span aria-hidden="true">{publication.action.isDownload ? "↓" : "↗"}</span>
+                  </a>
 
-                {publication.action.isDownload && (
-                  <p className="mt-3 text-xs font-medium text-move-black/50">
-                    {[
-                      publication.action.fileType ? (FILE_LABEL[publication.action.fileType] ?? "Arquivo") : null,
-                      publication.action.fileSize ? formatFileSize(publication.action.fileSize) : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                )}
-              </div>
-            </Reveal>
-          )}
+                  {publication.action.isDownload && (
+                    <p className="text-xs font-medium text-move-black/50">
+                      {[
+                        publication.action.fileType ? (FILE_LABEL[publication.action.fileType] ?? "Arquivo") : null,
+                        publication.action.fileSize ? formatFileSize(publication.action.fileSize) : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
+                </div>
+              </Reveal>
+            )}
+          </div>
         </div>
       </article>
 

@@ -1,14 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ALL, FilterGroup } from "@/components/FilterGroup";
 import type { FilterOption } from "@/components/FilterGroup";
 import { ProjectCard } from "@/components/ProjectCard";
+import { getLenis } from "@/components/SmoothScroll";
 import { SearchField } from "@/components/SearchField";
 import type { ProjectCard as ProjectCardData } from "@/lib/content";
 import { iconForEcosystem, iconForService } from "@/lib/filterIcons";
-import { ECOSYSTEMS, SEGMENTS } from "@/lib/taxonomy";
+import { ECOSYSTEMS } from "@/lib/taxonomy";
 
 /** Normaliza para busca: minúsculas e sem acento, para "arapyau" achar "Arapyaú". */
 const normalize = (value: string) =>
@@ -56,18 +57,45 @@ const byName = (a: string, b: string) => a.localeCompare(b, "pt-BR");
  * esconderia metade dessa mensagem. Serviços mostram somente as opções utilizadas
  * pelos projetos cadastrados, incluindo os valores dos registros anteriores à migração.
  */
-const optionsFor = (projects: ProjectCardData[], dimension: Dimension): string[] => {
+const optionsFor = (projects: ProjectCardData[], dimension: Dimension, segments: string[]): string[] => {
   if (dimension === "ecosystem") return [...ECOSYSTEMS].sort(byName);
-  if (dimension === "segment") return [...SEGMENTS].sort(byName);
+  // Segmento vem da collection, por prop: é lista editável no CMS, não constante.
+  if (dimension === "segment") return [...segments].sort(byName);
 
   return Array.from(
     new Set(projects.flatMap(PICK[dimension]).filter((value): value is string => Boolean(value))),
   ).sort(byName);
 };
 
-export function PortfolioBrowser({ projects, initialClient = null }: { projects: ProjectCardData[]; initialClient?: string | null }) {
+export function PortfolioBrowser({
+  projects,
+  segments,
+  initialClient = null,
+}: {
+  projects: ProjectCardData[];
+  /** Todos os segmentos cadastrados, inclusive os sem projeto — ver getSegments(). */
+  segments: string[];
+  initialClient?: string | null;
+}) {
   const [query, setQuery] = useState("");
   const [selection, setSelection] = useState<Selection>(NOTHING_SELECTED);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Aplicar um filtro no fim da listagem deixava a pessoa parada no rodapé, olhando
+   * para o espaço vazio que sobrou — os cards novos ficavam todos acima dela.
+   *
+   * Só vale para a escolha de filtro e para "limpar": rolar a cada tecla digitada na
+   * busca tiraria o campo de baixo dos olhos de quem está escrevendo. O `offset`
+   * compensa o cabeçalho fixo, a mesma medida do `top-28` da barra lateral.
+   */
+  const backToResults = () => {
+    const target = resultsRef.current;
+    if (!target) return;
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(target, { offset: -112 });
+    else target.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   /**
    * O logo de um cliente com vários projetos leva para cá com `?cliente=slug`. O filtro
@@ -104,7 +132,7 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
 
   const filtered = useMemo(
     () => projects.filter((project) => matches(project, selection)),
-    [projects, matches, selection],
+    [projects, segments, matches, selection],
   );
 
   /**
@@ -117,7 +145,7 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
         const pool = projects.filter((project) => matches(project, selection, dimension));
         const icon = ICON[dimension];
 
-        const options: FilterOption[] = optionsFor(projects, dimension).map((value) => ({
+        const options: FilterOption[] = optionsFor(projects, dimension, segments).map((value) => ({
           value,
           count: pool.filter((project) => PICK[dimension](project).includes(value)).length,
           icon: icon?.(value),
@@ -135,6 +163,7 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
     setQuery("");
     setClient(null);
     setSelection(NOTHING_SELECTED);
+    backToResults();
   };
 
   const filters = (
@@ -149,7 +178,10 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
       {clientName && (
         <button
           type="button"
-          onClick={() => setClient(null)}
+          onClick={() => {
+            setClient(null);
+            backToResults();
+          }}
           className="flex items-center justify-between gap-2 rounded-full bg-move-purple px-4 py-2 text-left text-xs font-bold text-white transition-[background-color,scale] hover:bg-move-purple/90 active:scale-[0.98]"
         >
           <span className="truncate">Cliente: {clientName}</span>
@@ -165,7 +197,10 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
             label={LABELS[dimension]}
             value={selection[dimension]}
             options={options}
-            onChange={(value) => setSelection((current) => ({ ...current, [dimension]: value }))}
+            onChange={(value) => {
+              setSelection((current) => ({ ...current, [dimension]: value }));
+              backToResults();
+            }}
           />
         ) : null,
       )}
@@ -188,7 +223,20 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
         {/* No desktop o filtro acompanha a rolagem; no celular vira um painel que abre,
             para não empurrar a listagem para baixo da dobra. */}
         <aside className="hidden lg:block">
-          <div className="sticky top-28">{filters}</div>
+          {/* Com todos os grupos abertos os filtros passam da altura da tela, e o
+              `sticky` impedia chegar ao fim deles: Segmentos e "Limpar filtros"
+              ficavam presos abaixo da dobra por mais que se rolasse a página. O painel
+              ganha rolagem própria.
+
+              `data-lenis-prevent` não é opcional: o Lenis global (components/SmoothScroll.tsx)
+              roda com `smoothWheel`, e sem esse atributo a roda do mouse dentro do
+              painel rolaria a página em vez do painel. */}
+          <div
+            data-lenis-prevent
+            className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain pr-1"
+          >
+            {filters}
+          </div>
         </aside>
 
         <details className="group rounded-[1.25rem] border border-move-purple/12 bg-white p-4 lg:hidden">
@@ -201,7 +249,7 @@ export function PortfolioBrowser({ projects, initialClient = null }: { projects:
           <div className="mt-6">{filters}</div>
         </details>
 
-        <div>
+        <div ref={resultsRef} className="scroll-mt-28">
           <p aria-live="polite" className="text-sm font-semibold text-move-purple">
             {filtered.length} {filtered.length === 1 ? "projeto" : "projetos"}
             {hasFilters && <span className="font-medium text-move-black/50"> de {projects.length}</span>}

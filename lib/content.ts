@@ -27,6 +27,32 @@ const PUBLISHED = { _status: { equals: "published" } } as const;
 
 const IMAGE_FALLBACK: ResolvedImage = { src: "", alt: "" };
 
+/**
+ * Força o download em vez da visualização no navegador.
+ *
+ * O arquivo mora no Blob, que é outro domínio. O atributo `download` do HTML só vale
+ * em mesma origem: o Safari o ignora num link cross-origin e navega para o arquivo, e
+ * como o Blob serve `content-disposition: inline` o que a pessoa acaba por gravar é a
+ * página, não o PDF. Com `?download=1` o próprio store responde
+ * `content-disposition: attachment`, que é instrução do servidor e vale em qualquer
+ * navegador.
+ *
+ * Só URLs do Blob recebem o parâmetro. Uma publicação de download pode cair para o
+ * `externalUrl` — há uma apontando para o Google Drive, que não entende `download=1`.
+ */
+const asAttachment = (url: string | null | undefined): string => {
+  if (!url) return "";
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.endsWith(".public.blob.vercel-storage.com")) return url;
+    parsed.searchParams.set("download", "1");
+    return parsed.toString();
+  } catch {
+    // Caminho relativo ou valor digitado à mão no CMS: fica como está.
+    return url;
+  }
+};
+
 const DATE_FORMAT = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "long",
@@ -363,7 +389,8 @@ export const getPublication = cachedRead(async (slug: string) => {
     action: target
       ? {
           label,
-          href: target,
+          // O download passa pelo `asAttachment`; o link externo segue intacto.
+          href: publication.type === "download" ? asAttachment(target) : target,
           isDownload: publication.type === "download" && Boolean(file?.url),
           fileSize: publication.type === "download" ? (file?.filesize ?? null) : null,
           fileType: publication.type === "download" ? (file?.mimeType ?? null) : null,
@@ -409,7 +436,15 @@ export const getPartners = cachedRead(async () => {
   const payload = await getPayloadClient();
 
   const [{ docs }, { docs: projects }] = await Promise.all([
-    payload.find({ collection: "partners", where: PUBLISHED, sort: "order", limit: 0 }),
+    // `showOnHome` governa só este carrossel. Os documentos anteriores ao campo não
+    // têm a chave gravada, e `not_equals: false` os trata como marcados — que é o
+    // estado em que já estavam.
+    payload.find({
+      collection: "partners",
+      where: { ...PUBLISHED, showOnHome: { not_equals: false } },
+      sort: "order",
+      limit: 0,
+    }),
     // Só o campo necessário para saber quais clientes têm projeto — o carrossel não
     // precisa carregar o portfólio inteiro para montar um href.
     payload.find({
@@ -525,6 +560,18 @@ const excerpt = (text: string, max = 200) => {
   return `${cut.slice(0, lastSpace > 0 ? lastSpace : max).replace(/[,;:.\s]+$/, "")}…`;
 };
 
+/**
+ * Segmento virou relação (collections/ProjectSegments.ts). Com `depth >= 1` chega
+ * populado; aceitar string também cobre os documentos que ainda não passaram pela
+ * migração e qualquer leitura feita com profundidade zero.
+ */
+const segmentNames = (segments: Project["segments"]): string[] => {
+  if (!Array.isArray(segments)) return [];
+  return segments
+    .map((segment) => (typeof segment === "object" && segment ? segment.name : typeof segment === "string" ? segment : null))
+    .filter((name): name is string => Boolean(name));
+};
+
 const toProjectCard = (project: Project): ProjectCard => {
   // `partner` só vem populado com depth ≥ 1; com depth 0 chega como id, e aí o card
   // simplesmente não mostra logo — que é o mesmo comportamento de quem não tem cliente.
@@ -539,8 +586,8 @@ const toProjectCard = (project: Project): ProjectCard => {
     ecosystems: taxonomyValues(project.ecosystems, project.ecosystem),
     service: taxonomyValues(project.services, project.service).join("; "),
     services: taxonomyValues(project.services, project.service),
-    segment: taxonomyValues(project.segments, project.segment).join("; ") || null,
-    segments: taxonomyValues(project.segments, project.segment),
+    segment: segmentNames(project.segments).join("; ") || null,
+    segments: segmentNames(project.segments),
     year: project.year,
     // O card precisa de algum texto; sem resumo próprio, o desafio é o melhor
     // substituto. A página do projeto não usa esse fallback — ver `intro` abaixo.
@@ -549,6 +596,31 @@ const toProjectCard = (project: Project): ProjectCard => {
     cardColor: project.cardColor ?? SURFACE_AUTO,
   };
 };
+
+/**
+ * Todos os segmentos cadastrados, inclusive os que ainda não têm projeto.
+ *
+ * O filtro de /portfolio mostra a lista inteira de propósito: os rótulos são parte do
+ * que a página comunica sobre o alcance do trabalho da Move, e uma lista que encolhe a
+ * cada clique faria o filtro parecer instável (ver components/FilterGroup.tsx). Por
+ * isso a lista vem da collection, e não dos projetos existentes.
+ */
+export const getSegments = cachedRead(
+  async () => {
+    const payload = await getPayloadClient();
+    const { docs } = await payload.find({
+      collection: "project-segments",
+      sort: "order",
+      limit: 0,
+      depth: 0,
+      select: { name: true },
+    });
+
+    return docs.map((segment) => segment.name);
+  },
+  "segments",
+  [TAG.projectSegments],
+);
 
 export const getProjects = cachedRead(async () => {
   const payload = await getPayloadClient();
@@ -562,7 +634,7 @@ export const getProjects = cachedRead(async () => {
   return docs.map(toProjectCard);
 },
   "projects",
-  [TAG.projects, TAG.partners, TAG.media],
+  [TAG.projects, TAG.projectSegments, TAG.partners, TAG.media],
 );
 
 export const getProjectSlugs = cachedRead(async () => {
@@ -607,7 +679,7 @@ export const getProject = cachedRead(async (slug: string) => {
   };
 },
   "project",
-  [TAG.projects, TAG.partners, TAG.media],
+  [TAG.projects, TAG.projectSegments, TAG.partners, TAG.media],
 );
 
 /** Outros projetos do mesmo ecossistema, para o rodapé da página do projeto. */
@@ -630,7 +702,7 @@ export const getRelatedProjects = cachedRead(async (slug: string, ecosystems: st
   return docs.map(toProjectCard);
 },
   "related-projects",
-  [TAG.projects, TAG.partners, TAG.media],
+  [TAG.projects, TAG.projectSegments, TAG.partners, TAG.media],
 );
 
 export const getTheoryOfChange = cachedRead(async () => {
@@ -674,7 +746,7 @@ export const getTheoryOfChange = cachedRead(async () => {
     pdf: {
       label: theory.pdf?.label ?? "",
       // O upload vence o caminho manual, mesma regra do resolveImage.
-      href: file?.url ?? theory.pdf?.href ?? "",
+      href: asAttachment(file?.url ?? theory.pdf?.href),
     },
   };
 },

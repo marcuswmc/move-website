@@ -11,6 +11,7 @@ import { unstable_cache } from "next/cache";
  */
 export const TAG = {
   projects: "projects",
+  projectSegments: "project-segments",
   services: "services",
   publications: "publications",
   publicationCategories: "publication-categories",
